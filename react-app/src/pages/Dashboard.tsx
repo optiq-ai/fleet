@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
+import dashboardService, { KPIData, Alert, MapData } from '../services/api/dashboardService';
 
-const DashboardContainer = styled.div`
+const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -17,47 +18,39 @@ const SectionTitle = styled.h2`
   margin: 0 0 16px 0;
 `;
 
-const KPISection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-`;
-
 const GridSection = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 20px;
   
   @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
 `;
 
-const MapPlaceholder = styled.div`
-  background-color: #e9ecef;
+const MapContainer = styled.div`
+  height: 400px;
+  background-color: #f5f5f5;
   border-radius: 8px;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6c757d;
+  overflow: hidden;
   position: relative;
 `;
 
-const MapOverlay = styled.div`
+const MapPlaceholder = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  color: #666;
 `;
 
 const MapPoint = styled.div<{ x: number; y: number; color: string }>`
@@ -69,20 +62,37 @@ const MapPoint = styled.div<{ x: number; y: number; color: string }>`
   background-color: ${props => props.color};
   border-radius: 50%;
   transform: translate(-50%, -50%);
+  cursor: pointer;
   
-  &:hover::after {
-    content: 'Lokalizacja';
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
+  &:hover {
+    width: 16px;
+    height: 16px;
+    z-index: 10;
   }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    background-color: ${props => props.color}33;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+  }
+`;
+
+const MapTooltip = styled.div<{ visible: boolean }>`
+  position: absolute;
+  background-color: white;
+  border-radius: 4px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  display: ${props => props.visible ? 'block' : 'none'};
+  max-width: 200px;
 `;
 
 const LoadingIndicator = styled.div`
@@ -93,325 +103,355 @@ const LoadingIndicator = styled.div`
   color: #666;
 `;
 
-// Typy danych
-interface DashboardData {
-  kpis: {
-    activeVehicles: number;
-    activeDrivers: number;
-    dailyCosts: number;
-    potentialSavings: number;
-    safetyIndex: number;
-    maintenanceForecast: number;
-  };
-  fraudAlerts: {
-    priority: string;
-    vehicle: string;
-    description: string;
-  }[];
-  safetyAlerts: {
-    type: string;
-    driver: string;
-    description: string;
-  }[];
-  maintenanceAlerts: {
-    vehicle: string;
-    component: string;
-    forecast: string;
-  }[];
-  mapData: {
-    fraudPoints: { x: number; y: number }[];
-    safetyPoints: { x: number; y: number }[];
-    vehiclePoints: { x: number; y: number }[];
-  };
-}
+const ErrorMessage = styled.div`
+  color: #d32f2f;
+  padding: 16px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  margin-bottom: 20px;
+`;
+
+const TabsContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+`;
+
+const Tab = styled.div<{ active: boolean }>`
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: ${props => props.active ? '500' : 'normal'};
+  color: ${props => props.active ? '#3f51b5' : '#666'};
+  border-bottom: 2px solid ${props => props.active ? '#3f51b5' : 'transparent'};
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: #3f51b5;
+    background-color: #f5f5f5;
+  }
+`;
 
 const Dashboard: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  // Stan dla danych KPI
+  const [kpiData, setKpiData] = useState<KPIData | null>(null);
+  
+  // Stan dla alertów
+  const [alerts, setAlerts] = useState<{
+    fraudAlerts: Alert[];
+    safetyAlerts: Alert[];
+    maintenanceAlerts: Alert[];
+  } | null>(null);
+  
+  // Stan dla danych mapy
+  const [mapData, setMapData] = useState<MapData | null>(null);
+  
+  // Stan dla aktywnej zakładki alertów
+  const [activeAlertTab, setActiveAlertTab] = useState<string>('fraud');
+  
+  // Stan dla tooltipa mapy
+  const [tooltip, setTooltip] = useState<{
+    visible: boolean;
+    content: string;
+    x: number;
+    y: number;
+  }>({
+    visible: false,
+    content: '',
+    x: 0,
+    y: 0
+  });
+  
+  // Stany ładowania i błędów
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Symulacja pobierania danych z API
+  
+  // Pobieranie danych przy montowaniu komponentu
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
-        // Symulacja opóźnienia sieciowego
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Pobieranie danych KPI
+        const kpiResponse = await dashboardService.getKPIData();
+        setKpiData(kpiResponse);
         
-        // Dane mockowe
-        const mockData: DashboardData = {
-          kpis: {
-            activeVehicles: 125,
-            activeDrivers: 98,
-            dailyCosts: 12500,
-            potentialSavings: 3200,
-            safetyIndex: 85,
-            maintenanceForecast: 12
-          },
-          fraudAlerts: [
-            { priority: 'WYS', vehicle: 'ABC1234', description: 'Nietypowa transakcja paliwowa' },
-            { priority: 'ŚRE', vehicle: 'DEF5678', description: 'Podejrzana lokalizacja tankowania' },
-            { priority: 'NIS', vehicle: 'GHI9012', description: 'Niezgodność przebiegu' }
-          ],
-          safetyAlerts: [
-            { type: 'Zmęcz.', driver: 'Jan K.', description: 'Wykryto oznaki zmęczenia' },
-            { type: 'Rozpr.', driver: 'Anna W.', description: 'Korzystanie z telefonu' },
-            { type: 'Styl', driver: 'Piotr M.', description: 'Gwałtowne hamowanie' }
-          ],
-          maintenanceAlerts: [
-            { vehicle: 'ABC123', component: 'Hamulce', forecast: '85% za 2 tyg.' },
-            { vehicle: 'DEF456', component: 'Akumulator', forecast: '72% za 5 dni' },
-            { vehicle: 'GHI789', component: 'Olej', forecast: '91% za 3 dni' }
-          ],
-          mapData: {
-            fraudPoints: [
-              { x: 25, y: 35 },
-              { x: 65, y: 45 },
-              { x: 40, y: 70 }
-            ],
-            safetyPoints: [
-              { x: 30, y: 40 },
-              { x: 70, y: 30 },
-              { x: 50, y: 60 }
-            ],
-            vehiclePoints: [
-              { x: 20, y: 30 },
-              { x: 40, y: 50 },
-              { x: 60, y: 40 },
-              { x: 80, y: 60 },
-              { x: 35, y: 75 }
-            ]
-          }
-        };
+        // Pobieranie alertów
+        const alertsResponse = await dashboardService.getAlerts();
+        setAlerts(alertsResponse);
         
-        setDashboardData(mockData);
-        setError(null);
+        // Pobieranie danych mapy
+        const mapResponse = await dashboardService.getMapData('vehicles');
+        setMapData(mapResponse);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
-        setError('Nie udało się pobrać danych dashboardu. Spróbuj ponownie później.');
+        setError('Nie udało się pobrać danych dashboardu. Spróbuj odświeżyć stronę.');
       } finally {
         setIsLoading(false);
       }
     };
-
+    
     fetchDashboardData();
   }, []);
-
-  // Konwersja danych do formatu wymaganego przez komponent Table
-  const getFraudAlertTableData = () => {
-    if (!dashboardData) return { headers: [], data: [] };
-    
-    return {
-      headers: ['Prio', 'Pojazd', 'Opis'],
-      data: dashboardData.fraudAlerts.map(alert => [
-        alert.priority,
-        alert.vehicle,
-        alert.description
-      ])
-    };
+  
+  // Obsługa zmiany typu danych mapy
+  const handleMapTypeChange = async (type: string) => {
+    try {
+      setIsLoading(true);
+      const mapResponse = await dashboardService.getMapData(type);
+      setMapData(mapResponse);
+    } catch (err) {
+      console.error('Error fetching map data:', err);
+      setError('Nie udało się pobrać danych mapy.');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const getSafetyAlertTableData = () => {
-    if (!dashboardData) return { headers: [], data: [] };
-    
-    return {
-      headers: ['Typ', 'Kierowca', 'Opis'],
-      data: dashboardData.safetyAlerts.map(alert => [
-        alert.type,
-        alert.driver,
-        alert.description
-      ])
-    };
+  // Obsługa pokazywania tooltipa na mapie
+  const handleMapPointHover = (point: any, event: React.MouseEvent) => {
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    setTooltip({
+      visible: true,
+      content: `${point.label} (${point.type})`,
+      x: rect.left,
+      y: rect.top - 30
+    });
   };
   
-  const getMaintenanceTableData = () => {
-    if (!dashboardData) return { headers: [], data: [] };
+  // Obsługa ukrywania tooltipa na mapie
+  const handleMapPointLeave = () => {
+    setTooltip({
+      ...tooltip,
+      visible: false
+    });
+  };
+  
+  // Renderowanie sekcji KPI
+  const renderKPISection = () => {
+    if (!kpiData) return null;
     
-    return {
-      headers: ['Pojazd', 'Element', 'Prognoza'],
-      data: dashboardData.maintenanceAlerts.map(alert => [
-        alert.vehicle,
-        alert.component,
-        alert.forecast
-      ])
+    return (
+      <>
+        <SectionTitle>KLUCZOWE WSKAŹNIKI</SectionTitle>
+        <GridSection>
+          <KPICard 
+            title="Aktywne pojazdy" 
+            value={kpiData.activeVehicles.toString()} 
+            icon="🚚"
+            trend="up"
+            trendValue="5%"
+          />
+          <KPICard 
+            title="Aktywni kierowcy" 
+            value={kpiData.activeDrivers.toString()} 
+            icon="👤"
+            trend="up"
+            trendValue="3%"
+          />
+          <KPICard 
+            title="Dzienne koszty" 
+            value={`${kpiData.dailyCosts.toLocaleString()} zł`} 
+            icon="💰"
+            trend="down"
+            trendValue="2%"
+            trendPositive
+          />
+          <KPICard 
+            title="Potencjalne oszczędności" 
+            value={`${kpiData.potentialSavings.toLocaleString()} zł`} 
+            icon="💹"
+            trend="up"
+            trendValue="8%"
+            trendPositive
+          />
+          <KPICard 
+            title="Indeks bezpieczeństwa" 
+            value={`${kpiData.safetyIndex}/100`} 
+            icon="🛡️"
+            trend="up"
+            trendValue="4%"
+            trendPositive
+          />
+          <KPICard 
+            title="Prognoza konserwacji" 
+            value={kpiData.maintenanceForecast.toString()} 
+            icon="🔧"
+            trend="down"
+            trendValue="10%"
+            trendPositive
+          />
+        </GridSection>
+      </>
+    );
+  };
+  
+  // Renderowanie sekcji alertów
+  const renderAlertsSection = () => {
+    if (!alerts) return null;
+    
+    const getAlertsByType = () => {
+      switch (activeAlertTab) {
+        case 'fraud':
+          return alerts.fraudAlerts;
+        case 'safety':
+          return alerts.safetyAlerts;
+        case 'maintenance':
+          return alerts.maintenanceAlerts;
+        default:
+          return alerts.fraudAlerts;
+      }
     };
+    
+    const currentAlerts = getAlertsByType();
+    
+    return (
+      <>
+        <SectionTitle>ALERTY</SectionTitle>
+        <Card fullWidth>
+          <TabsContainer>
+            <Tab 
+              active={activeAlertTab === 'fraud'} 
+              onClick={() => setActiveAlertTab('fraud')}
+            >
+              Oszustwa ({alerts.fraudAlerts.length})
+            </Tab>
+            <Tab 
+              active={activeAlertTab === 'safety'} 
+              onClick={() => setActiveAlertTab('safety')}
+            >
+              Bezpieczeństwo ({alerts.safetyAlerts.length})
+            </Tab>
+            <Tab 
+              active={activeAlertTab === 'maintenance'} 
+              onClick={() => setActiveAlertTab('maintenance')}
+            >
+              Konserwacja ({alerts.maintenanceAlerts.length})
+            </Tab>
+          </TabsContainer>
+          
+          <Table 
+            data={currentAlerts}
+            columns={[
+              { key: 'priority', header: 'Priorytet' },
+              { key: 'description', header: 'Opis' },
+              { key: 'vehicle', header: 'Pojazd' },
+              { key: 'date', header: 'Data' },
+              { key: 'status', header: 'Status' }
+            ]}
+            onRowClick={(row) => console.log('Clicked row:', row)}
+          />
+        </Card>
+      </>
+    );
   };
-
-  // Obsługa kliknięcia wiersza tabeli
-  const handleRowClick = (table: string, index: number) => {
-    console.log(`Kliknięto wiersz ${index} w tabeli ${table}`);
-    // Tutaj można dodać nawigację do szczegółów
+  
+  // Renderowanie sekcji mapy
+  const renderMapSection = () => {
+    if (!mapData) return null;
+    
+    // Funkcja do generowania pseudolosowych współrzędnych na podstawie id punktu
+    const getCoordinates = (id: string) => {
+      const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return {
+        x: (hash % 80) + 10, // 10-90%
+        y: ((hash * 13) % 80) + 10 // 10-90%
+      };
+    };
+    
+    // Funkcja do określania koloru punktu na podstawie typu
+    const getPointColor = (type: string) => {
+      switch (type) {
+        case 'vehicle':
+          return '#4caf50';
+        case 'fraud':
+          return '#f44336';
+        case 'safety':
+          return '#ff9800';
+        default:
+          return '#2196f3';
+      }
+    };
+    
+    return (
+      <>
+        <SectionTitle>MAPA FLOTY</SectionTitle>
+        <Card fullWidth>
+          <TabsContainer>
+            <Tab 
+              active={true} 
+              onClick={() => handleMapTypeChange('vehicles')}
+            >
+              Pojazdy
+            </Tab>
+            <Tab 
+              active={false} 
+              onClick={() => handleMapTypeChange('fraud')}
+            >
+              Oszustwa
+            </Tab>
+            <Tab 
+              active={false} 
+              onClick={() => handleMapTypeChange('safety')}
+            >
+              Bezpieczeństwo
+            </Tab>
+          </TabsContainer>
+          
+          <MapContainer>
+            {mapData.points.length === 0 ? (
+              <MapPlaceholder>Brak danych do wyświetlenia na mapie</MapPlaceholder>
+            ) : (
+              <>
+                {mapData.points.map(point => {
+                  const coords = getCoordinates(point.id);
+                  return (
+                    <MapPoint 
+                      key={point.id}
+                      x={coords.x}
+                      y={coords.y}
+                      color={getPointColor(point.type)}
+                      onMouseEnter={(e) => handleMapPointHover(point, e)}
+                      onMouseLeave={handleMapPointLeave}
+                    />
+                  );
+                })}
+                <MapTooltip 
+                  visible={tooltip.visible}
+                  style={{ top: tooltip.y, left: tooltip.x }}
+                >
+                  {tooltip.content}
+                </MapTooltip>
+              </>
+            )}
+          </MapContainer>
+        </Card>
+      </>
+    );
   };
-
+  
   if (isLoading) {
     return (
-      <DashboardContainer>
+      <PageContainer>
         <LoadingIndicator>Ładowanie danych dashboardu...</LoadingIndicator>
-      </DashboardContainer>
+      </PageContainer>
     );
   }
-
+  
   if (error) {
     return (
-      <DashboardContainer>
-        <Card fullWidth>
-          <div style={{ color: 'red', padding: '20px', textAlign: 'center' }}>
-            {error}
-          </div>
-        </Card>
-      </DashboardContainer>
+      <PageContainer>
+        <ErrorMessage>{error}</ErrorMessage>
+      </PageContainer>
     );
   }
-
-  if (!dashboardData) {
-    return (
-      <DashboardContainer>
-        <Card fullWidth>
-          <div style={{ padding: '20px', textAlign: 'center' }}>
-            Brak danych do wyświetlenia
-          </div>
-        </Card>
-      </DashboardContainer>
-    );
-  }
-
-  const { headers: fraudHeaders, data: fraudData } = getFraudAlertTableData();
-  const { headers: safetyHeaders, data: safetyData } = getSafetyAlertTableData();
-  const { headers: maintenanceHeaders, data: maintenanceData } = getMaintenanceTableData();
-
+  
   return (
-    <DashboardContainer>
-      <KPISection>
-        <KPICard 
-          title="Aktywne pojazdy" 
-          value={dashboardData.kpis.activeVehicles} 
-        />
-        <KPICard 
-          title="Aktywni kierowcy" 
-          value={dashboardData.kpis.activeDrivers} 
-        />
-        <KPICard 
-          title="Koszty dzisiaj" 
-          value={`${dashboardData.kpis.dailyCosts} PLN`} 
-        />
-        <KPICard 
-          title="Potencjalne oszczędności" 
-          value={`${dashboardData.kpis.potentialSavings} PLN`} 
-        />
-        <KPICard 
-          title="Wskaźnik bezpieczeństwa" 
-          value={`${dashboardData.kpis.safetyIndex}%`} 
-          trend="up" 
-          trendValue="5% w tym miesiącu" 
-        />
-        <KPICard 
-          title="Prognoza konserwacji" 
-          value={`${dashboardData.kpis.maintenanceForecast} pojazdów`} 
-          trend="down" 
-          trendValue="3 mniej niż w zeszłym tygodniu" 
-        />
-      </KPISection>
-
-      <SectionTitle>WYKRYWANIE OSZUSTW</SectionTitle>
-      <Card fullWidth>
-        <Table 
-          headers={fraudHeaders} 
-          data={fraudData} 
-          onRowClick={(index) => handleRowClick('fraud', index)}
-        />
-      </Card>
-      
-      <GridSection>
-        <Card>
-          <MapPlaceholder>
-            Mapa fraudów
-            <MapOverlay>
-              {dashboardData.mapData.fraudPoints.map((point, index) => (
-                <MapPoint 
-                  key={`fraud-${index}`}
-                  x={point.x} 
-                  y={point.y} 
-                  color="#dc3545"
-                />
-              ))}
-            </MapOverlay>
-          </MapPlaceholder>
-        </Card>
-        <Card>
-          <MapPlaceholder>
-            Weryfikacja karty
-            <MapOverlay>
-              {dashboardData.mapData.fraudPoints.map((point, index) => (
-                <MapPoint 
-                  key={`verify-${index}`}
-                  x={point.x} 
-                  y={point.y} 
-                  color="#fd7e14"
-                />
-              ))}
-            </MapOverlay>
-          </MapPlaceholder>
-        </Card>
-      </GridSection>
-
-      <SectionTitle>BEZPIECZEŃSTWO KIEROWCY</SectionTitle>
-      <Card fullWidth>
-        <Table 
-          headers={safetyHeaders} 
-          data={safetyData} 
-          onRowClick={(index) => handleRowClick('safety', index)}
-        />
-      </Card>
-      
-      <GridSection>
-        <Card>
-          <MapPlaceholder>
-            Mapa incydentów
-            <MapOverlay>
-              {dashboardData.mapData.safetyPoints.map((point, index) => (
-                <MapPoint 
-                  key={`safety-${index}`}
-                  x={point.x} 
-                  y={point.y} 
-                  color="#ffc107"
-                />
-              ))}
-            </MapOverlay>
-          </MapPlaceholder>
-        </Card>
-        <Card>
-          <MapPlaceholder>
-            Ranking bezpieczeństwa
-          </MapPlaceholder>
-        </Card>
-      </GridSection>
-
-      <SectionTitle>KONSERWACJA PREDYKCYJNA</SectionTitle>
-      <Card fullWidth>
-        <Table 
-          headers={maintenanceHeaders} 
-          data={maintenanceData} 
-          onRowClick={(index) => handleRowClick('maintenance', index)}
-        />
-      </Card>
-      
-      <SectionTitle>MONITORING POJAZDÓW</SectionTitle>
-      <Card fullWidth>
-        <MapPlaceholder>
-          Mapa pojazdów
-          <MapOverlay>
-            {dashboardData.mapData.vehiclePoints.map((point, index) => (
-              <MapPoint 
-                key={`vehicle-${index}`}
-                x={point.x} 
-                y={point.y} 
-                color="#0d6efd"
-              />
-            ))}
-          </MapOverlay>
-        </MapPlaceholder>
-      </Card>
-    </DashboardContainer>
+    <PageContainer>
+      {renderKPISection()}
+      {renderAlertsSection()}
+      {renderMapSection()}
+    </PageContainer>
   );
 };
 
