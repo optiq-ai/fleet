@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
-import Table from '../components/common/Table';
 import KPICard from '../components/common/KPICard';
+import Table from '../components/common/Table';
+import predictiveMaintenanceService, { 
+  MaintenanceAlert, 
+  MaintenanceAlertsResponse, 
+  VehicleHealth,
+  VehicleHealthResponse,
+  MaintenanceHistoryResponse,
+  MaintenanceScheduleResponse,
+  MaintenanceCostAnalysis
+} from '../services/api/predictiveMaintenanceService';
 
 const PageContainer = styled.div`
   display: flex;
@@ -17,13 +26,6 @@ const SectionTitle = styled.h2`
   margin: 0 0 16px 0;
 `;
 
-const KPISection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-`;
-
 const GridSection = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -35,63 +37,6 @@ const GridSection = styled.div`
   }
 `;
 
-const ChartPlaceholder = styled.div`
-  background-color: #e9ecef;
-  border-radius: 8px;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6c757d;
-  position: relative;
-`;
-
-const FilterBar = styled.div`
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-`;
-
-const FilterSelect = styled.select`
-  padding: 8px 16px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
-  }
-`;
-
-const FilterOption = styled.option`
-  padding: 8px;
-`;
-
-const SearchInput = styled.input`
-  padding: 8px 16px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  flex-grow: 1;
-  max-width: 300px;
-  
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
-  }
-  
-  &::placeholder {
-    color: #999;
-  }
-`;
-
 const LoadingIndicator = styled.div`
   display: flex;
   justify-content: center;
@@ -100,189 +45,232 @@ const LoadingIndicator = styled.div`
   color: #666;
 `;
 
-const ProgressBar = styled.div`
-  width: 100%;
-  height: 20px;
-  background-color: #e9ecef;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 10px;
-`;
-
-const ProgressFill = styled.div<{ width: number; color: string }>`
-  height: 100%;
-  width: ${props => props.width}%;
-  background-color: ${props => props.color};
-  border-radius: 10px;
-  transition: width 1s ease-in-out;
-`;
-
-const ProgressLabel = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #666;
-`;
-
-const Timeline = styled.div`
-  position: relative;
-  margin: 20px 0;
-  padding-left: 30px;
-`;
-
-const TimelineItem = styled.div`
-  position: relative;
-  padding-bottom: 30px;
-  
-  &:last-child {
-    padding-bottom: 0;
-  }
-  
-  &::before {
-    content: '';
-    position: absolute;
-    left: -30px;
-    top: 0;
-    width: 2px;
-    height: 100%;
-    background-color: #e0e0e0;
-  }
-  
-  &:last-child::before {
-    height: 0;
-  }
-`;
-
-const TimelineDot = styled.div<{ color: string }>`
-  position: absolute;
-  left: -39px;
-  top: 0;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: ${props => props.color};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 12px;
-  z-index: 1;
-`;
-
-const TimelineContent = styled.div`
-  background-color: #f8f9fa;
-  border-radius: 8px;
+const ErrorMessage = styled.div`
+  color: #d32f2f;
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #ffebee;
+  border-radius: 4px;
+  margin-bottom: 20px;
 `;
 
-const TimelineTitle = styled.div`
-  font-weight: 500;
-  margin-bottom: 8px;
+const FilterContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
 `;
 
-const TimelineDate = styled.div`
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 8px;
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
-const TimelineDescription = styled.div`
+const FilterLabel = styled.label`
   font-size: 14px;
+  font-weight: 500;
   color: #333;
 `;
 
-const ComponentCard = styled.div<{ health: number }>`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  margin-bottom: 16px;
-  border-left: 4px solid ${props => 
-    props.health > 80 ? '#28a745' : 
-    props.health > 60 ? '#ffc107' : 
-    props.health > 40 ? '#fd7e14' : 
-    '#dc3545'
-  };
+const FilterSelect = styled.select`
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 150px;
+  
+  &:focus {
+    outline: none;
+    border-color: #3f51b5;
+  }
 `;
 
-const ComponentHeader = styled.div`
+const FilterInput = styled.input`
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  
+  &:focus {
+    outline: none;
+    border-color: #3f51b5;
+  }
+`;
+
+const Button = styled.button<{ primary?: boolean }>`
+  padding: 8px 16px;
+  background-color: ${props => props.primary ? '#3f51b5' : 'white'};
+  color: ${props => props.primary ? 'white' : '#3f51b5'};
+  border: 1px solid #3f51b5;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: ${props => props.primary ? '#303f9f' : '#f0f0f0'};
+  }
+  
+  &:disabled {
+    background-color: #e0e0e0;
+    color: #9e9e9e;
+    border-color: #e0e0e0;
+    cursor: not-allowed;
+  }
+`;
+
+const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-top: 20px;
 `;
 
-const ComponentName = styled.div`
-  font-weight: 500;
-  font-size: 16px;
-`;
-
-const ComponentHealth = styled.div<{ health: number }>`
-  font-weight: 500;
-  color: ${props => 
-    props.health > 80 ? '#28a745' : 
-    props.health > 60 ? '#ffc107' : 
-    props.health > 40 ? '#fd7e14' : 
-    '#dc3545'
-  };
-`;
-
-const ComponentDetails = styled.div`
-  display: flex;
-  justify-content: space-between;
+const PaginationInfo = styled.div`
   font-size: 14px;
   color: #666;
-  margin-bottom: 12px;
 `;
 
-const GaugeChart = styled.div`
-  position: relative;
-  width: 100%;
-  height: 120px;
+const PaginationButtons = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  gap: 8px;
 `;
 
-const GaugeBackground = styled.div`
+const Badge = styled.span<{ color: string }>`
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: ${props => props.color};
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+const TabsContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+`;
+
+const Tab = styled.div<{ active: boolean }>`
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: ${props => props.active ? '500' : 'normal'};
+  color: ${props => props.active ? '#3f51b5' : '#666'};
+  border-bottom: 2px solid ${props => props.active ? '#3f51b5' : 'transparent'};
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: #3f51b5;
+    background-color: #f5f5f5;
+  }
+`;
+
+const DetailContainer = styled.div`
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin-top: 20px;
+`;
+
+const DetailTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 12px 0;
+`;
+
+const DetailRow = styled.div`
+  display: flex;
+  margin-bottom: 8px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const DetailLabel = styled.div`
+  font-weight: 500;
+  width: 200px;
+  color: #666;
+`;
+
+const DetailValue = styled.div`
+  flex: 1;
+`;
+
+const GaugeContainer = styled.div`
   position: relative;
   width: 200px;
   height: 100px;
-  border-top-left-radius: 100px;
-  border-top-right-radius: 100px;
-  background: linear-gradient(
-    to right,
-    #dc3545 0%,
-    #fd7e14 25%,
-    #ffc107 50%,
-    #28a745 75%,
-    #28a745 100%
-  );
+  margin: 0 auto;
   overflow: hidden;
 `;
 
-const GaugeOverlay = styled.div`
+const GaugeBackground = styled.div`
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 0;
-  border-top-left-radius: 90px;
-  border-top-right-radius: 90px;
-  background-color: white;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  border-radius: 100px 100px 0 0;
+  background: linear-gradient(to right, #f44336 0%, #ffeb3b 50%, #4caf50 100%);
+  overflow: hidden;
 `;
 
-const GaugeNeedle = styled.div<{ rotation: number }>`
+const GaugeMask = styled.div<{ value: number }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  transform-origin: center bottom;
+  transform: rotate(${props => 180 - props.value * 1.8}deg);
+`;
+
+const GaugeCenter = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 160px;
+  height: 80px;
+  background-color: white;
+  border-radius: 80px 80px 0 0;
+  transform: translateX(-50%);
+`;
+
+const GaugeValue = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+`;
+
+const GaugeLabel = styled.div`
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #666;
+`;
+
+const GaugeNeedle = styled.div<{ value: number }>`
   position: absolute;
   bottom: 0;
   left: 50%;
   width: 4px;
   height: 90px;
   background-color: #333;
-  transform: translateX(-50%) rotate(${props => props.rotation}deg);
   transform-origin: bottom center;
-  transition: transform 1s ease-in-out;
+  transform: translateX(-50%) rotate(${props => -90 + props.value * 1.8}deg);
   
   &::after {
     content: '';
@@ -297,419 +285,845 @@ const GaugeNeedle = styled.div<{ rotation: number }>`
   }
 `;
 
-const GaugeValue = styled.div`
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  font-weight: 500;
-  color: #333;
+const ChartContainer = styled.div`
+  height: 300px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
 `;
 
-// Typy danych
-interface MaintenanceData {
-  kpis: {
-    vehiclesForMaintenance: number;
-    scheduledServices: number;
-    warrantyAlerts: number;
-    partsInventory: number;
-  };
-  maintenanceForecasts: {
-    vehicle: string;
-    component: string;
-    forecast: string;
-    confidence: string;
-  }[];
-  maintenanceSchedule: {
-    date: string;
-    vehicle: string;
-    serviceType: string;
-    status: string;
-  }[];
-  vehicleComponents: {
-    id: string;
-    vehicle: string;
-    name: string;
-    health: number;
-    lastService: string;
-    nextService: string;
-  }[];
-  partsInventory: {
-    part: string;
-    stock: number;
-    reorderPoint: number;
-    onOrder: number;
-  }[];
-  maintenanceHistory: {
-    id: string;
-    vehicle: string;
-    date: string;
-    type: string;
-    description: string;
-    cost: string;
-  }[];
-}
+const BarChart = styled.div`
+  display: flex;
+  height: 250px;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 0 16px;
+`;
+
+const BarChartBar = styled.div<{ height: number; color: string }>`
+  flex: 1;
+  height: ${props => props.height}%;
+  background-color: ${props => props.color};
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  min-width: 30px;
+  
+  &::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #666;
+  }
+  
+  &::before {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+  }
+`;
+
+const TimelineContainer = styled.div`
+  margin-top: 20px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+`;
+
+const TimelineItem = styled.div`
+  display: flex;
+  margin-bottom: 16px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 8px;
+    width: 2px;
+    height: calc(100% + 16px);
+    background-color: #e0e0e0;
+    z-index: 1;
+  }
+  
+  &:last-child::before {
+    display: none;
+  }
+`;
+
+const TimelineDot = styled.div<{ color: string }>`
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: ${props => props.color};
+  margin-right: 16px;
+  margin-top: 4px;
+  z-index: 2;
+`;
+
+const TimelineContent = styled.div`
+  flex: 1;
+`;
+
+const TimelineDate = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+`;
+
+const TimelineDescription = styled.div`
+  font-size: 14px;
+  color: #666;
+`;
 
 const PredictiveMaintenance: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [maintenanceData, setMaintenanceData] = useState<MaintenanceData | null>(null);
+  // Stan dla alertów konserwacji
+  const [alerts, setAlerts] = useState<MaintenanceAlertsResponse | null>(null);
+  
+  // Stan dla wybranego alertu
+  const [selectedAlert, setSelectedAlert] = useState<MaintenanceAlert | null>(null);
+  
+  // Stan dla stanu technicznego pojazdów
+  const [vehicleHealth, setVehicleHealth] = useState<VehicleHealthResponse | null>(null);
+  
+  // Stan dla historii konserwacji
+  const [maintenanceHistory, setMaintenanceHistory] = useState<MaintenanceHistoryResponse | null>(null);
+  
+  // Stan dla harmonogramu konserwacji
+  const [maintenanceSchedule, setMaintenanceSchedule] = useState<MaintenanceScheduleResponse | null>(null);
+  
+  // Stan dla analizy kosztów
+  const [costAnalysis, setCostAnalysis] = useState<MaintenanceCostAnalysis | null>(null);
+  
+  // Stan dla filtrów
+  const [filters, setFilters] = useState({
+    priority: 'all',
+    vehicle: '',
+    component: '',
+    status: 'all',
+    page: 1,
+    limit: 10
+  });
+  
+  // Stan dla aktywnej zakładki
+  const [activeTab, setActiveTab] = useState<string>('alerts');
+  
+  // Stany ładowania i błędów
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [vehicleFilter, setVehicleFilter] = useState('all');
-  const [componentFilter, setComponentFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
-
-  // Symulacja pobierania danych z API
+  
+  // Pobieranie danych przy montowaniu komponentu
   useEffect(() => {
     const fetchMaintenanceData = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
-        // Symulacja opóźnienia sieciowego
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Pobieranie alertów konserwacji
+        const alertsResponse = await predictiveMaintenanceService.getAlerts(
+          filters.priority !== 'all' ? filters.priority : undefined,
+          filters.vehicle || undefined,
+          filters.component || undefined,
+          filters.status !== 'all' ? filters.status : undefined,
+          filters.page,
+          filters.limit
+        );
+        setAlerts(alertsResponse);
         
-        // Dane mockowe
-        const mockData: MaintenanceData = {
-          kpis: {
-            vehiclesForMaintenance: 12,
-            scheduledServices: 8,
-            warrantyAlerts: 5,
-            partsInventory: 87
-          },
-          maintenanceForecasts: [
-            { vehicle: 'ABC123', component: 'Hamulce', forecast: 'Awaria za 2 tyg.', confidence: '85%' },
-            { vehicle: 'DEF456', component: 'Akumulator', forecast: 'Awaria za 5 dni', confidence: '72%' },
-            { vehicle: 'GHI789', component: 'Olej', forecast: 'Wymiana za 3 dni', confidence: '91%' },
-            { vehicle: 'JKL012', component: 'Zawieszenie', forecast: 'Awaria za 3 tyg.', confidence: '68%' },
-            { vehicle: 'MNO345', component: 'Alternator', forecast: 'Awaria za 10 dni', confidence: '77%' }
-          ],
-          maintenanceSchedule: [
-            { date: '13.04', vehicle: 'ABC123', serviceType: 'Wymiana hamulców', status: 'Zaplanowane' },
-            { date: '15.04', vehicle: 'DEF456', serviceType: 'Wymiana akumulatora', status: 'Zaplanowane' },
-            { date: '15.04', vehicle: 'GHI789', serviceType: 'Wymiana oleju', status: 'Zaplanowane' },
-            { date: '20.04', vehicle: 'PQR678', serviceType: 'Przegląd okresowy', status: 'Zaplanowane' },
-            { date: '25.04', vehicle: 'STU901', serviceType: 'Wymiana opon', status: 'Zaplanowane' }
-          ],
-          vehicleComponents: [
-            { id: 'comp1', vehicle: 'ABC123', name: 'Hamulce', health: 35, lastService: '10.01.2025', nextService: '15.04.2025' },
-            { id: 'comp2', vehicle: 'ABC123', name: 'Akumulator', health: 65, lastService: '05.02.2025', nextService: '05.08.2025' },
-            { id: 'comp3', vehicle: 'ABC123', name: 'Olej silnikowy', health: 25, lastService: '15.01.2025', nextService: '15.04.2025' },
-            { id: 'comp4', vehicle: 'DEF456', name: 'Hamulce', health: 75, lastService: '20.02.2025', nextService: '20.08.2025' },
-            { id: 'comp5', vehicle: 'DEF456', name: 'Akumulator', health: 28, lastService: '10.12.2024', nextService: '15.04.2025' },
-            { id: 'comp6', vehicle: 'GHI789', name: 'Olej silnikowy', health: 15, lastService: '05.01.2025', nextService: '15.04.2025' }
-          ],
-          partsInventory: [
-            { part: 'Klocki hamulcowe', stock: 24, reorderPoint: 10, onOrder: 0 },
-            { part: 'Tarcze hamulcowe', stock: 12, reorderPoint: 5, onOrder: 10 },
-            { part: 'Akumulatory', stock: 8, reorderPoint: 5, onOrder: 0 },
-            { part: 'Olej silnikowy (l)', stock: 150, reorderPoint: 50, onOrder: 0 },
-            { part: 'Filtry oleju', stock: 35, reorderPoint: 15, onOrder: 0 },
-            { part: 'Filtry powietrza', stock: 18, reorderPoint: 10, onOrder: 20 }
-          ],
-          maintenanceHistory: [
-            { id: 'hist1', vehicle: 'ABC123', date: '10.01.2025', type: 'Naprawa', description: 'Wymiana klocków hamulcowych', cost: '850 PLN' },
-            { id: 'hist2', vehicle: 'DEF456', date: '20.02.2025', type: 'Przegląd', description: 'Przegląd okresowy', cost: '450 PLN' },
-            { id: 'hist3', vehicle: 'GHI789', date: '05.01.2025', type: 'Naprawa', description: 'Wymiana oleju i filtrów', cost: '350 PLN' },
-            { id: 'hist4', vehicle: 'ABC123', date: '05.11.2024', type: 'Naprawa', description: 'Wymiana akumulatora', cost: '750 PLN' },
-            { id: 'hist5', vehicle: 'DEF456', date: '10.12.2024', type: 'Naprawa', description: 'Wymiana alternatora', cost: '1200 PLN' }
-          ]
-        };
+        // Pobieranie stanu technicznego pojazdów
+        const healthResponse = await predictiveMaintenanceService.getVehicleHealth();
+        setVehicleHealth(healthResponse);
         
-        setMaintenanceData(mockData);
-        setError(null);
+        // Pobieranie historii konserwacji
+        const historyResponse = await predictiveMaintenanceService.getMaintenanceHistory(
+          undefined, undefined, undefined, undefined, 1, 5
+        );
+        setMaintenanceHistory(historyResponse);
+        
+        // Pobieranie harmonogramu konserwacji
+        const scheduleResponse = await predictiveMaintenanceService.getMaintenanceSchedule(
+          undefined, undefined, undefined, undefined, 1, 5
+        );
+        setMaintenanceSchedule(scheduleResponse);
+        
+        // Pobieranie analizy kosztów
+        const costResponse = await predictiveMaintenanceService.getCostAnalysis();
+        setCostAnalysis(costResponse);
       } catch (err) {
         console.error('Error fetching maintenance data:', err);
-        setError('Nie udało się pobrać danych o konserwacji. Spróbuj ponownie później.');
+        setError('Nie udało się pobrać danych konserwacji predykcyjnej. Spróbuj odświeżyć stronę.');
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchMaintenanceData();
-  }, []);
-
-  // Filtrowanie prognoz
-  const getFilteredForecasts = () => {
-    if (!maintenanceData) return [];
     
-    return maintenanceData.maintenanceForecasts.filter(forecast => {
-      // Filtrowanie po pojeździe
-      if (vehicleFilter !== 'all' && forecast.vehicle !== vehicleFilter) return false;
-      
-      // Filtrowanie po komponencie
-      if (componentFilter !== 'all' && forecast.component !== componentFilter) return false;
-      
-      // Filtrowanie po wyszukiwaniu
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          forecast.vehicle.toLowerCase().includes(query) ||
-          forecast.component.toLowerCase().includes(query) ||
-          forecast.forecast.toLowerCase().includes(query)
-        );
-      }
-      
-      return true;
+    fetchMaintenanceData();
+  }, [filters.priority, filters.status, filters.page, filters.limit]);
+  
+  // Obsługa zmiany filtrów
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFilters({
+      ...filters,
+      [name]: value,
+      // Resetowanie strony przy zmianie filtrów
+      ...(name !== 'page' && { page: 1 })
     });
   };
-
-  // Filtrowanie komponentów pojazdu
-  const getFilteredComponents = () => {
-    if (!maintenanceData) return [];
-    
-    let components = maintenanceData.vehicleComponents;
-    
-    // Filtrowanie po wybranym pojeździe
-    if (selectedVehicle) {
-      components = components.filter(component => component.vehicle === selectedVehicle);
-    }
-    
-    return components;
-  };
-
-  // Konwersja danych do formatu wymaganego przez komponent Table
-  const getForecastTableData = () => {
-    const filteredForecasts = getFilteredForecasts();
-    
-    return {
-      headers: ['Pojazd', 'Element', 'Prognoza', 'Pewność'],
-      data: filteredForecasts.map(forecast => [
-        forecast.vehicle,
-        forecast.component,
-        forecast.forecast,
-        forecast.confidence
-      ])
-    };
+  
+  // Obsługa wyszukiwania
+  const handleSearch = () => {
+    setFilters({
+      ...filters,
+      page: 1
+    });
   };
   
-  const getScheduleTableData = () => {
-    if (!maintenanceData) return { headers: [], data: [] };
-    
-    return {
-      headers: ['Data', 'Pojazd', 'Typ serwisu', 'Status'],
-      data: maintenanceData.maintenanceSchedule.map(schedule => [
-        schedule.date,
-        schedule.vehicle,
-        schedule.serviceType,
-        schedule.status
-      ])
-    };
+  // Obsługa zmiany strony
+  const handlePageChange = (newPage: number) => {
+    setFilters({
+      ...filters,
+      page: newPage
+    });
   };
   
-  const getPartsInventoryTableData = () => {
-    if (!maintenanceData) return { headers: [], data: [] };
+  // Obsługa kliknięcia wiersza alertu
+  const handleAlertClick = async (alert: MaintenanceAlert) => {
+    setIsDetailLoading(true);
     
-    return {
-      headers: ['Część', 'Stan magazynowy', 'Punkt ponownego zamówienia', 'W zamówieniu'],
-      data: maintenanceData.partsInventory.map(part => [
-        part.part,
-        part.stock.toString(),
-        part.reorderPoint.toString(),
-        part.onOrder.toString()
-      ])
-    };
-  };
-
-  // Obsługa kliknięcia wiersza tabeli
-  const handleRowClick = (table: string, index: number) => {
-    console.log(`Kliknięto wiersz ${index} w tabeli ${table}`);
-    
-    if (table === 'forecast' && maintenanceData) {
-      const forecast = getFilteredForecasts()[index];
-      setSelectedVehicle(forecast.vehicle);
-      alert(`Wybrano pojazd: ${forecast.vehicle}`);
+    try {
+      const alertDetails = await predictiveMaintenanceService.getAlertDetails(alert.id);
+      setSelectedAlert(alertDetails);
+    } catch (err) {
+      console.error('Error fetching alert details:', err);
+      setError('Nie udało się pobrać szczegółów alertu.');
+    } finally {
+      setIsDetailLoading(false);
     }
   };
-
-  // Obsługa zmiany filtrów
-  const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setVehicleFilter(e.target.value);
+  
+  // Obsługa aktualizacji statusu alertu
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    try {
+      await predictiveMaintenanceService.updateAlertStatus(id, newStatus);
+      
+      // Odświeżenie listy alertów
+      const alertsResponse = await predictiveMaintenanceService.getAlerts(
+        filters.priority !== 'all' ? filters.priority : undefined,
+        filters.vehicle || undefined,
+        filters.component || undefined,
+        filters.status !== 'all' ? filters.status : undefined,
+        filters.page,
+        filters.limit
+      );
+      
+      setAlerts(alertsResponse);
+      
+      // Aktualizacja wybranego alertu, jeśli istnieje
+      if (selectedAlert && selectedAlert.id === id) {
+        setSelectedAlert({
+          ...selectedAlert,
+          status: newStatus
+        });
+      }
+    } catch (err) {
+      console.error('Error updating alert status:', err);
+      setError('Nie udało się zaktualizować statusu alertu.');
+    }
   };
   
-  const handleComponentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setComponentFilter(e.target.value);
+  // Renderowanie sekcji filtrów
+  const renderFilters = () => {
+    return (
+      <FilterContainer>
+        <FilterGroup>
+          <FilterLabel htmlFor="priority">Priorytet</FilterLabel>
+          <FilterSelect 
+            id="priority" 
+            name="priority" 
+            value={filters.priority} 
+            onChange={handleFilterChange}
+          >
+            <option value="all">Wszystkie</option>
+            <option value="high">Wysoki</option>
+            <option value="medium">Średni</option>
+            <option value="low">Niski</option>
+          </FilterSelect>
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel htmlFor="vehicle">Pojazd</FilterLabel>
+          <FilterInput 
+            type="text" 
+            id="vehicle" 
+            name="vehicle" 
+            value={filters.vehicle} 
+            onChange={handleFilterChange}
+            placeholder="Numer pojazdu"
+          />
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel htmlFor="component">Komponent</FilterLabel>
+          <FilterInput 
+            type="text" 
+            id="component" 
+            name="component" 
+            value={filters.component} 
+            onChange={handleFilterChange}
+            placeholder="Nazwa komponentu"
+          />
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel htmlFor="status">Status</FilterLabel>
+          <FilterSelect 
+            id="status" 
+            name="status" 
+            value={filters.status} 
+            onChange={handleFilterChange}
+          >
+            <option value="all">Wszystkie</option>
+            <option value="new">Nowy</option>
+            <option value="inProgress">W trakcie</option>
+            <option value="scheduled">Zaplanowany</option>
+            <option value="completed">Zakończony</option>
+          </FilterSelect>
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel>&nbsp;</FilterLabel>
+          <Button primary onClick={handleSearch}>Szukaj</Button>
+        </FilterGroup>
+      </FilterContainer>
+    );
   };
   
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  // Renderowanie tabeli alertów
+  const renderAlertsTable = () => {
+    if (!alerts) return null;
+    
+    const getPriorityBadge = (priority: string) => {
+      const colors: Record<string, string> = {
+        high: '#f44336',
+        medium: '#ff9800',
+        low: '#4caf50'
+      };
+      
+      return (
+        <Badge color={colors[priority] || '#2196f3'}>
+          {priority === 'high' ? 'Wysoki' : 
+           priority === 'medium' ? 'Średni' : 
+           priority === 'low' ? 'Niski' : priority}
+        </Badge>
+      );
+    };
+    
+    const getStatusBadge = (status: string) => {
+      const colors: Record<string, string> = {
+        new: '#2196f3',
+        inProgress: '#ff9800',
+        scheduled: '#9c27b0',
+        completed: '#4caf50'
+      };
+      
+      return (
+        <Badge color={colors[status] || '#2196f3'}>
+          {status === 'new' ? 'Nowy' : 
+           status === 'inProgress' ? 'W trakcie' : 
+           status === 'scheduled' ? 'Zaplanowany' : 
+           status === 'completed' ? 'Zakończony' : status}
+        </Badge>
+      );
+    };
+    
+    const getConfidenceBadge = (confidence: string) => {
+      const confidenceValue = parseInt(confidence);
+      let color = '#f44336';
+      
+      if (confidenceValue >= 80) {
+        color = '#4caf50';
+      } else if (confidenceValue >= 60) {
+        color = '#8bc34a';
+      } else if (confidenceValue >= 40) {
+        color = '#ffeb3b';
+      } else if (confidenceValue >= 20) {
+        color = '#ff9800';
+      }
+      
+      return (
+        <Badge color={color}>
+          {confidence}%
+        </Badge>
+      );
+    };
+    
+    const columns = [
+      { 
+        key: 'priority', 
+        header: 'Priorytet',
+        render: (alert: MaintenanceAlert) => getPriorityBadge(alert.priority)
+      },
+      { key: 'vehicle', header: 'Pojazd' },
+      { key: 'component', header: 'Komponent' },
+      { key: 'description', header: 'Opis' },
+      { key: 'forecastDate', header: 'Prognoza' },
+      { 
+        key: 'confidence', 
+        header: 'Pewność',
+        render: (alert: MaintenanceAlert) => getConfidenceBadge(alert.confidence)
+      },
+      { 
+        key: 'status', 
+        header: 'Status',
+        render: (alert: MaintenanceAlert) => getStatusBadge(alert.status)
+      }
+    ];
+    
+    return (
+      <>
+        <Table 
+          data={alerts.alerts}
+          columns={columns}
+          onRowClick={handleAlertClick}
+        />
+        
+        <PaginationContainer>
+          <PaginationInfo>
+            Wyświetlanie {(filters.page - 1) * filters.limit + 1} - {Math.min(filters.page * filters.limit, alerts.total)} z {alerts.total} alertów
+          </PaginationInfo>
+          
+          <PaginationButtons>
+            <Button 
+              onClick={() => handlePageChange(filters.page - 1)}
+              disabled={filters.page === 1}
+            >
+              Poprzednia
+            </Button>
+            
+            <Button 
+              onClick={() => handlePageChange(filters.page + 1)}
+              disabled={filters.page * filters.limit >= alerts.total}
+            >
+              Następna
+            </Button>
+          </PaginationButtons>
+        </PaginationContainer>
+      </>
+    );
   };
-
-  // Obliczanie rotacji wskaźnika na wykresie
-  const calculateGaugeRotation = (value: number) => {
-    // Wartość 0% = -90 stopni, 100% = 90 stopni
-    return -90 + (value / 100) * 180;
+  
+  // Renderowanie szczegółów alertu
+  const renderAlertDetails = () => {
+    if (!selectedAlert) return null;
+    
+    return (
+      <DetailContainer>
+        <DetailTitle>Szczegóły alertu</DetailTitle>
+        
+        <DetailRow>
+          <DetailLabel>ID:</DetailLabel>
+          <DetailValue>{selectedAlert.id}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Pojazd:</DetailLabel>
+          <DetailValue>{selectedAlert.vehicle}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Komponent:</DetailLabel>
+          <DetailValue>{selectedAlert.component}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Opis:</DetailLabel>
+          <DetailValue>{selectedAlert.description}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Prognoza awarii:</DetailLabel>
+          <DetailValue>{selectedAlert.forecastDate}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Pewność prognozy:</DetailLabel>
+          <DetailValue>{selectedAlert.confidence}%</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Status:</DetailLabel>
+          <DetailValue>
+            <FilterSelect 
+              value={selectedAlert.status} 
+              onChange={(e) => handleStatusUpdate(selectedAlert.id, e.target.value)}
+            >
+              <option value="new">Nowy</option>
+              <option value="inProgress">W trakcie</option>
+              <option value="scheduled">Zaplanowany</option>
+              <option value="completed">Zakończony</option>
+            </FilterSelect>
+          </DetailValue>
+        </DetailRow>
+        
+        {selectedAlert.details && (
+          <>
+            <DetailTitle style={{ marginTop: '16px' }}>Szczegóły komponentu</DetailTitle>
+            
+            <DetailRow>
+              <DetailLabel>ID komponentu:</DetailLabel>
+              <DetailValue>{selectedAlert.details.componentId}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Typ komponentu:</DetailLabel>
+              <DetailValue>{selectedAlert.details.componentType}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Ostatnia konserwacja:</DetailLabel>
+              <DetailValue>{selectedAlert.details.lastMaintenance}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Obecny stan:</DetailLabel>
+              <DetailValue>{selectedAlert.details.currentCondition}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Szacowana żywotność:</DetailLabel>
+              <DetailValue>{selectedAlert.details.estimatedLifeRemaining}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Prawdopodobieństwo awarii:</DetailLabel>
+              <DetailValue>{selectedAlert.details.failureProbability}%</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Zalecane działanie:</DetailLabel>
+              <DetailValue>{selectedAlert.details.recommendedAction}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Szacowany koszt:</DetailLabel>
+              <DetailValue>{selectedAlert.details.estimatedCost} zł</DetailValue>
+            </DetailRow>
+            
+            {selectedAlert.details.sensorData && selectedAlert.details.sensorData.length > 0 && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Dane z czujników</DetailTitle>
+                
+                {selectedAlert.details.sensorData.map((sensor, index) => (
+                  <div key={index} style={{ marginBottom: '16px' }}>
+                    <DetailRow>
+                      <DetailLabel>Czujnik:</DetailLabel>
+                      <DetailValue>{sensor.sensorType} ({sensor.sensorId})</DetailValue>
+                    </DetailRow>
+                    
+                    <DetailRow>
+                      <DetailLabel>Jednostka:</DetailLabel>
+                      <DetailValue>{sensor.unit}</DetailValue>
+                    </DetailRow>
+                    
+                    <DetailRow>
+                      <DetailLabel>Próg alarmowy:</DetailLabel>
+                      <DetailValue>{sensor.threshold} {sensor.unit}</DetailValue>
+                    </DetailRow>
+                    
+                    <ChartContainer>
+                      <div style={{ fontSize: '14px', marginBottom: '8px' }}>Ostatnie odczyty:</div>
+                      <BarChart>
+                        {sensor.readings.slice(-5).map((reading, idx) => {
+                          const value = reading.value;
+                          const height = (value / (sensor.threshold * 1.5)) * 100;
+                          const color = value > sensor.threshold ? '#f44336' : '#4caf50';
+                          const date = new Date(reading.timestamp).toLocaleDateString();
+                          
+                          return (
+                            <BarChartBar 
+                              key={idx} 
+                              height={Math.min(height, 100)} 
+                              color={color}
+                              data-value={`${value} ${sensor.unit}`}
+                              data-label={date}
+                            />
+                          );
+                        })}
+                      </BarChart>
+                    </ChartContainer>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        )}
+      </DetailContainer>
+    );
   };
-
+  
+  // Renderowanie stanu technicznego pojazdów
+  const renderVehicleHealth = () => {
+    if (!vehicleHealth) return null;
+    
+    return (
+      <Card title="Stan techniczny pojazdów">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
+          {vehicleHealth.vehicles.slice(0, 3).map((vehicle, index) => (
+            <div key={index} style={{ textAlign: 'center', width: '200px' }}>
+              <h3>{vehicle.vehicle}</h3>
+              
+              <GaugeContainer>
+                <GaugeBackground />
+                <GaugeMask value={vehicle.overallHealth} />
+                <GaugeCenter />
+                <GaugeValue>{vehicle.overallHealth}%</GaugeValue>
+                <GaugeNeedle value={vehicle.overallHealth} />
+              </GaugeContainer>
+              
+              <div style={{ marginTop: '20px', textAlign: 'left' }}>
+                {vehicle.components.map((component, idx) => (
+                  <div key={idx} style={{ marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{component.name}</span>
+                      <span>{component.health}%</span>
+                    </div>
+                    <div style={{ width: '100%', height: '4px', backgroundColor: '#e0e0e0', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div 
+                        style={{ 
+                          height: '100%', 
+                          width: `${component.health}%`, 
+                          backgroundColor: component.health > 70 ? '#4caf50' : component.health > 40 ? '#ff9800' : '#f44336',
+                          borderRadius: '2px'
+                        }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    );
+  };
+  
+  // Renderowanie harmonogramu konserwacji
+  const renderMaintenanceSchedule = () => {
+    if (!maintenanceSchedule) return null;
+    
+    const getStatusBadge = (status: string) => {
+      const colors: Record<string, string> = {
+        scheduled: '#2196f3',
+        inProgress: '#ff9800',
+        completed: '#4caf50',
+        cancelled: '#f44336'
+      };
+      
+      return (
+        <Badge color={colors[status] || '#2196f3'}>
+          {status === 'scheduled' ? 'Zaplanowany' : 
+           status === 'inProgress' ? 'W trakcie' : 
+           status === 'completed' ? 'Zakończony' : 
+           status === 'cancelled' ? 'Anulowany' : status}
+        </Badge>
+      );
+    };
+    
+    return (
+      <Card title="Harmonogram konserwacji">
+        <Table 
+          data={maintenanceSchedule.schedule}
+          columns={[
+            { key: 'vehicle', header: 'Pojazd' },
+            { key: 'scheduledDate', header: 'Data' },
+            { key: 'type', header: 'Typ' },
+            { key: 'estimatedDuration', header: 'Czas trwania' },
+            { key: 'estimatedCost', header: 'Koszt', render: (item: any) => `${item.estimatedCost} zł` },
+            { key: 'status', header: 'Status', render: (item: any) => getStatusBadge(item.status) }
+          ]}
+        />
+      </Card>
+    );
+  };
+  
+  // Renderowanie historii konserwacji
+  const renderMaintenanceHistory = () => {
+    if (!maintenanceHistory) return null;
+    
+    return (
+      <Card title="Historia konserwacji">
+        <TimelineContainer>
+          {maintenanceHistory.history.map((item, index) => (
+            <TimelineItem key={index}>
+              <TimelineDot color="#3f51b5" />
+              <TimelineContent>
+                <TimelineDate>{item.date} - {item.vehicle}</TimelineDate>
+                <TimelineDescription>
+                  <strong>{item.type}</strong> - {item.components.join(', ')}
+                  <br />
+                  Koszt: {item.cost} zł | Technik: {item.technician}
+                </TimelineDescription>
+              </TimelineContent>
+            </TimelineItem>
+          ))}
+        </TimelineContainer>
+      </Card>
+    );
+  };
+  
+  // Renderowanie analizy kosztów
+  const renderCostAnalysis = () => {
+    if (!costAnalysis) return null;
+    
+    return (
+      <Card title="Analiza kosztów konserwacji">
+        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <h3>Całkowity koszt: {costAnalysis.totalCost.toLocaleString()} zł</h3>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <h4>Konserwacja prewencyjna vs. naprawy</h4>
+            <div style={{ display: 'flex', height: '20px', width: '200px', borderRadius: '10px', overflow: 'hidden' }}>
+              <div 
+                style={{ 
+                  width: `${(costAnalysis.preventiveVsCorrective.preventive / (costAnalysis.preventiveVsCorrective.preventive + costAnalysis.preventiveVsCorrective.corrective)) * 100}%`, 
+                  backgroundColor: '#4caf50' 
+                }} 
+              />
+              <div 
+                style={{ 
+                  width: `${(costAnalysis.preventiveVsCorrective.corrective / (costAnalysis.preventiveVsCorrective.preventive + costAnalysis.preventiveVsCorrective.corrective)) * 100}%`, 
+                  backgroundColor: '#f44336' 
+                }} 
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '4px' }}>
+              <div>Prewencyjna: {costAnalysis.preventiveVsCorrective.preventive.toLocaleString()} zł</div>
+              <div>Naprawy: {costAnalysis.preventiveVsCorrective.corrective.toLocaleString()} zł</div>
+            </div>
+          </div>
+        </div>
+        
+        <ChartContainer>
+          <div style={{ fontSize: '14px', marginBottom: '8px' }}>Koszty według miesięcy:</div>
+          <BarChart>
+            {costAnalysis.costByMonth.map((item, index) => {
+              const maxCost = Math.max(...costAnalysis.costByMonth.map(i => i.cost));
+              const height = (item.cost / maxCost) * 100;
+              
+              return (
+                <BarChartBar 
+                  key={index} 
+                  height={height} 
+                  color="#3f51b5"
+                  data-value={`${item.cost.toLocaleString()} zł`}
+                  data-label={item.month}
+                />
+              );
+            })}
+          </BarChart>
+        </ChartContainer>
+      </Card>
+    );
+  };
+  
   if (isLoading) {
     return (
       <PageContainer>
-        <LoadingIndicator>Ładowanie danych o konserwacji predykcyjnej...</LoadingIndicator>
+        <LoadingIndicator>Ładowanie danych konserwacji predykcyjnej...</LoadingIndicator>
       </PageContainer>
     );
   }
-
+  
   if (error) {
     return (
       <PageContainer>
-        <Card fullWidth>
-          <div style={{ color: 'red', padding: '20px', textAlign: 'center' }}>
-            {error}
-          </div>
-        </Card>
+        <ErrorMessage>{error}</ErrorMessage>
       </PageContainer>
     );
   }
-
-  if (!maintenanceData) {
-    return (
-      <PageContainer>
-        <Card fullWidth>
-          <div style={{ padding: '20px', textAlign: 'center' }}>
-            Brak danych do wyświetlenia
-          </div>
-        </Card>
-      </PageContainer>
-    );
-  }
-
-  const { headers: forecastHeaders, data: forecastData } = getForecastTableData();
-  const { headers: scheduleHeaders, data: scheduleData } = getScheduleTableData();
-  const { headers: partsHeaders, data: partsData } = getPartsInventoryTableData();
-  const filteredComponents = getFilteredComponents();
-
-  // Unikalne pojazdy i komponenty do filtrów
-  const uniqueVehicles = Array.from(new Set(maintenanceData.maintenanceForecasts.map(f => f.vehicle)));
-  const uniqueComponents = Array.from(new Set(maintenanceData.maintenanceForecasts.map(f => f.component)));
-
+  
   return (
     <PageContainer>
-      <KPISection>
-        <KPICard 
-          title="Pojazdy do konserwacji" 
-          value={maintenanceData.kpis.vehiclesForMaintenance} 
-          trend="up" 
-          trendValue="3 więcej niż w zeszłym tygodniu" 
-        />
-        <KPICard 
-          title="Zaplanowane przeglądy" 
-          value={maintenanceData.kpis.scheduledServices} 
-          trend="neutral" 
-          trendValue="Bez zmian" 
-        />
-        <KPICard 
-          title="Alerty gwarancyjne" 
-          value={maintenanceData.kpis.warrantyAlerts} 
-          trend="down" 
-          trendValue="2 mniej niż w zeszłym miesiącu" 
-        />
-        <KPICard 
-          title="Stan części magazynowych" 
-          value={`${maintenanceData.kpis.partsInventory}%`} 
-          trend="up" 
-          trendValue="5% więcej niż w zeszłym miesiącu" 
-        />
-      </KPISection>
-
-      <SectionTitle>PROGNOZA AWARII</SectionTitle>
-      <FilterBar>
-        <FilterSelect value={vehicleFilter} onChange={handleVehicleChange}>
-          <FilterOption value="all">Wszystkie pojazdy</FilterOption>
-          {uniqueVehicles.map((vehicle, index) => (
-            <FilterOption key={index} value={vehicle}>{vehicle}</FilterOption>
-          ))}
-        </FilterSelect>
-        
-        <FilterSelect value={componentFilter} onChange={handleComponentChange}>
-          <FilterOption value="all">Wszystkie komponenty</FilterOption>
-          {uniqueComponents.map((component, index) => (
-            <FilterOption key={index} value={component}>{component}</FilterOption>
-          ))}
-        </FilterSelect>
-        
-        <SearchInput 
-          type="text" 
-          placeholder="Szukaj..." 
-          value={searchQuery} 
-          onChange={handleSearchChange}
-        />
-      </FilterBar>
+      <SectionTitle>KONSERWACJA PREDYKCYJNA</SectionTitle>
       
-      <Card fullWidth>
-        <Table 
-          headers={forecastHeaders} 
-          data={forecastData} 
-          onRowClick={(index) => handleRowClick('forecast', index)}
-          emptyMessage="Brak prognoz spełniających kryteria filtrowania"
-        />
-      </Card>
-
-      <SectionTitle>HARMONOGRAM KONSERWACJI</SectionTitle>
-      <Card fullWidth>
-        <Table 
-          headers={scheduleHeaders} 
-          data={scheduleData} 
-          onRowClick={(index) => handleRowClick('schedule', index)}
-        />
-      </Card>
+      <TabsContainer>
+        <Tab 
+          active={activeTab === 'alerts'} 
+          onClick={() => setActiveTab('alerts')}
+        >
+          Alerty konserwacji
+        </Tab>
+        <Tab 
+          active={activeTab === 'health'} 
+          onClick={() => setActiveTab('health')}
+        >
+          Stan techniczny
+        </Tab>
+        <Tab 
+          active={activeTab === 'schedule'} 
+          onClick={() => setActiveTab('schedule')}
+        >
+          Harmonogram i historia
+        </Tab>
+        <Tab 
+          active={activeTab === 'costs'} 
+          onClick={() => setActiveTab('costs')}
+        >
+          Analiza kosztów
+        </Tab>
+      </TabsContainer>
       
-      {selectedVehicle && (
+      {activeTab === 'alerts' && (
         <>
-          <SectionTitle>STAN KOMPONENTÓW POJAZDU {selectedVehicle}</SectionTitle>
-          <div>
-            {filteredComponents.map((component, index) => (
-              <ComponentCard key={index} health={component.health}>
-                <ComponentHeader>
-                  <ComponentName>{component.name}</ComponentName>
-                  <ComponentHealth health={component.health}>{component.health}%</ComponentHealth>
-                </ComponentHeader>
-                <ComponentDetails>
-                  <div>Ostatni serwis: {component.lastService}</div>
-                  <div>Następny serwis: {component.nextService}</div>
-                </ComponentDetails>
-                <GaugeChart>
-                  <GaugeBackground>
-                    <GaugeOverlay />
-                    <GaugeNeedle rotation={calculateGaugeRotation(component.health)} />
-                    <GaugeValue>{component.health}%</GaugeValue>
-                  </GaugeBackground>
-                </GaugeChart>
-              </ComponentCard>
-            ))}
-          </div>
+          {renderFilters()}
+          
+          <Card title="Alerty konserwacji" fullWidth>
+            {renderAlertsTable()}
+          </Card>
+          
+          {selectedAlert && (
+            <Card title="Szczegóły alertu" fullWidth>
+              {isDetailLoading ? (
+                <LoadingIndicator>Ładowanie szczegółów...</LoadingIndicator>
+              ) : (
+                renderAlertDetails()
+              )}
+            </Card>
+          )}
         </>
       )}
       
-      <SectionTitle>ZARZĄDZANIE CZĘŚCIAMI</SectionTitle>
-      <GridSection>
-        <Card title="Stan magazynu">
-          <Table 
-            headers={partsHeaders} 
-            data={partsData} 
-          />
-        </Card>
-        <Card title="Historia konserwacji">
-          <Timeline>
-            {maintenanceData.maintenanceHistory
-              .filter(history => !selectedVehicle || history.vehicle === selectedVehicle)
-              .slice(0, 3)
-              .map((history, index) => (
-                <TimelineItem key={index}>
-                  <TimelineDot color={history.type === 'Naprawa' ? '#dc3545' : '#28a745'}>
-                    {history.type === 'Naprawa' ? 'N' : 'P'}
-                  </TimelineDot>
-                  <TimelineContent>
-                    <TimelineTitle>{history.description}</TimelineTitle>
-                    <TimelineDate>{history.date} - {history.vehicle}</TimelineDate>
-                    <TimelineDescription>
-                      Typ: {history.type}<br />
-                      Koszt: {history.cost}
-                    </TimelineDescription>
-                  </TimelineContent>
-                </TimelineItem>
-              ))}
-          </Timeline>
-        </Card>
-      </GridSection>
+      {activeTab === 'health' && (
+        <>
+          {renderVehicleHealth()}
+        </>
+      )}
+      
+      {activeTab === 'schedule' && (
+        <GridSection>
+          {renderMaintenanceSchedule()}
+          {renderMaintenanceHistory()}
+        </GridSection>
+      )}
+      
+      {activeTab === 'costs' && (
+        <>
+          {renderCostAnalysis()}
+        </>
+      )}
     </PageContainer>
   );
 };
