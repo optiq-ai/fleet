@@ -1,213 +1,38 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
-// Define types for our context
-interface ViewConfig {
+// Typy danych
+interface ViewSection {
   id: string;
   name: string;
-  createdBy: string;
-  isDefault: boolean;
-  forRole: string;
-  layout: SectionConfig[];
-}
-
-interface SectionConfig {
-  section: string;
+  type: string;
   visible: boolean;
-  position?: {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-  components: string[];
+  order: number;
 }
 
-interface RoleConfig {
-  role: string;
-  availableSections: {
-    section: string;
-    status: 'required' | 'optional' | 'unavailable';
-    components: string[];
-  }[];
+interface View {
+  id: string;
+  name: string;
+  description: string;
+  isDefault: boolean;
+  sections: ViewSection[];
+  userGroups: string[];
 }
 
 interface ViewCustomizationContextType {
-  // User views
-  userViews: ViewConfig[];
-  currentView: string;
-  setCurrentView: (viewId: string) => void;
-  saveView: (view: ViewConfig) => void;
-  updateView: (viewId: string, updates: Partial<ViewConfig>) => void;
-  deleteView: (viewId: string) => void;
-  
-  // Admin configuration
-  roleConfigs: RoleConfig[];
-  templateViews: ViewConfig[];
-  saveRoleConfig: (config: RoleConfig) => void;
-  saveTemplateView: (template: ViewConfig) => void;
-  deleteTemplateView: (templateId: string) => void;
-  
-  // Edit mode
-  isEditMode: boolean;
-  setEditMode: (mode: boolean) => void;
+  views: View[];
+  currentView: View | null;
+  isLoading: boolean;
+  error: string | null;
+  setCurrentView: (view: View) => void;
+  saveView: (view: View) => Promise<boolean>;
+  deleteView: (viewId: string) => Promise<boolean>;
+  createView: (view: Omit<View, 'id'>) => Promise<View | null>;
 }
 
-// Create the context
+// Tworzenie kontekstu
 const ViewCustomizationContext = createContext<ViewCustomizationContextType | undefined>(undefined);
 
-// Provider component
-interface ViewCustomizationProviderProps {
-  children: ReactNode;
-}
-
-export const ViewCustomizationProvider: React.FC<ViewCustomizationProviderProps> = ({ children }) => {
-  // State for user views
-  const [userViews, setUserViews] = useState<ViewConfig[]>([
-    {
-      id: 'default-view',
-      name: 'Widok standardowy',
-      createdBy: 'system',
-      isDefault: true,
-      forRole: 'dispatcher',
-      layout: [
-        {
-          section: 'kpi',
-          visible: true,
-          position: { x: 0, y: 0, w: 12, h: 1 },
-          components: ['activeVehicles', 'activeDrivers', 'dailyCosts']
-        },
-        {
-          section: 'vehicleMonitoring',
-          visible: true,
-          position: { x: 0, y: 1, w: 12, h: 2 },
-          components: ['map', 'vehicleStatus', 'alerts']
-        },
-        {
-          section: 'fraudDetection',
-          visible: true,
-          position: { x: 0, y: 3, w: 12, h: 2 },
-          components: ['alerts', 'map', 'verification']
-        }
-      ]
-    }
-  ]);
-  
-  const [currentView, setCurrentView] = useState('default-view');
-  
-  // State for admin configuration
-  const [roleConfigs, setRoleConfigs] = useState<RoleConfig[]>([
-    {
-      role: 'dispatcher',
-      availableSections: [
-        { section: 'kpi', status: 'required', components: ['activeVehicles', 'activeDrivers', 'dailyCosts'] },
-        { section: 'vehicleMonitoring', status: 'required', components: ['map', 'vehicleStatus', 'alerts'] },
-        { section: 'fraudDetection', status: 'optional', components: ['alerts', 'map', 'verification'] },
-        { section: 'driverSafety', status: 'unavailable', components: [] }
-      ]
-    }
-  ]);
-  
-  const [templateViews, setTemplateViews] = useState<ViewConfig[]>([
-    {
-      id: 'template-dispatcher',
-      name: 'Szablon dyspozytora',
-      createdBy: 'admin',
-      isDefault: true,
-      forRole: 'dispatcher',
-      layout: [
-        {
-          section: 'kpi',
-          visible: true,
-          position: { x: 0, y: 0, w: 12, h: 1 },
-          components: ['activeVehicles', 'activeDrivers', 'dailyCosts']
-        },
-        {
-          section: 'vehicleMonitoring',
-          visible: true,
-          position: { x: 0, y: 1, w: 12, h: 2 },
-          components: ['map', 'vehicleStatus', 'alerts']
-        }
-      ]
-    }
-  ]);
-  
-  // Edit mode state
-  const [isEditMode, setEditMode] = useState(false);
-  
-  // Functions for user views
-  const saveView = (view: ViewConfig) => {
-    setUserViews(prev => [...prev, view]);
-  };
-  
-  const updateView = (viewId: string, updates: Partial<ViewConfig>) => {
-    setUserViews(prev => 
-      prev.map(view => 
-        view.id === viewId ? { ...view, ...updates } : view
-      )
-    );
-  };
-  
-  const deleteView = (viewId: string) => {
-    setUserViews(prev => prev.filter(view => view.id !== viewId));
-  };
-  
-  // Functions for admin configuration
-  const saveRoleConfig = (config: RoleConfig) => {
-    setRoleConfigs(prev => {
-      const index = prev.findIndex(rc => rc.role === config.role);
-      if (index >= 0) {
-        const newConfigs = [...prev];
-        newConfigs[index] = config;
-        return newConfigs;
-      } else {
-        return [...prev, config];
-      }
-    });
-  };
-  
-  const saveTemplateView = (template: ViewConfig) => {
-    setTemplateViews(prev => {
-      const index = prev.findIndex(t => t.id === template.id);
-      if (index >= 0) {
-        const newTemplates = [...prev];
-        newTemplates[index] = template;
-        return newTemplates;
-      } else {
-        return [...prev, template];
-      }
-    });
-  };
-  
-  const deleteTemplateView = (templateId: string) => {
-    setTemplateViews(prev => prev.filter(template => template.id !== templateId));
-  };
-  
-  const value = {
-    userViews,
-    currentView,
-    setCurrentView,
-    saveView,
-    updateView,
-    deleteView,
-    
-    roleConfigs,
-    templateViews,
-    saveRoleConfig,
-    saveTemplateView,
-    deleteTemplateView,
-    
-    isEditMode,
-    setEditMode
-  };
-  
-  return (
-    <ViewCustomizationContext.Provider value={value}>
-      {children}
-    </ViewCustomizationContext.Provider>
-  );
-};
-
-// Custom hook to use the context
+// Hook do używania kontekstu
 export const useViewCustomization = () => {
   const context = useContext(ViewCustomizationContext);
   if (context === undefined) {
@@ -215,3 +40,188 @@ export const useViewCustomization = () => {
   }
   return context;
 };
+
+// Provider komponent
+interface ViewCustomizationProviderProps {
+  children: ReactNode;
+}
+
+export const ViewCustomizationProvider: React.FC<ViewCustomizationProviderProps> = ({ children }) => {
+  const [views, setViews] = useState<View[]>([]);
+  const [currentView, setCurrentView] = useState<View | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Pobieranie widoków przy inicjalizacji
+  useEffect(() => {
+    const fetchViews = async () => {
+      setIsLoading(true);
+      try {
+        // Symulacja opóźnienia sieciowego
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Dane mockowe
+        const mockViews: View[] = [
+          {
+            id: 'view1',
+            name: 'Widok standardowy',
+            description: 'Domyślny widok z wszystkimi sekcjami',
+            isDefault: true,
+            sections: [
+              { id: 'section1', name: 'Statystyki KPI', type: 'kpi', visible: true, order: 1 },
+              { id: 'section2', name: 'Wykrywanie oszustw', type: 'fraud', visible: true, order: 2 },
+              { id: 'section3', name: 'Bezpieczeństwo kierowcy', type: 'safety', visible: true, order: 3 },
+              { id: 'section4', name: 'Konserwacja predykcyjna', type: 'maintenance', visible: true, order: 4 },
+              { id: 'section5', name: 'Monitoring pojazdów', type: 'monitoring', visible: true, order: 5 }
+            ],
+            userGroups: ['all']
+          },
+          {
+            id: 'view2',
+            name: 'Widok bezpieczeństwa',
+            description: 'Widok skupiony na bezpieczeństwie kierowców',
+            isDefault: false,
+            sections: [
+              { id: 'section1', name: 'Statystyki KPI', type: 'kpi', visible: true, order: 1 },
+              { id: 'section2', name: 'Wykrywanie oszustw', type: 'fraud', visible: false, order: 2 },
+              { id: 'section3', name: 'Bezpieczeństwo kierowcy', type: 'safety', visible: true, order: 2 },
+              { id: 'section4', name: 'Konserwacja predykcyjna', type: 'maintenance', visible: false, order: 4 },
+              { id: 'section5', name: 'Monitoring pojazdów', type: 'monitoring', visible: true, order: 3 }
+            ],
+            userGroups: ['managers', 'safety_officers']
+          },
+          {
+            id: 'view3',
+            name: 'Widok konserwacji',
+            description: 'Widok skupiony na konserwacji pojazdów',
+            isDefault: false,
+            sections: [
+              { id: 'section1', name: 'Statystyki KPI', type: 'kpi', visible: true, order: 1 },
+              { id: 'section2', name: 'Wykrywanie oszustw', type: 'fraud', visible: false, order: 2 },
+              { id: 'section3', name: 'Bezpieczeństwo kierowcy', type: 'safety', visible: false, order: 3 },
+              { id: 'section4', name: 'Konserwacja predykcyjna', type: 'maintenance', visible: true, order: 2 },
+              { id: 'section5', name: 'Monitoring pojazdów', type: 'monitoring', visible: true, order: 3 }
+            ],
+            userGroups: ['managers', 'maintenance_staff']
+          }
+        ];
+        
+        setViews(mockViews);
+        setCurrentView(mockViews.find(view => view.isDefault) || mockViews[0]);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching views:', err);
+        setError('Nie udało się pobrać widoków. Spróbuj ponownie później.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchViews();
+  }, []);
+
+  // Zapisywanie widoku
+  const saveView = async (view: View): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Symulacja opóźnienia sieciowego
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Aktualizacja lokalnego stanu
+      const updatedViews = views.map(v => v.id === view.id ? view : v);
+      setViews(updatedViews);
+      
+      if (currentView && currentView.id === view.id) {
+        setCurrentView(view);
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error saving view:', err);
+      setError('Nie udało się zapisać widoku. Spróbuj ponownie później.');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Usuwanie widoku
+  const deleteView = async (viewId: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Symulacja opóźnienia sieciowego
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Sprawdzenie czy widok nie jest domyślny
+      const viewToDelete = views.find(v => v.id === viewId);
+      if (viewToDelete && viewToDelete.isDefault) {
+        setError('Nie można usunąć domyślnego widoku.');
+        return false;
+      }
+      
+      // Aktualizacja lokalnego stanu
+      const updatedViews = views.filter(v => v.id !== viewId);
+      setViews(updatedViews);
+      
+      // Jeśli usuwany widok jest aktualnie wybrany, przełącz na domyślny
+      if (currentView && currentView.id === viewId) {
+        const defaultView = updatedViews.find(v => v.isDefault) || updatedViews[0];
+        setCurrentView(defaultView);
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error deleting view:', err);
+      setError('Nie udało się usunąć widoku. Spróbuj ponownie później.');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Tworzenie nowego widoku
+  const createView = async (viewData: Omit<View, 'id'>): Promise<View | null> => {
+    setIsLoading(true);
+    try {
+      // Symulacja opóźnienia sieciowego
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Tworzenie nowego widoku z unikalnym ID
+      const newView: View = {
+        ...viewData,
+        id: `view${Date.now()}`
+      };
+      
+      // Aktualizacja lokalnego stanu
+      setViews([...views, newView]);
+      
+      return newView;
+    } catch (err) {
+      console.error('Error creating view:', err);
+      setError('Nie udało się utworzyć widoku. Spróbuj ponownie później.');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Wartość kontekstu
+  const value = {
+    views,
+    currentView,
+    isLoading,
+    error,
+    setCurrentView,
+    saveView,
+    deleteView,
+    createView
+  };
+
+  return (
+    <ViewCustomizationContext.Provider value={value}>
+      {children}
+    </ViewCustomizationContext.Provider>
+  );
+};
+
+export default ViewCustomizationContext;
