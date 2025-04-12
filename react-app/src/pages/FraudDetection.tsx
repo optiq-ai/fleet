@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
-import Table from '../components/common/Table';
-import fraudDetectionService, { 
-  FraudAlert, 
-  FraudAlertsResponse, 
-  TransactionPatternsResponse 
-} from '../services/api/fraudDetectionService';
+import fraudDetectionService from '../services/api/fraudDetectionService';
+
+// Nowe importy dla ulepszonych funkcji wykrywania oszustw
+import BiometricAuthModal from '../components/fraud/BiometricAuthModal';
+import TransactionPatternAnalysis from '../components/fraud/TransactionPatternAnalysis';
+import CardPresenceVerification from '../components/fraud/CardPresenceVerification';
+import BlockchainLedger from '../components/fraud/BlockchainLedger';
+import FuelQualityTest from '../components/fraud/FuelQualityTest';
+import MultiFactorAuth from '../components/fraud/MultiFactorAuth';
 
 const PageContainer = styled.div`
   display: flex;
@@ -32,762 +35,624 @@ const GridSection = styled.div`
   }
 `;
 
-const MapContainer = styled.div`
-  height: 400px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-`;
-
-const MapPlaceholder = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #666;
-`;
-
-const MapPoint = styled.div<{ x: number; y: number; color: string }>`
-  position: absolute;
-  top: ${props => props.y}%;
-  left: ${props => props.x}%;
-  width: 12px;
-  height: 12px;
-  background-color: ${props => props.color};
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  
-  &:hover {
-    width: 16px;
-    height: 16px;
-    z-index: 10;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 24px;
-    height: 24px;
-    background-color: ${props => props.color}33;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-  }
-`;
-
-const MapTooltip = styled.div<{ visible: boolean }>`
-  position: absolute;
-  background-color: white;
-  border-radius: 4px;
-  padding: 8px 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  display: ${props => props.visible ? 'block' : 'none'};
-  max-width: 200px;
-`;
-
-const LoadingIndicator = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100px;
-  color: #666;
-`;
-
-const ErrorMessage = styled.div`
-  color: #d32f2f;
-  padding: 16px;
-  background-color: #ffebee;
-  border-radius: 4px;
-  margin-bottom: 20px;
-`;
-
-const FilterContainer = styled.div`
+const FilterSection = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 20px;
   padding: 16px;
   background-color: #f5f5f5;
   border-radius: 8px;
+`;
+
+const FilterLabel = styled.div`
+  font-weight: 500;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
 `;
 
 const FilterGroup = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
-`;
-
-const FilterLabel = styled.label`
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
 `;
 
 const FilterSelect = styled.select`
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
-  min-width: 150px;
-  
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
-  }
+  background-color: white;
 `;
 
 const FilterInput = styled.input`
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+`;
+
+const FilterButton = styled.button`
+  padding: 8px 16px;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
+  &:hover {
+    background-color: #303f9f;
   }
 `;
 
-const Button = styled.button<{ primary?: boolean }>`
-  padding: 8px 16px;
-  background-color: ${props => props.primary ? '#3f51b5' : 'white'};
-  color: ${props => props.primary ? 'white' : '#3f51b5'};
-  border: 1px solid #3f51b5;
+const MapContainer = styled.div`
+  height: 400px;
+  background-color: #e9e9e9;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+`;
+
+const MapOverlay = styled.div`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 12px;
   border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+`;
+
+const AlertsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const AlertItem = styled.div<{ priority: 'high' | 'medium' | 'low' }>`
+  padding: 12px;
+  border-radius: 4px;
+  background-color: ${props => 
+    props.priority === 'high' ? '#ffebee' : 
+    props.priority === 'medium' ? '#fff8e1' : 
+    '#e8f5e9'
+  };
+  border-left: 4px solid ${props => 
+    props.priority === 'high' ? '#f44336' : 
+    props.priority === 'medium' ? '#ffc107' : 
+    '#4caf50'
+  };
+`;
+
+const AlertTitle = styled.div`
+  font-weight: 500;
+  margin-bottom: 4px;
+`;
+
+const AlertDetails = styled.div`
   font-size: 14px;
+  color: #666;
+`;
+
+const TabsContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+`;
+
+const Tab = styled.div<{ active: boolean }>`
+  padding: 12px 24px;
   cursor: pointer;
+  font-weight: ${props => props.active ? '500' : 'normal'};
+  color: ${props => props.active ? '#3f51b5' : '#666'};
+  border-bottom: 2px solid ${props => props.active ? '#3f51b5' : 'transparent'};
   transition: all 0.3s ease;
   
   &:hover {
-    background-color: ${props => props.primary ? '#303f9f' : '#f0f0f0'};
+    color: #3f51b5;
+    background-color: #f5f5f5;
+  }
+`;
+
+const TransactionsTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
   }
   
-  &:disabled {
-    background-color: #e0e0e0;
-    color: #9e9e9e;
-    border-color: #e0e0e0;
-    cursor: not-allowed;
+  th {
+    background-color: #f5f5f5;
+    font-weight: 500;
   }
-`;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-`;
-
-const PaginationInfo = styled.div`
-  font-size: 14px;
-  color: #666;
-`;
-
-const PaginationButtons = styled.div`
-  display: flex;
-  gap: 8px;
-`;
-
-const ChartContainer = styled.div`
-  height: 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  margin-top: 16px;
-`;
-
-const PieChart = styled.div`
-  position: relative;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: conic-gradient(
-    #f44336 0% 25%,
-    #ff9800 25% 50%,
-    #ffeb3b 50% 75%,
-    #4caf50 75% 100%
-  );
-`;
-
-const PieChartLegend = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-left: 32px;
-`;
-
-const LegendItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-`;
-
-const LegendColor = styled.div<{ color: string }>`
-  width: 16px;
-  height: 16px;
-  background-color: ${props => props.color};
-  border-radius: 4px;
-`;
-
-const DetailContainer = styled.div`
-  padding: 16px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  margin-top: 20px;
-`;
-
-const DetailTitle = styled.h3`
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  margin: 0 0 12px 0;
-`;
-
-const DetailRow = styled.div`
-  display: flex;
-  margin-bottom: 8px;
   
-  @media (max-width: 768px) {
-    flex-direction: column;
+  tr:hover {
+    background-color: #f9f9f9;
   }
 `;
 
-const DetailLabel = styled.div`
-  font-weight: 500;
-  width: 200px;
-  color: #666;
-`;
-
-const DetailValue = styled.div`
-  flex: 1;
-`;
-
-const Badge = styled.span<{ color: string }>`
+const StatusBadge = styled.span<{ status: 'suspicious' | 'verified' | 'flagged' }>`
   display: inline-block;
   padding: 4px 8px;
-  background-color: ${props => props.color};
-  color: white;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
+  background-color: ${props => 
+    props.status === 'suspicious' ? '#ffebee' : 
+    props.status === 'verified' ? '#e8f5e9' : 
+    '#fff8e1'
+  };
+  color: ${props => 
+    props.status === 'suspicious' ? '#c62828' : 
+    props.status === 'verified' ? '#2e7d32' : 
+    '#f57f17'
+  };
+`;
+
+const ActionButton = styled.button`
+  padding: 4px 8px;
+  background-color: transparent;
+  color: #3f51b5;
+  border: 1px solid #3f51b5;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 8px;
+  
+  &:hover {
+    background-color: #e8eaf6;
+  }
+`;
+
+// Nowe style dla ulepszonych funkcji wykrywania oszustw
+const EnhancedFeaturesContainer = styled.div`
+  margin-top: 20px;
+`;
+
+const FeatureCard = styled.div`
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+`;
+
+const FeatureHeader = styled.div`
+  padding: 16px;
+  background-color: #3f51b5;
+  color: white;
+  font-weight: 500;
+`;
+
+const FeatureBody = styled.div`
+  padding: 16px;
+`;
+
+const FeatureDescription = styled.p`
+  margin-bottom: 16px;
+  color: #666;
+`;
+
+const FeatureButton = styled.button`
+  padding: 8px 16px;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #303f9f;
+  }
 `;
 
 const FraudDetection: React.FC = () => {
-  // Stan dla alertów oszustw
-  const [alerts, setAlerts] = useState<FraudAlertsResponse | null>(null);
-  
-  // Stan dla wybranego alertu
-  const [selectedAlert, setSelectedAlert] = useState<FraudAlert | null>(null);
-  
-  // Stan dla wzorców transakcji
-  const [transactionPatterns, setTransactionPatterns] = useState<TransactionPatternsResponse | null>(null);
-  
   // Stan dla filtrów
-  const [filters, setFilters] = useState({
-    priority: 'all',
-    status: 'all',
-    dateFrom: '',
-    dateTo: '',
-    search: '',
-    page: 1,
-    limit: 10
-  });
+  const [dateRange, setDateRange] = useState<string>('last7days');
+  const [transactionType, setTransactionType] = useState<string>('all');
+  const [locationFilter, setLocationFilter] = useState<string>('');
+  const [amountMin, setAmountMin] = useState<string>('');
+  const [amountMax, setAmountMax] = useState<string>('');
   
-  // Stan dla tooltipa mapy
-  const [tooltip, setTooltip] = useState<{
-    visible: boolean;
-    content: string;
-    x: number;
-    y: number;
-  }>({
-    visible: false,
-    content: '',
-    x: 0,
-    y: 0
-  });
+  // Stan dla alertów i transakcji
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
   
-  // Stany ładowania i błędów
+  // Stan dla aktywnej zakładki
+  const [activeTab, setActiveTab] = useState<string>('transactions');
+  
+  // Stan dla ładowania
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   
-  // Pobieranie alertów przy montowaniu komponentu i zmianie filtrów
+  // Nowe stany dla ulepszonych funkcji wykrywania oszustw
+  const [showBiometricModal, setShowBiometricModal] = useState<boolean>(false);
+  const [showMultiFactorAuth, setShowMultiFactorAuth] = useState<boolean>(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [verificationResults, setVerificationResults] = useState<any>(null);
+  
+  // Pobieranie danych przy montowaniu komponentu
   useEffect(() => {
-    const fetchAlerts = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
-      setError(null);
       
       try {
-        const alertsResponse = await fraudDetectionService.getAlerts(
-          filters.priority !== 'all' ? filters.priority : undefined,
-          filters.status !== 'all' ? filters.status : undefined,
-          filters.dateFrom || undefined,
-          filters.dateTo || undefined,
-          filters.search || undefined,
-          filters.page,
-          filters.limit
-        );
+        // Pobieranie alertów
+        const alertsResponse = await fraudDetectionService.getFraudAlerts();
+        setAlerts(alertsResponse.alerts);
         
-        setAlerts(alertsResponse);
-        
-        // Pobieranie wzorców transakcji
-        const patternsResponse = await fraudDetectionService.getTransactionPatterns();
-        setTransactionPatterns(patternsResponse);
-      } catch (err) {
-        console.error('Error fetching fraud detection data:', err);
-        setError('Nie udało się pobrać danych wykrywania oszustw. Spróbuj odświeżyć stronę.');
+        // Pobieranie transakcji
+        const transactionsResponse = await fraudDetectionService.getFraudTransactions({
+          dateRange,
+          transactionType,
+          location: locationFilter,
+          amountMin: amountMin ? parseFloat(amountMin) : undefined,
+          amountMax: amountMax ? parseFloat(amountMax) : undefined
+        });
+        setTransactions(transactionsResponse.transactions);
+      } catch (error) {
+        console.error('Error fetching fraud detection data:', error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchAlerts();
-  }, [filters.priority, filters.status, filters.page, filters.limit]);
+    fetchData();
+  }, [dateRange, transactionType, locationFilter, amountMin, amountMax]);
   
   // Obsługa zmiany filtrów
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFilters({
-      ...filters,
-      [name]: value,
-      // Resetowanie strony przy zmianie filtrów
-      ...(name !== 'page' && { page: 1 })
-    });
+  const handleFilterChange = () => {
+    // Filtrowanie jest obsługiwane przez useEffect
   };
   
-  // Obsługa wyszukiwania
-  const handleSearch = () => {
-    setFilters({
-      ...filters,
-      page: 1
-    });
-  };
-  
-  // Obsługa zmiany strony
-  const handlePageChange = (newPage: number) => {
-    setFilters({
-      ...filters,
-      page: newPage
-    });
-  };
-  
-  // Obsługa kliknięcia wiersza alertu
-  const handleAlertClick = async (alert: FraudAlert) => {
-    setIsDetailLoading(true);
-    
+  // Obsługa weryfikacji karty
+  const handleCardVerification = async (transactionId: string) => {
     try {
-      const alertDetails = await fraudDetectionService.getAlertDetails(alert.id);
-      setSelectedAlert(alertDetails);
-    } catch (err) {
-      console.error('Error fetching alert details:', err);
-      setError('Nie udało się pobrać szczegółów alertu.');
-    } finally {
-      setIsDetailLoading(false);
+      const transaction = transactions.find(t => t.id === transactionId);
+      setSelectedTransaction(transaction);
+      
+      const result = await fraudDetectionService.verifyCardPresence(transactionId);
+      setVerificationResults(result);
+    } catch (error) {
+      console.error('Error verifying card presence:', error);
     }
   };
   
-  // Obsługa aktualizacji statusu alertu
-  const handleStatusUpdate = async (id: string, newStatus: string) => {
-    try {
-      await fraudDetectionService.updateAlertStatus(id, { status: newStatus });
-      
-      // Odświeżenie listy alertów
-      const alertsResponse = await fraudDetectionService.getAlerts(
-        filters.priority !== 'all' ? filters.priority : undefined,
-        filters.status !== 'all' ? filters.status : undefined,
-        filters.dateFrom || undefined,
-        filters.dateTo || undefined,
-        filters.search || undefined,
-        filters.page,
-        filters.limit
-      );
-      
-      setAlerts(alertsResponse);
-      
-      // Aktualizacja wybranego alertu, jeśli istnieje
-      if (selectedAlert && selectedAlert.id === id) {
-        setSelectedAlert({
-          ...selectedAlert,
-          status: newStatus
-        });
-      }
-    } catch (err) {
-      console.error('Error updating alert status:', err);
-      setError('Nie udało się zaktualizować statusu alertu.');
-    }
+  // Obsługa uwierzytelniania biometrycznego
+  const handleBiometricAuth = (transactionId: string) => {
+    const transaction = transactions.find(t => t.id === transactionId);
+    setSelectedTransaction(transaction);
+    setShowBiometricModal(true);
   };
   
-  // Renderowanie sekcji filtrów
-  const renderFilters = () => {
+  // Obsługa wieloczynnikowego uwierzytelniania
+  const handleMultiFactorAuth = (transactionId: string) => {
+    const transaction = transactions.find(t => t.id === transactionId);
+    setSelectedTransaction(transaction);
+    setShowMultiFactorAuth(true);
+  };
+  
+  // Renderowanie alertów
+  const renderAlerts = () => {
     return (
-      <FilterContainer>
-        <FilterGroup>
-          <FilterLabel htmlFor="priority">Priorytet</FilterLabel>
-          <FilterSelect 
-            id="priority" 
-            name="priority" 
-            value={filters.priority} 
-            onChange={handleFilterChange}
-          >
-            <option value="all">Wszystkie</option>
-            <option value="high">Wysoki</option>
-            <option value="medium">Średni</option>
-            <option value="low">Niski</option>
-          </FilterSelect>
-        </FilterGroup>
-        
-        <FilterGroup>
-          <FilterLabel htmlFor="status">Status</FilterLabel>
-          <FilterSelect 
-            id="status" 
-            name="status" 
-            value={filters.status} 
-            onChange={handleFilterChange}
-          >
-            <option value="all">Wszystkie</option>
-            <option value="new">Nowy</option>
-            <option value="inProgress">W trakcie</option>
-            <option value="closed">Zamknięty</option>
-          </FilterSelect>
-        </FilterGroup>
-        
-        <FilterGroup>
-          <FilterLabel htmlFor="dateFrom">Data od</FilterLabel>
-          <FilterInput 
-            type="date" 
-            id="dateFrom" 
-            name="dateFrom" 
-            value={filters.dateFrom} 
-            onChange={handleFilterChange}
-          />
-        </FilterGroup>
-        
-        <FilterGroup>
-          <FilterLabel htmlFor="dateTo">Data do</FilterLabel>
-          <FilterInput 
-            type="date" 
-            id="dateTo" 
-            name="dateTo" 
-            value={filters.dateTo} 
-            onChange={handleFilterChange}
-          />
-        </FilterGroup>
-        
-        <FilterGroup>
-          <FilterLabel htmlFor="search">Wyszukaj</FilterLabel>
-          <FilterInput 
-            type="text" 
-            id="search" 
-            name="search" 
-            value={filters.search} 
-            onChange={handleFilterChange}
-            placeholder="Pojazd, lokalizacja..."
-          />
-        </FilterGroup>
-        
-        <FilterGroup>
-          <FilterLabel>&nbsp;</FilterLabel>
-          <Button primary onClick={handleSearch}>Szukaj</Button>
-        </FilterGroup>
-      </FilterContainer>
+      <AlertsContainer>
+        {alerts.map(alert => (
+          <AlertItem key={alert.id} priority={alert.priority}>
+            <AlertTitle>{alert.title}</AlertTitle>
+            <AlertDetails>{alert.details}</AlertDetails>
+          </AlertItem>
+        ))}
+      </AlertsContainer>
     );
   };
   
-  // Renderowanie tabeli alertów
-  const renderAlertsTable = () => {
-    if (!alerts) return null;
-    
-    const getPriorityBadge = (priority: string) => {
-      const colors: Record<string, string> = {
-        high: '#f44336',
-        medium: '#ff9800',
-        low: '#4caf50'
-      };
-      
-      return (
-        <Badge color={colors[priority] || '#2196f3'}>
-          {priority === 'high' ? 'Wysoki' : 
-           priority === 'medium' ? 'Średni' : 
-           priority === 'low' ? 'Niski' : priority}
-        </Badge>
-      );
-    };
-    
-    const getStatusBadge = (status: string) => {
-      const colors: Record<string, string> = {
-        new: '#2196f3',
-        inProgress: '#ff9800',
-        closed: '#9e9e9e'
-      };
-      
-      return (
-        <Badge color={colors[status] || '#2196f3'}>
-          {status === 'new' ? 'Nowy' : 
-           status === 'inProgress' ? 'W trakcie' : 
-           status === 'closed' ? 'Zamknięty' : status}
-        </Badge>
-      );
-    };
-    
-    const columns = [
-      { 
-        key: 'priority', 
-        header: 'Priorytet',
-        render: (alert: FraudAlert) => getPriorityBadge(alert.priority)
-      },
-      { key: 'vehicle', header: 'Pojazd' },
-      { key: 'description', header: 'Opis' },
-      { key: 'date', header: 'Data' },
-      { key: 'location', header: 'Lokalizacja' },
-      { 
-        key: 'status', 
-        header: 'Status',
-        render: (alert: FraudAlert) => getStatusBadge(alert.status)
-      }
-    ];
-    
+  // Renderowanie transakcji
+  const renderTransactions = () => {
     return (
-      <>
-        <Table 
-          data={alerts.alerts}
-          columns={columns}
-          onRowClick={handleAlertClick}
-        />
-        
-        <PaginationContainer>
-          <PaginationInfo>
-            Wyświetlanie {(filters.page - 1) * filters.limit + 1} - {Math.min(filters.page * filters.limit, alerts.total)} z {alerts.total} alertów
-          </PaginationInfo>
-          
-          <PaginationButtons>
-            <Button 
-              onClick={() => handlePageChange(filters.page - 1)}
-              disabled={filters.page === 1}
-            >
-              Poprzednia
-            </Button>
-            
-            <Button 
-              onClick={() => handlePageChange(filters.page + 1)}
-              disabled={filters.page * filters.limit >= alerts.total}
-            >
-              Następna
-            </Button>
-          </PaginationButtons>
-        </PaginationContainer>
-      </>
-    );
-  };
-  
-  // Renderowanie szczegółów alertu
-  const renderAlertDetails = () => {
-    if (!selectedAlert) return null;
-    
-    return (
-      <DetailContainer>
-        <DetailTitle>Szczegóły alertu</DetailTitle>
-        
-        <DetailRow>
-          <DetailLabel>ID:</DetailLabel>
-          <DetailValue>{selectedAlert.id}</DetailValue>
-        </DetailRow>
-        
-        <DetailRow>
-          <DetailLabel>Pojazd:</DetailLabel>
-          <DetailValue>{selectedAlert.vehicle}</DetailValue>
-        </DetailRow>
-        
-        <DetailRow>
-          <DetailLabel>Opis:</DetailLabel>
-          <DetailValue>{selectedAlert.description}</DetailValue>
-        </DetailRow>
-        
-        <DetailRow>
-          <DetailLabel>Data:</DetailLabel>
-          <DetailValue>{selectedAlert.date}</DetailValue>
-        </DetailRow>
-        
-        <DetailRow>
-          <DetailLabel>Lokalizacja:</DetailLabel>
-          <DetailValue>{selectedAlert.location}</DetailValue>
-        </DetailRow>
-        
-        <DetailRow>
-          <DetailLabel>Status:</DetailLabel>
-          <DetailValue>
-            <FilterSelect 
-              value={selectedAlert.status} 
-              onChange={(e) => handleStatusUpdate(selectedAlert.id, e.target.value)}
-            >
-              <option value="new">Nowy</option>
-              <option value="inProgress">W trakcie</option>
-              <option value="closed">Zamknięty</option>
-            </FilterSelect>
-          </DetailValue>
-        </DetailRow>
-        
-        {selectedAlert.details && (
-          <>
-            <DetailTitle style={{ marginTop: '16px' }}>Szczegóły transakcji</DetailTitle>
-            
-            <DetailRow>
-              <DetailLabel>ID transakcji:</DetailLabel>
-              <DetailValue>{selectedAlert.details.transactionId}</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>Kwota:</DetailLabel>
-              <DetailValue>{selectedAlert.details.amount} zł</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>Rodzaj paliwa:</DetailLabel>
-              <DetailValue>{selectedAlert.details.fuelType}</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>Ilość:</DetailLabel>
-              <DetailValue>{selectedAlert.details.quantity} l</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>ID kierowcy:</DetailLabel>
-              <DetailValue>{selectedAlert.details.driverId}</DetailValue>
-            </DetailRow>
-            
-            {selectedAlert.details.cardVerification && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Weryfikacja karty</DetailTitle>
-                
-                <DetailRow>
-                  <DetailLabel>Status:</DetailLabel>
-                  <DetailValue>
-                    <Badge 
-                      color={selectedAlert.details.cardVerification.status === 'verified' ? '#4caf50' : '#f44336'}
-                    >
-                      {selectedAlert.details.cardVerification.status === 'verified' ? 'Zweryfikowana' : 'Niezweryfikowana'}
-                    </Badge>
-                  </DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Odległość od pojazdu:</DetailLabel>
-                  <DetailValue>
-                    {selectedAlert.details.cardVerification.distanceFromVehicle} km
-                  </DetailValue>
-                </DetailRow>
-              </>
-            )}
-          </>
-        )}
-      </DetailContainer>
-    );
-  };
-  
-  // Renderowanie analizy wzorców transakcji
-  const renderTransactionPatterns = () => {
-    if (!transactionPatterns) return null;
-    
-    return (
-      <Card title="Analiza wzorców transakcji">
-        <ChartContainer>
-          <PieChart />
-          <PieChartLegend>
-            {transactionPatterns.analysis.riskDistribution.map((item, index) => (
-              <LegendItem key={index}>
-                <LegendColor color={item.color} />
-                {item.category}: {item.percentage}%
-              </LegendItem>
-            ))}
-          </PieChartLegend>
-        </ChartContainer>
-        
-        <DetailContainer style={{ marginTop: '16px' }}>
-          <DetailTitle>Statystyki transakcji</DetailTitle>
-          
-          <DetailRow>
-            <DetailLabel>Średnia kwota:</DetailLabel>
-            <DetailValue>{transactionPatterns.analysis.averageAmount} zł</DetailValue>
-          </DetailRow>
-          
-          <DetailRow>
-            <DetailLabel>Średnia ilość:</DetailLabel>
-            <DetailValue>{transactionPatterns.analysis.averageQuantity} l</DetailValue>
-          </DetailRow>
-          
-          <DetailTitle style={{ marginTop: '16px' }}>Najczęstsze lokalizacje</DetailTitle>
-          
-          {transactionPatterns.analysis.frequentLocations.map((location, index) => (
-            <DetailRow key={index}>
-              <DetailLabel>{location.location}:</DetailLabel>
-              <DetailValue>{location.count} transakcji</DetailValue>
-            </DetailRow>
+      <TransactionsTable>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Kierowca</th>
+            <th>Pojazd</th>
+            <th>Lokalizacja</th>
+            <th>Kwota</th>
+            <th>Status</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map(transaction => (
+            <tr key={transaction.id}>
+              <td>{transaction.date}</td>
+              <td>{transaction.driver}</td>
+              <td>{transaction.vehicle}</td>
+              <td>{transaction.location}</td>
+              <td>{transaction.amount.toFixed(2)} {transaction.currency}</td>
+              <td>
+                <StatusBadge status={transaction.status}>
+                  {transaction.status === 'suspicious' ? 'Podejrzana' : 
+                   transaction.status === 'verified' ? 'Zweryfikowana' : 
+                   'Oznaczona'}
+                </StatusBadge>
+              </td>
+              <td>
+                <ActionButton onClick={() => handleCardVerification(transaction.id)}>
+                  Weryfikuj kartę
+                </ActionButton>
+                <ActionButton onClick={() => handleBiometricAuth(transaction.id)}>
+                  Biometria
+                </ActionButton>
+                <ActionButton onClick={() => handleMultiFactorAuth(transaction.id)}>
+                  MFA
+                </ActionButton>
+              </td>
+            </tr>
           ))}
-        </DetailContainer>
-      </Card>
+        </tbody>
+      </TransactionsTable>
     );
   };
   
-  if (isLoading) {
+  // Renderowanie analizy wzorców
+  const renderPatternAnalysis = () => {
     return (
-      <PageContainer>
-        <LoadingIndicator>Ładowanie danych wykrywania oszustw...</LoadingIndicator>
-      </PageContainer>
+      <TransactionPatternAnalysis 
+        transactions={transactions} 
+        onAnomalyDetected={(anomalies) => console.log('Anomalies detected:', anomalies)} 
+      />
     );
-  }
+  };
   
-  if (error) {
+  // Renderowanie rejestru blockchain
+  const renderBlockchainLedger = () => {
     return (
-      <PageContainer>
-        <ErrorMessage>{error}</ErrorMessage>
-      </PageContainer>
+      <BlockchainLedger 
+        transactions={transactions} 
+        onLedgerVerified={(verified) => console.log('Ledger verified:', verified)} 
+      />
     );
-  }
+  };
+  
+  // Renderowanie testów jakości paliwa
+  const renderFuelQualityTests = () => {
+    return (
+      <FuelQualityTest 
+        transactions={transactions} 
+        onTestResults={(results) => console.log('Fuel quality test results:', results)} 
+      />
+    );
+  };
   
   return (
     <PageContainer>
       <SectionTitle>WYKRYWANIE OSZUSTW</SectionTitle>
       
-      {renderFilters()}
-      
-      <Card title="Alerty oszustw" fullWidth>
-        {renderAlertsTable()}
-      </Card>
-      
-      {selectedAlert && (
-        <Card title="Szczegóły alertu" fullWidth>
-          {isDetailLoading ? (
-            <LoadingIndicator>Ładowanie szczegółów...</LoadingIndicator>
-          ) : (
-            renderAlertDetails()
-          )}
-        </Card>
-      )}
+      <FilterSection>
+        <FilterGroup>
+          <FilterLabel>Okres:</FilterLabel>
+          <FilterSelect 
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+          >
+            <option value="today">Dzisiaj</option>
+            <option value="yesterday">Wczoraj</option>
+            <option value="last7days">Ostatnie 7 dni</option>
+            <option value="last30days">Ostatnie 30 dni</option>
+            <option value="custom">Niestandardowy</option>
+          </FilterSelect>
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel>Typ transakcji:</FilterLabel>
+          <FilterSelect 
+            value={transactionType}
+            onChange={(e) => setTransactionType(e.target.value)}
+          >
+            <option value="all">Wszystkie</option>
+            <option value="fuel">Paliwo</option>
+            <option value="service">Serwis</option>
+            <option value="toll">Opłaty drogowe</option>
+            <option value="other">Inne</option>
+          </FilterSelect>
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel>Lokalizacja:</FilterLabel>
+          <FilterInput 
+            type="text" 
+            placeholder="Miasto, kraj..." 
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+          />
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel>Kwota:</FilterLabel>
+          <FilterInput 
+            type="number" 
+            placeholder="Min" 
+            value={amountMin}
+            onChange={(e) => setAmountMin(e.target.value)}
+          />
+          <span>-</span>
+          <FilterInput 
+            type="number" 
+            placeholder="Max" 
+            value={amountMax}
+            onChange={(e) => setAmountMax(e.target.value)}
+          />
+        </FilterGroup>
+        
+        <FilterButton onClick={handleFilterChange}>
+          Filtruj
+        </FilterButton>
+      </FilterSection>
       
       <GridSection>
-        {renderTransactionPatterns()}
-        
-        <Card title="Mapa alertów">
+        <Card title="Mapa podejrzanych transakcji">
           <MapContainer>
-            <MapPlaceholder>
-              Mapa alertów oszustw
-              <br />
-              (Integracja z rzeczywistą mapą)
-            </MapPlaceholder>
+            {/* Tutaj będzie mapa z Google Maps lub innej biblioteki */}
+            <MapOverlay>
+              <div>Podejrzane transakcje: {transactions.filter(t => t.status === 'suspicious').length}</div>
+              <div>Zweryfikowane transakcje: {transactions.filter(t => t.status === 'verified').length}</div>
+            </MapOverlay>
           </MapContainer>
         </Card>
+        
+        <Card title="Alerty oszustw">
+          {renderAlerts()}
+        </Card>
       </GridSection>
+      
+      <Card title="Analiza transakcji" fullWidth>
+        <TabsContainer>
+          <Tab 
+            active={activeTab === 'transactions'} 
+            onClick={() => setActiveTab('transactions')}
+          >
+            Transakcje
+          </Tab>
+          <Tab 
+            active={activeTab === 'patterns'} 
+            onClick={() => setActiveTab('patterns')}
+          >
+            Analiza wzorców
+          </Tab>
+          <Tab 
+            active={activeTab === 'blockchain'} 
+            onClick={() => setActiveTab('blockchain')}
+          >
+            Rejestr blockchain
+          </Tab>
+          <Tab 
+            active={activeTab === 'fuelquality'} 
+            onClick={() => setActiveTab('fuelquality')}
+          >
+            Testy jakości paliwa
+          </Tab>
+        </TabsContainer>
+        
+        {activeTab === 'transactions' && renderTransactions()}
+        {activeTab === 'patterns' && renderPatternAnalysis()}
+        {activeTab === 'blockchain' && renderBlockchainLedger()}
+        {activeTab === 'fuelquality' && renderFuelQualityTests()}
+      </Card>
+      
+      <EnhancedFeaturesContainer>
+        <SectionTitle>ULEPSZONE FUNKCJE WYKRYWANIA OSZUSTW</SectionTitle>
+        
+        <GridSection>
+          <FeatureCard>
+            <FeatureHeader>Weryfikacja obecności karty</FeatureHeader>
+            <FeatureBody>
+              <FeatureDescription>
+                Walidacja, że karta paliwowa i pojazd znajdują się w tej samej lokalizacji w momencie zakupu.
+                System wykorzystuje dane GPS pojazdu i lokalizację terminala płatniczego do weryfikacji.
+              </FeatureDescription>
+              <FeatureButton onClick={() => handleCardVerification(transactions[0]?.id)}>
+                Testuj weryfikację
+              </FeatureButton>
+            </FeatureBody>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureHeader>Uwierzytelnianie biometryczne</FeatureHeader>
+            <FeatureBody>
+              <FeatureDescription>
+                Bezpieczna identyfikacja kierowcy za pomocą odcisków palców lub rozpoznawania twarzy.
+                Zwiększa bezpieczeństwo transakcji i zapobiega nieautoryzowanemu użyciu kart paliwowych.
+              </FeatureDescription>
+              <FeatureButton onClick={() => setShowBiometricModal(true)}>
+                Testuj biometrię
+              </FeatureButton>
+            </FeatureBody>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureHeader>Analiza wzorców transakcji</FeatureHeader>
+            <FeatureBody>
+              <FeatureDescription>
+                Wykrywanie nietypowych wzorców zakupowych oparte na AI.
+                System analizuje historyczne dane i identyfikuje anomalie w zachowaniach zakupowych.
+              </FeatureDescription>
+              <FeatureButton onClick={() => setActiveTab('patterns')}>
+                Pokaż analizę
+              </FeatureButton>
+            </FeatureBody>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureHeader>Autoryzacja wieloczynnikowa</FeatureHeader>
+            <FeatureBody>
+              <FeatureDescription>
+                Wymaganie dodatkowej weryfikacji dla podejrzanych transakcji.
+                Zwiększa bezpieczeństwo poprzez dodatkowe warstwy weryfikacji dla transakcji wysokiego ryzyka.
+              </FeatureDescription>
+              <FeatureButton onClick={() => setShowMultiFactorAuth(true)}>
+                Testuj MFA
+              </FeatureButton>
+            </FeatureBody>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureHeader>Księga transakcji oparta na blockchain</FeatureHeader>
+            <FeatureBody>
+              <FeatureDescription>
+                Niezmienne rejestry wszystkich transakcji paliwowych i zdarzeń konserwacyjnych.
+                Zapewnia pełną przejrzystość i niemożliwość modyfikacji historii transakcji.
+              </FeatureDescription>
+              <FeatureButton onClick={() => setActiveTab('blockchain')}>
+                Pokaż rejestr
+              </FeatureButton>
+            </FeatureBody>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureHeader>Testowanie jakości paliwa</FeatureHeader>
+            <FeatureBody>
+              <FeatureDescription>
+                Wykrywanie problemów z rozcieńczeniem paliwa lub jego jakością.
+                System analizuje dane z czujników pojazdu, aby wykryć problemy z jakością paliwa.
+              </FeatureDescription>
+              <FeatureButton onClick={() => setActiveTab('fuelquality')}>
+                Pokaż testy
+              </FeatureButton>
+            </FeatureBody>
+          </FeatureCard>
+        </GridSection>
+      </EnhancedFeaturesContainer>
+      
+      {/* Modalne okna dla ulepszonych funkcji */}
+      {showBiometricModal && (
+        <BiometricAuthModal 
+          transaction={selectedTransaction}
+          onClose={() => setShowBiometricModal(false)}
+          onAuthenticate={(result) => {
+            console.log('Biometric authentication result:', result);
+            setShowBiometricModal(false);
+          }}
+        />
+      )}
+      
+      {showMultiFactorAuth && (
+        <MultiFactorAuth 
+          transaction={selectedTransaction}
+          onClose={() => setShowMultiFactorAuth(false)}
+          onVerify={(result) => {
+            console.log('Multi-factor authentication result:', result);
+            setShowMultiFactorAuth(false);
+          }}
+        />
+      )}
+      
+      {verificationResults && (
+        <CardPresenceVerification 
+          results={verificationResults}
+          onClose={() => setVerificationResults(null)}
+        />
+      )}
     </PageContainer>
   );
 };
