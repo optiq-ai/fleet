@@ -5,6 +5,8 @@ interface TableProps {
   headers: string[];
   data: any[][];
   onRowClick?: (index: number) => void;
+  isLoading?: boolean;
+  emptyMessage?: string;
 }
 
 const TableContainer = styled.div`
@@ -29,10 +31,10 @@ const TableHeaderCell = styled.th`
   border-bottom: 1px solid #e0e0e0;
 `;
 
-const TableRow = styled.tr`
-  cursor: pointer;
+const TableRow = styled.tr<{ clickable?: boolean }>`
+  cursor: ${props => props.clickable ? 'pointer' : 'default'};
   &:hover {
-    background-color: #f5f7fa;
+    background-color: ${props => props.clickable ? '#f5f7fa' : 'transparent'};
   }
 `;
 
@@ -41,7 +43,99 @@ const TableCell = styled.td`
   border-bottom: 1px solid #e0e0e0;
 `;
 
-const Table: React.FC<TableProps> = ({ headers, data, onRowClick }) => {
+const LoadingRow = styled.tr`
+  height: 200px;
+`;
+
+const LoadingCell = styled.td`
+  text-align: center;
+  color: #666;
+`;
+
+const EmptyRow = styled.tr`
+  height: 100px;
+`;
+
+const EmptyCell = styled.td`
+  text-align: center;
+  color: #666;
+`;
+
+const LoadingPlaceholder = styled.div`
+  height: 20px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin: 8px 0;
+  animation: pulse 1.5s infinite;
+  
+  @keyframes pulse {
+    0% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.6;
+    }
+  }
+`;
+
+const Table: React.FC<TableProps> = ({ 
+  headers, 
+  data, 
+  onRowClick, 
+  isLoading = false,
+  emptyMessage = "Brak danych do wyświetlenia"
+}) => {
+  if (isLoading) {
+    return (
+      <TableContainer>
+        <StyledTable>
+          <TableHeader>
+            <tr>
+              {headers.map((header, index) => (
+                <TableHeaderCell key={index}>{header}</TableHeaderCell>
+              ))}
+            </tr>
+          </TableHeader>
+          <tbody>
+            <LoadingRow>
+              <LoadingCell colSpan={headers.length}>
+                <LoadingPlaceholder />
+                <LoadingPlaceholder style={{ width: '80%' }} />
+                <LoadingPlaceholder style={{ width: '60%' }} />
+              </LoadingCell>
+            </LoadingRow>
+          </tbody>
+        </StyledTable>
+      </TableContainer>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <TableContainer>
+        <StyledTable>
+          <TableHeader>
+            <tr>
+              {headers.map((header, index) => (
+                <TableHeaderCell key={index}>{header}</TableHeaderCell>
+              ))}
+            </tr>
+          </TableHeader>
+          <tbody>
+            <EmptyRow>
+              <EmptyCell colSpan={headers.length}>
+                {emptyMessage}
+              </EmptyCell>
+            </EmptyRow>
+          </tbody>
+        </StyledTable>
+      </TableContainer>
+    );
+  }
+
   return (
     <TableContainer>
       <StyledTable>
@@ -57,6 +151,7 @@ const Table: React.FC<TableProps> = ({ headers, data, onRowClick }) => {
             <TableRow 
               key={rowIndex} 
               onClick={() => onRowClick && onRowClick(rowIndex)}
+              clickable={!!onRowClick}
             >
               {row.map((cell, cellIndex) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 interface KPICardProps {
@@ -7,6 +7,7 @@ interface KPICardProps {
   icon?: string;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string;
+  isLoading?: boolean;
 }
 
 const CardContainer = styled.div`
@@ -17,6 +18,12 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
 `;
 
 const CardTitle = styled.div`
@@ -47,12 +54,72 @@ const TrendIcon = styled.span`
   margin-right: 4px;
 `;
 
-const KPICard: React.FC<KPICardProps> = ({ title, value, trend, trendValue }) => {
+const LoadingPlaceholder = styled.div`
+  height: 24px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  animation: pulse 1.5s infinite;
+  
+  @keyframes pulse {
+    0% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.6;
+    }
+  }
+`;
+
+const KPICard: React.FC<KPICardProps> = ({ 
+  title, 
+  value, 
+  trend, 
+  trendValue,
+  isLoading = false 
+}) => {
+  // Animacja wartości
+  const [displayValue, setDisplayValue] = useState<string | number>(0);
+  
+  useEffect(() => {
+    if (isLoading) return;
+    
+    if (typeof value === 'number') {
+      // Animacja dla wartości liczbowych
+      const duration = 1000; // ms
+      const steps = 20;
+      const stepValue = value / steps;
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += stepValue;
+        if (current >= value) {
+          setDisplayValue(value);
+          clearInterval(timer);
+        } else {
+          setDisplayValue(Math.floor(current));
+        }
+      }, duration / steps);
+      
+      return () => clearInterval(timer);
+    } else {
+      // Dla wartości tekstowych - bez animacji
+      setDisplayValue(value);
+    }
+  }, [value, isLoading]);
+  
   return (
     <CardContainer>
       <CardTitle>{title}</CardTitle>
-      <CardValue>{value}</CardValue>
-      {trend && trendValue && (
+      {isLoading ? (
+        <LoadingPlaceholder />
+      ) : (
+        <CardValue>{displayValue}</CardValue>
+      )}
+      {trend && trendValue && !isLoading && (
         <TrendContainer trend={trend}>
           <TrendIcon>
             {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'}
