@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -10,13 +10,19 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/fleet', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('Could not connect to MongoDB', err));
+// Connect to PostgreSQL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/fleet'
+});
+
+// Test database connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Error connecting to PostgreSQL', err);
+  } else {
+    console.log('Connected to PostgreSQL at', res.rows[0].now);
+  }
+});
 
 // Routes
 app.get('/api/health', (req, res) => {

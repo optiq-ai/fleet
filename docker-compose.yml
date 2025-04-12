@@ -7,7 +7,7 @@ services:
       context: ./react-app
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3020:3000"
     volumes:
       - ./react-app:/app
       - /app/node_modules
@@ -29,19 +29,23 @@ services:
       - ./backend:/app
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=mongodb://fleet-db:27017/fleet
+      - DATABASE_URL=postgresql://postgres:postgres@fleet-db:5432/fleet
     depends_on:
       - fleet-db
     restart: unless-stopped
 
-  # MongoDB database
+  # PostgreSQL database
   fleet-db:
-    image: mongo:latest
+    image: postgres:latest
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongodb_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=fleet
     restart: unless-stopped
 
 volumes:
-  mongodb_data:
+  postgres_data:
