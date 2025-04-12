@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import KPICard from '../components/common/KPICard';
+import driverSafetyService, { 
+  SafetyAlert, 
+  SafetyAlertsResponse, 
+  DriverRanking,
+  DriverRankingResponse,
+  DrivingStyleResponse,
+  CoachingSessionsResponse
+} from '../services/api/driverSafetyService';
 
 const PageContainer = styled.div`
   display: flex;
@@ -17,13 +24,6 @@ const SectionTitle = styled.h2`
   margin: 0 0 16px 0;
 `;
 
-const KPISection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-`;
-
 const GridSection = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -35,120 +35,24 @@ const GridSection = styled.div`
   }
 `;
 
-const MapPlaceholder = styled.div`
-  background-color: #e9ecef;
+const MapContainer = styled.div`
+  height: 400px;
+  background-color: #f5f5f5;
   border-radius: 8px;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6c757d;
+  overflow: hidden;
   position: relative;
 `;
 
-const MapOverlay = styled.div`
+const MapPlaceholder = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-`;
-
-const MapPoint = styled.div<{ x: number; y: number; color: string; size?: number }>`
-  position: absolute;
-  top: ${props => props.y}%;
-  left: ${props => props.x}%;
-  width: ${props => props.size || 12}px;
-  height: ${props => props.size || 12}px;
-  background-color: ${props => props.color};
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    transform: translate(-50%, -50%) scale(1.5);
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-  }
-  
-  &:hover::after {
-    content: 'Incident ID: ${props => props.x * props.y}';
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 20;
-  }
-`;
-
-const ChartPlaceholder = styled.div`
-  background-color: #e9ecef;
-  border-radius: 8px;
-  height: 200px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  color: #6c757d;
-  position: relative;
-`;
-
-const FilterBar = styled.div`
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-`;
-
-const FilterSelect = styled.select`
-  padding: 8px 16px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
-  }
-`;
-
-const FilterOption = styled.option`
-  padding: 8px;
-`;
-
-const SearchInput = styled.input`
-  padding: 8px 16px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  flex-grow: 1;
-  max-width: 300px;
-  
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
-  }
-  
-  &::placeholder {
-    color: #999;
-  }
+  color: #666;
 `;
 
 const LoadingIndicator = styled.div`
@@ -159,519 +63,907 @@ const LoadingIndicator = styled.div`
   color: #666;
 `;
 
-const RadarChart = styled.div`
+const ErrorMessage = styled.div`
+  color: #d32f2f;
+  padding: 16px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  margin-bottom: 20px;
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const FilterLabel = styled.label`
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+`;
+
+const FilterSelect = styled.select`
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 150px;
+  
+  &:focus {
+    outline: none;
+    border-color: #3f51b5;
+  }
+`;
+
+const FilterInput = styled.input`
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  
+  &:focus {
+    outline: none;
+    border-color: #3f51b5;
+  }
+`;
+
+const Button = styled.button<{ primary?: boolean }>`
+  padding: 8px 16px;
+  background-color: ${props => props.primary ? '#3f51b5' : 'white'};
+  color: ${props => props.primary ? 'white' : '#3f51b5'};
+  border: 1px solid #3f51b5;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: ${props => props.primary ? '#303f9f' : '#f0f0f0'};
+  }
+  
+  &:disabled {
+    background-color: #e0e0e0;
+    color: #9e9e9e;
+    border-color: #e0e0e0;
+    cursor: not-allowed;
+  }
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+`;
+
+const PaginationInfo = styled.div`
+  font-size: 14px;
+  color: #666;
+`;
+
+const PaginationButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const Badge = styled.span<{ color: string }>`
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: ${props => props.color};
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+const TabsContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+`;
+
+const Tab = styled.div<{ active: boolean }>`
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: ${props => props.active ? '500' : 'normal'};
+  color: ${props => props.active ? '#3f51b5' : '#666'};
+  border-bottom: 2px solid ${props => props.active ? '#3f51b5' : 'transparent'};
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: #3f51b5;
+    background-color: #f5f5f5;
+  }
+`;
+
+const DetailContainer = styled.div`
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin-top: 20px;
+`;
+
+const DetailTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 12px 0;
+`;
+
+const DetailRow = styled.div`
+  display: flex;
+  margin-bottom: 8px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const DetailLabel = styled.div`
+  font-weight: 500;
+  width: 200px;
+  color: #666;
+`;
+
+const DetailValue = styled.div`
+  flex: 1;
+`;
+
+const RadarChartContainer = styled.div`
   position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+`;
+
+const RadarChartBackground = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const RadarBackground = styled.div`
-  position: relative;
-  width: 200px;
-  height: 200px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(240, 240, 240, 0.9) 30%,
-    rgba(230, 230, 230, 0.9) 60%,
-    rgba(220, 220, 220, 0.9) 100%
-  );
+  background-color: #f5f5f5;
+  z-index: 1;
 `;
 
-const RadarAxis = styled.div<{ rotation: number }>`
+const RadarChartAxis = styled.div<{ angle: number }>`
   position: absolute;
   top: 50%;
   left: 50%;
   width: 100%;
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.1);
-  transform: translateY(-50%) rotate(${props => props.rotation}deg);
-  transform-origin: center;
+  background-color: #e0e0e0;
+  transform-origin: left center;
+  transform: rotate(${props => props.angle}deg);
+  z-index: 2;
 `;
 
-const RadarLabel = styled.div<{ x: number; y: number }>`
+const RadarChartCircle = styled.div<{ size: number }>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: ${props => props.size}%;
+  height: ${props => props.size}%;
+  border-radius: 50%;
+  border: 1px dashed #e0e0e0;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+`;
+
+const RadarChartPoint = styled.div<{ x: number; y: number; value: number }>`
+  position: absolute;
+  top: ${props => 50 + props.y * props.value / 100}%;
+  left: ${props => 50 + props.x * props.value / 100}%;
+  width: 8px;
+  height: 8px;
+  background-color: #3f51b5;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+`;
+
+const RadarChartPolygon = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  
+  & > svg {
+    width: 100%;
+    height: 100%;
+    
+    & > polygon {
+      fill: rgba(63, 81, 181, 0.2);
+      stroke: #3f51b5;
+      stroke-width: 2;
+    }
+  }
+`;
+
+const RadarChartLabel = styled.div<{ x: number; y: number }>`
   position: absolute;
   top: ${props => props.y}%;
   left: ${props => props.x}%;
   transform: translate(-50%, -50%);
   font-size: 12px;
   color: #666;
-  white-space: nowrap;
-`;
-
-const RadarPoint = styled.div<{ x: number; y: number; size: number; color: string }>`
-  position: absolute;
-  top: ${props => props.y}%;
-  left: ${props => props.x}%;
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  background-color: ${props => props.color};
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-`;
-
-const RadarPolygon = styled.polygon`
-  fill: rgba(63, 81, 181, 0.2);
-  stroke: rgba(63, 81, 181, 0.8);
-  stroke-width: 2;
+  z-index: 5;
 `;
 
 const ProgressBar = styled.div`
   width: 100%;
-  height: 20px;
-  background-color: #e9ecef;
-  border-radius: 10px;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-top: 4px;
 `;
 
-const ProgressFill = styled.div<{ width: number; color: string }>`
+const ProgressBarFill = styled.div<{ width: number; color: string }>`
   height: 100%;
   width: ${props => props.width}%;
   background-color: ${props => props.color};
-  border-radius: 10px;
-  transition: width 1s ease-in-out;
+  border-radius: 4px;
+  transition: width 0.3s ease;
 `;
 
-const ProgressLabel = styled.div`
+const VideoContainer = styled.div`
+  width: 100%;
+  height: 200px;
+  background-color: #000;
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #666;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  margin-top: 16px;
+  border-radius: 8px;
 `;
-
-// Typy danych
-interface DriverSafetyData {
-  kpis: {
-    safetyIndex: number;
-    alertCount: number;
-    fatigueDrivers: number;
-    distractionCases: number;
-  };
-  safetyAlerts: {
-    type: string;
-    driver: string;
-    description: string;
-    time: string;
-    location: string;
-    status: string;
-  }[];
-  coachingSessions: {
-    driver: string;
-    type: string;
-    topic: string;
-    date: string;
-    status: string;
-  }[];
-  mapData: {
-    incidentPoints: { x: number; y: number; type: string }[];
-  };
-  driverRankings: {
-    driver: string;
-    score: number;
-    trend: 'up' | 'down' | 'neutral';
-  }[];
-  drivingStyle: {
-    category: string;
-    value: number;
-    angle: number;
-    labelPosition: { x: number; y: number };
-  }[];
-}
 
 const DriverSafety: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [safetyData, setSafetyData] = useState<DriverSafetyData | null>(null);
+  // Stan dla alertów bezpieczeństwa
+  const [alerts, setAlerts] = useState<SafetyAlertsResponse | null>(null);
+  
+  // Stan dla wybranego alertu
+  const [selectedAlert, setSelectedAlert] = useState<SafetyAlert | null>(null);
+  
+  // Stan dla rankingu kierowców
+  const [driverRanking, setDriverRanking] = useState<DriverRankingResponse | null>(null);
+  
+  // Stan dla analizy stylu jazdy
+  const [drivingStyle, setDrivingStyle] = useState<DrivingStyleResponse | null>(null);
+  
+  // Stan dla sesji coachingowych
+  const [coachingSessions, setCoachingSessions] = useState<CoachingSessionsResponse | null>(null);
+  
+  // Stan dla filtrów
+  const [filters, setFilters] = useState({
+    type: 'all',
+    time: 'all',
+    search: '',
+    page: 1,
+    limit: 10
+  });
+  
+  // Stan dla aktywnej zakładki
+  const [activeTab, setActiveTab] = useState<string>('alerts');
+  
+  // Stany ładowania i błędów
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [alertTypeFilter, setAlertTypeFilter] = useState('all');
-  const [timeFilter, setTimeFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Symulacja pobierania danych z API
+  
+  // Pobieranie danych przy montowaniu komponentu
   useEffect(() => {
     const fetchSafetyData = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
-        // Symulacja opóźnienia sieciowego
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Pobieranie alertów bezpieczeństwa
+        const alertsResponse = await driverSafetyService.getAlerts(
+          filters.type !== 'all' ? filters.type : undefined,
+          filters.time !== 'all' ? filters.time : undefined,
+          filters.search || undefined,
+          filters.page,
+          filters.limit
+        );
+        setAlerts(alertsResponse);
         
-        // Dane mockowe
-        const mockData: DriverSafetyData = {
-          kpis: {
-            safetyIndex: 85,
-            alertCount: 12,
-            fatigueDrivers: 3,
-            distractionCases: 5
-          },
-          safetyAlerts: [
-            { type: 'Zmęcz.', driver: 'Jan K.', description: 'Wykryto oznaki zmęczenia', time: '10:23', location: 'Warszawa-Łódź', status: 'Nowy' },
-            { type: 'Rozpr.', driver: 'Anna W.', description: 'Korzystanie z telefonu', time: '09:45', location: 'Kraków-Katowice', status: 'Nowy' },
-            { type: 'Styl', driver: 'Piotr M.', description: 'Gwałtowne hamowanie', time: '08:30', location: 'Poznań', status: 'W trakcie' },
-            { type: 'Koliz.', driver: 'Tomasz L.', description: 'Zbyt mała odległość', time: '11:15', location: 'Wrocław', status: 'W trakcie' },
-            { type: 'Zmęcz.', driver: 'Ewa S.', description: 'Długi czas pracy', time: '12:05', location: 'Gdańsk-Gdynia', status: 'Zamknięty' }
-          ],
-          coachingSessions: [
-            { driver: 'Jan K.', type: 'Online', topic: 'Zmęczenie za kierownicą', date: '15.04', status: 'Zaplanowane' },
-            { driver: 'Piotr M.', type: 'Osobiste', topic: 'Techniki hamowania', date: '18.04', status: 'Zaplanowane' },
-            { driver: 'Grupa A', type: 'Webinar', topic: 'Bezpieczny dystans', date: '20.04', status: 'Zaplanowane' },
-            { driver: 'Anna W.', type: 'Online', topic: 'Rozproszenie uwagi', date: '22.04', status: 'Zaplanowane' },
-            { driver: 'Tomasz L.', type: 'Osobiste', topic: 'Defensywna jazda', date: '25.04', status: 'Zaplanowane' }
-          ],
-          mapData: {
-            incidentPoints: [
-              { x: 25, y: 35, type: 'Zmęczenie' },
-              { x: 65, y: 45, type: 'Rozproszenie' },
-              { x: 40, y: 70, type: 'Styl jazdy' },
-              { x: 30, y: 20, type: 'Kolizja' },
-              { x: 70, y: 60, type: 'Zmęczenie' },
-              { x: 55, y: 30, type: 'Rozproszenie' }
-            ]
-          },
-          driverRankings: [
-            { driver: 'Marek N.', score: 95, trend: 'up' },
-            { driver: 'Alicja K.', score: 92, trend: 'up' },
-            { driver: 'Robert W.', score: 88, trend: 'neutral' },
-            { driver: 'Karolina Z.', score: 85, trend: 'down' },
-            { driver: 'Michał S.', score: 82, trend: 'up' }
-          ],
-          drivingStyle: [
-            { category: 'Hamowanie', value: 75, angle: 0, labelPosition: { x: 90, y: 50 } },
-            { category: 'Przyspieszanie', value: 85, angle: 72, labelPosition: { x: 75, y: 15 } },
-            { category: 'Zakręty', value: 65, angle: 144, labelPosition: { x: 25, y: 15 } },
-            { category: 'Prędkość', value: 90, angle: 216, labelPosition: { x: 10, y: 50 } },
-            { category: 'Dystans', value: 70, angle: 288, labelPosition: { x: 25, y: 85 } }
-          ]
-        };
+        // Pobieranie rankingu kierowców
+        const rankingResponse = await driverSafetyService.getDriverRanking();
+        setDriverRanking(rankingResponse);
         
-        setSafetyData(mockData);
-        setError(null);
+        // Pobieranie sesji coachingowych
+        const coachingResponse = await driverSafetyService.getCoachingSessions();
+        setCoachingSessions(coachingResponse);
+        
+        // Pobieranie analizy stylu jazdy dla pierwszego kierowcy z rankingu
+        if (rankingResponse && rankingResponse.rankings.length > 0) {
+          const drivingStyleResponse = await driverSafetyService.getDriverStyle(
+            rankingResponse.rankings[0].driver
+          );
+          setDrivingStyle(drivingStyleResponse);
+        }
       } catch (err) {
         console.error('Error fetching safety data:', err);
-        setError('Nie udało się pobrać danych o bezpieczeństwie. Spróbuj ponownie później.');
+        setError('Nie udało się pobrać danych bezpieczeństwa kierowcy. Spróbuj odświeżyć stronę.');
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchSafetyData();
-  }, []);
-
-  // Filtrowanie alertów
-  const getFilteredAlerts = () => {
-    if (!safetyData) return [];
     
-    return safetyData.safetyAlerts.filter(alert => {
-      // Filtrowanie po typie alertu
-      if (alertTypeFilter !== 'all') {
-        if (alertTypeFilter === 'fatigue' && alert.type !== 'Zmęcz.') return false;
-        if (alertTypeFilter === 'distraction' && alert.type !== 'Rozpr.') return false;
-        if (alertTypeFilter === 'style' && alert.type !== 'Styl') return false;
-        if (alertTypeFilter === 'collision' && alert.type !== 'Koliz.') return false;
-      }
-      
-      // Filtrowanie po czasie (uproszczone)
-      if (timeFilter !== 'all') {
-        const hour = parseInt(alert.time.split(':')[0]);
-        if (timeFilter === 'morning' && (hour < 6 || hour >= 12)) return false;
-        if (timeFilter === 'afternoon' && (hour < 12 || hour >= 18)) return false;
-        if (timeFilter === 'evening' && (hour < 18 || hour >= 22)) return false;
-      }
-      
-      // Filtrowanie po wyszukiwaniu
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          alert.driver.toLowerCase().includes(query) ||
-          alert.description.toLowerCase().includes(query) ||
-          alert.location.toLowerCase().includes(query)
-        );
-      }
-      
-      return true;
+    fetchSafetyData();
+  }, [filters.type, filters.time, filters.page, filters.limit]);
+  
+  // Obsługa zmiany filtrów
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFilters({
+      ...filters,
+      [name]: value,
+      // Resetowanie strony przy zmianie filtrów
+      ...(name !== 'page' && { page: 1 })
     });
   };
-
-  // Konwersja danych do formatu wymaganego przez komponent Table
-  const getSafetyAlertTableData = () => {
-    const filteredAlerts = getFilteredAlerts();
+  
+  // Obsługa wyszukiwania
+  const handleSearch = () => {
+    setFilters({
+      ...filters,
+      page: 1
+    });
+  };
+  
+  // Obsługa zmiany strony
+  const handlePageChange = (newPage: number) => {
+    setFilters({
+      ...filters,
+      page: newPage
+    });
+  };
+  
+  // Obsługa kliknięcia wiersza alertu
+  const handleAlertClick = async (alert: SafetyAlert) => {
+    setIsDetailLoading(true);
     
-    return {
-      headers: ['Typ', 'Kierowca', 'Opis', 'Czas', 'Lokalizacja', 'Status'],
-      data: filteredAlerts.map(alert => [
-        alert.type,
-        alert.driver,
-        alert.description,
-        alert.time,
-        alert.location,
-        alert.status
-      ])
+    try {
+      const alertDetails = await driverSafetyService.getAlertDetails(alert.id);
+      setSelectedAlert(alertDetails);
+    } catch (err) {
+      console.error('Error fetching alert details:', err);
+      setError('Nie udało się pobrać szczegółów alertu.');
+    } finally {
+      setIsDetailLoading(false);
+    }
+  };
+  
+  // Obsługa kliknięcia wiersza kierowcy
+  const handleDriverClick = async (driver: DriverRanking) => {
+    setIsDetailLoading(true);
+    
+    try {
+      const drivingStyleResponse = await driverSafetyService.getDriverStyle(driver.driver);
+      setDrivingStyle(drivingStyleResponse);
+    } catch (err) {
+      console.error('Error fetching driving style:', err);
+      setError('Nie udało się pobrać analizy stylu jazdy.');
+    } finally {
+      setIsDetailLoading(false);
+    }
+  };
+  
+  // Renderowanie sekcji filtrów
+  const renderFilters = () => {
+    return (
+      <FilterContainer>
+        <FilterGroup>
+          <FilterLabel htmlFor="type">Typ alertu</FilterLabel>
+          <FilterSelect 
+            id="type" 
+            name="type" 
+            value={filters.type} 
+            onChange={handleFilterChange}
+          >
+            <option value="all">Wszystkie</option>
+            <option value="fatigue">Zmęczenie</option>
+            <option value="distraction">Rozproszenie uwagi</option>
+            <option value="style">Styl jazdy</option>
+            <option value="collision">Ryzyko kolizji</option>
+          </FilterSelect>
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel htmlFor="time">Czas</FilterLabel>
+          <FilterSelect 
+            id="time" 
+            name="time" 
+            value={filters.time} 
+            onChange={handleFilterChange}
+          >
+            <option value="all">Wszystkie</option>
+            <option value="morning">Rano</option>
+            <option value="afternoon">Popołudnie</option>
+            <option value="evening">Wieczór</option>
+          </FilterSelect>
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel htmlFor="search">Wyszukaj</FilterLabel>
+          <FilterInput 
+            type="text" 
+            id="search" 
+            name="search" 
+            value={filters.search} 
+            onChange={handleFilterChange}
+            placeholder="Kierowca, lokalizacja..."
+          />
+        </FilterGroup>
+        
+        <FilterGroup>
+          <FilterLabel>&nbsp;</FilterLabel>
+          <Button primary onClick={handleSearch}>Szukaj</Button>
+        </FilterGroup>
+      </FilterContainer>
+    );
+  };
+  
+  // Renderowanie tabeli alertów
+  const renderAlertsTable = () => {
+    if (!alerts) return null;
+    
+    const getTypeBadge = (type: string) => {
+      const colors: Record<string, string> = {
+        fatigue: '#f44336',
+        distraction: '#ff9800',
+        style: '#2196f3',
+        collision: '#9c27b0'
+      };
+      
+      return (
+        <Badge color={colors[type] || '#2196f3'}>
+          {type === 'fatigue' ? 'Zmęczenie' : 
+           type === 'distraction' ? 'Rozproszenie' : 
+           type === 'style' ? 'Styl jazdy' : 
+           type === 'collision' ? 'Ryzyko kolizji' : type}
+        </Badge>
+      );
     };
-  };
-  
-  const getCoachingTableData = () => {
-    if (!safetyData) return { headers: [], data: [] };
     
-    return {
-      headers: ['Kierowca', 'Typ', 'Temat', 'Data', 'Status'],
-      data: safetyData.coachingSessions.map(session => [
-        session.driver,
-        session.type,
-        session.topic,
-        session.date,
-        session.status
-      ])
+    const getStatusBadge = (status: string) => {
+      const colors: Record<string, string> = {
+        new: '#2196f3',
+        inProgress: '#ff9800',
+        closed: '#9e9e9e'
+      };
+      
+      return (
+        <Badge color={colors[status] || '#2196f3'}>
+          {status === 'new' ? 'Nowy' : 
+           status === 'inProgress' ? 'W trakcie' : 
+           status === 'closed' ? 'Zamknięty' : status}
+        </Badge>
+      );
     };
-  };
-
-  // Generowanie punktów dla wykresu radarowego
-  const generateRadarPoints = () => {
-    if (!safetyData) return '';
     
-    const center = { x: 50, y: 50 };
-    const radius = 40;
+    const columns = [
+      { 
+        key: 'type', 
+        header: 'Typ',
+        render: (alert: SafetyAlert) => getTypeBadge(alert.type)
+      },
+      { key: 'driver', header: 'Kierowca' },
+      { key: 'description', header: 'Opis' },
+      { key: 'time', header: 'Czas' },
+      { key: 'location', header: 'Lokalizacja' },
+      { 
+        key: 'status', 
+        header: 'Status',
+        render: (alert: SafetyAlert) => getStatusBadge(alert.status)
+      }
+    ];
     
-    return safetyData.drivingStyle.map(item => {
-      const angle = (item.angle * Math.PI) / 180;
-      const distance = (item.value / 100) * radius;
-      const x = center.x + distance * Math.cos(angle);
-      const y = center.y + distance * Math.sin(angle);
-      return `${x},${y}`;
-    }).join(' ');
-  };
-
-  // Obsługa kliknięcia wiersza tabeli
-  const handleRowClick = (table: string, index: number) => {
-    console.log(`Kliknięto wiersz ${index} w tabeli ${table}`);
-    // Tutaj można dodać nawigację do szczegółów
-    alert(`Otwieranie szczegółów alertu ${index + 1}`);
-  };
-
-  // Obsługa zmiany filtrów
-  const handleAlertTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setAlertTypeFilter(e.target.value);
+    return (
+      <>
+        <Table 
+          data={alerts.alerts}
+          columns={columns}
+          onRowClick={handleAlertClick}
+        />
+        
+        <PaginationContainer>
+          <PaginationInfo>
+            Wyświetlanie {(filters.page - 1) * filters.limit + 1} - {Math.min(filters.page * filters.limit, alerts.total)} z {alerts.total} alertów
+          </PaginationInfo>
+          
+          <PaginationButtons>
+            <Button 
+              onClick={() => handlePageChange(filters.page - 1)}
+              disabled={filters.page === 1}
+            >
+              Poprzednia
+            </Button>
+            
+            <Button 
+              onClick={() => handlePageChange(filters.page + 1)}
+              disabled={filters.page * filters.limit >= alerts.total}
+            >
+              Następna
+            </Button>
+          </PaginationButtons>
+        </PaginationContainer>
+      </>
+    );
   };
   
-  const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTimeFilter(e.target.value);
+  // Renderowanie szczegółów alertu
+  const renderAlertDetails = () => {
+    if (!selectedAlert) return null;
+    
+    return (
+      <DetailContainer>
+        <DetailTitle>Szczegóły alertu</DetailTitle>
+        
+        <DetailRow>
+          <DetailLabel>ID:</DetailLabel>
+          <DetailValue>{selectedAlert.id}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Kierowca:</DetailLabel>
+          <DetailValue>{selectedAlert.driver}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Typ:</DetailLabel>
+          <DetailValue>{selectedAlert.type}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Opis:</DetailLabel>
+          <DetailValue>{selectedAlert.description}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Czas:</DetailLabel>
+          <DetailValue>{selectedAlert.time}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Lokalizacja:</DetailLabel>
+          <DetailValue>{selectedAlert.location}</DetailValue>
+        </DetailRow>
+        
+        <DetailRow>
+          <DetailLabel>Status:</DetailLabel>
+          <DetailValue>{selectedAlert.status}</DetailValue>
+        </DetailRow>
+        
+        {selectedAlert.details && (
+          <>
+            <DetailTitle style={{ marginTop: '16px' }}>Szczegóły incydentu</DetailTitle>
+            
+            <DetailRow>
+              <DetailLabel>Typ incydentu:</DetailLabel>
+              <DetailValue>{selectedAlert.details.incidentType}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Poziom zagrożenia:</DetailLabel>
+              <DetailValue>{selectedAlert.details.severity}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Stan kierowcy:</DetailLabel>
+              <DetailValue>{selectedAlert.details.driverState}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Prędkość pojazdu:</DetailLabel>
+              <DetailValue>{selectedAlert.details.vehicleSpeed} km/h</DetailValue>
+            </DetailRow>
+            
+            <VideoContainer>
+              Nagranie wideo incydentu
+              <br />
+              (Integracja z rzeczywistym odtwarzaczem wideo)
+            </VideoContainer>
+          </>
+        )}
+      </DetailContainer>
+    );
   };
   
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  // Renderowanie rankingu kierowców
+  const renderDriverRanking = () => {
+    if (!driverRanking) return null;
+    
+    const getTrendBadge = (trend: string) => {
+      const colors: Record<string, string> = {
+        up: '#4caf50',
+        down: '#f44336',
+        stable: '#ff9800'
+      };
+      
+      return (
+        <Badge color={colors[trend] || '#2196f3'}>
+          {trend === 'up' ? '↑ Poprawa' : 
+           trend === 'down' ? '↓ Pogorszenie' : 
+           trend === 'stable' ? '→ Stabilny' : trend}
+        </Badge>
+      );
+    };
+    
+    const getScoreColor = (score: number) => {
+      if (score >= 80) return '#4caf50';
+      if (score >= 60) return '#8bc34a';
+      if (score >= 40) return '#ffeb3b';
+      if (score >= 20) return '#ff9800';
+      return '#f44336';
+    };
+    
+    return (
+      <Card title="Ranking bezpieczeństwa kierowców">
+        <Table 
+          data={driverRanking.rankings}
+          columns={[
+            { key: 'driver', header: 'Kierowca' },
+            { 
+              key: 'score', 
+              header: 'Wynik',
+              render: (driver: DriverRanking) => (
+                <div>
+                  {driver.score}/100
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={driver.score} 
+                      color={getScoreColor(driver.score)} 
+                    />
+                  </ProgressBar>
+                </div>
+              )
+            },
+            { 
+              key: 'trend', 
+              header: 'Trend',
+              render: (driver: DriverRanking) => getTrendBadge(driver.trend)
+            }
+          ]}
+          onRowClick={handleDriverClick}
+        />
+      </Card>
+    );
   };
-
+  
+  // Renderowanie analizy stylu jazdy
+  const renderDrivingStyle = () => {
+    if (!drivingStyle) return null;
+    
+    // Przygotowanie danych dla wykresu radarowego
+    const calculatePolygonPoints = () => {
+      const centerX = 150;
+      const centerY = 150;
+      const radius = 120;
+      
+      return drivingStyle.drivingStyle.map(category => {
+        const angleRad = (category.angle * Math.PI) / 180;
+        const value = category.value / 100;
+        const x = centerX + radius * value * Math.cos(angleRad);
+        const y = centerY + radius * value * Math.sin(angleRad);
+        return `${x},${y}`;
+      }).join(' ');
+    };
+    
+    return (
+      <Card title={`Analiza stylu jazdy - ${drivingStyle.driver}`}>
+        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <h3>Wynik ogólny: {drivingStyle.overallScore}/100</h3>
+          <ProgressBar style={{ maxWidth: '300px', margin: '0 auto' }}>
+            <ProgressBarFill 
+              width={drivingStyle.overallScore} 
+              color={
+                drivingStyle.overallScore >= 80 ? '#4caf50' :
+                drivingStyle.overallScore >= 60 ? '#8bc34a' :
+                drivingStyle.overallScore >= 40 ? '#ffeb3b' :
+                drivingStyle.overallScore >= 20 ? '#ff9800' :
+                '#f44336'
+              } 
+            />
+          </ProgressBar>
+        </div>
+        
+        <RadarChartContainer>
+          <RadarChartBackground />
+          
+          {/* Osie */}
+          {drivingStyle.drivingStyle.map((category, index) => (
+            <RadarChartAxis key={`axis-${index}`} angle={category.angle} />
+          ))}
+          
+          {/* Kółka */}
+          <RadarChartCircle size={25} />
+          <RadarChartCircle size={50} />
+          <RadarChartCircle size={75} />
+          
+          {/* Punkty */}
+          {drivingStyle.drivingStyle.map((category, index) => (
+            <RadarChartPoint 
+              key={`point-${index}`}
+              x={Math.cos((category.angle * Math.PI) / 180) * 50}
+              y={Math.sin((category.angle * Math.PI) / 180) * 50}
+              value={category.value}
+            />
+          ))}
+          
+          {/* Wielokąt */}
+          <RadarChartPolygon>
+            <svg>
+              <polygon points={calculatePolygonPoints()} />
+            </svg>
+          </RadarChartPolygon>
+          
+          {/* Etykiety */}
+          {drivingStyle.drivingStyle.map((category, index) => (
+            <RadarChartLabel 
+              key={`label-${index}`}
+              x={category.labelPosition.x}
+              y={category.labelPosition.y}
+            >
+              {category.category}
+            </RadarChartLabel>
+          ))}
+        </RadarChartContainer>
+        
+        <DetailContainer style={{ marginTop: '20px' }}>
+          <DetailTitle>Rekomendacje</DetailTitle>
+          
+          {drivingStyle.recommendations.map((recommendation, index) => (
+            <DetailRow key={index}>
+              <DetailLabel>{recommendation.category}:</DetailLabel>
+              <DetailValue>{recommendation.recommendation}</DetailValue>
+            </DetailRow>
+          ))}
+        </DetailContainer>
+      </Card>
+    );
+  };
+  
+  // Renderowanie sesji coachingowych
+  const renderCoachingSessions = () => {
+    if (!coachingSessions) return null;
+    
+    const getStatusBadge = (status: string) => {
+      const colors: Record<string, string> = {
+        planned: '#2196f3',
+        completed: '#4caf50',
+        cancelled: '#f44336'
+      };
+      
+      return (
+        <Badge color={colors[status] || '#2196f3'}>
+          {status === 'planned' ? 'Zaplanowana' : 
+           status === 'completed' ? 'Zakończona' : 
+           status === 'cancelled' ? 'Anulowana' : status}
+        </Badge>
+      );
+    };
+    
+    return (
+      <Card title="Sesje coachingowe">
+        <Table 
+          data={coachingSessions.sessions}
+          columns={[
+            { key: 'driver', header: 'Kierowca' },
+            { key: 'type', header: 'Typ' },
+            { key: 'topic', header: 'Temat' },
+            { key: 'date', header: 'Data' },
+            { 
+              key: 'status', 
+              header: 'Status',
+              render: (session: any) => getStatusBadge(session.status)
+            }
+          ]}
+        />
+      </Card>
+    );
+  };
+  
   if (isLoading) {
     return (
       <PageContainer>
-        <LoadingIndicator>Ładowanie danych o bezpieczeństwie kierowców...</LoadingIndicator>
+        <LoadingIndicator>Ładowanie danych bezpieczeństwa kierowcy...</LoadingIndicator>
       </PageContainer>
     );
   }
-
+  
   if (error) {
     return (
       <PageContainer>
-        <Card fullWidth>
-          <div style={{ color: 'red', padding: '20px', textAlign: 'center' }}>
-            {error}
-          </div>
-        </Card>
+        <ErrorMessage>{error}</ErrorMessage>
       </PageContainer>
     );
   }
-
-  if (!safetyData) {
-    return (
-      <PageContainer>
-        <Card fullWidth>
-          <div style={{ padding: '20px', textAlign: 'center' }}>
-            Brak danych do wyświetlenia
-          </div>
-        </Card>
-      </PageContainer>
-    );
-  }
-
-  const { headers: alertHeaders, data: alertData } = getSafetyAlertTableData();
-  const { headers: coachingHeaders, data: coachingData } = getCoachingTableData();
-  const radarPoints = generateRadarPoints();
-
+  
   return (
     <PageContainer>
-      <KPISection>
-        <KPICard 
-          title="Wskaźnik bezpieczeństwa" 
-          value={`${safetyData.kpis.safetyIndex}%`} 
-          trend="up" 
-          trendValue="5% w tym miesiącu" 
-        />
-        <KPICard 
-          title="Liczba alertów" 
-          value={safetyData.kpis.alertCount} 
-          trend="down" 
-          trendValue="3 mniej niż wczoraj" 
-        />
-        <KPICard 
-          title="Zmęczenie kierowców" 
-          value={`${safetyData.kpis.fatigueDrivers} kierowców`} 
-          trend="neutral" 
-          trendValue="Bez zmian" 
-        />
-        <KPICard 
-          title="Rozproszenie uwagi" 
-          value={`${safetyData.kpis.distractionCases} przypadków`} 
-          trend="down" 
-          trendValue="2 mniej niż wczoraj" 
-        />
-      </KPISection>
-
-      <SectionTitle>MAPA INCYDENTÓW BEZPIECZEŃSTWA</SectionTitle>
-      <Card fullWidth>
-        <MapPlaceholder>
-          Interaktywna mapa z oznaczeniami incydentów
-          <MapOverlay>
-            {safetyData.mapData.incidentPoints.map((point, index) => (
-              <MapPoint 
-                key={`incident-${index}`}
-                x={point.x} 
-                y={point.y} 
-                color={
-                  point.type === 'Zmęczenie' ? '#dc3545' :
-                  point.type === 'Rozproszenie' ? '#fd7e14' :
-                  point.type === 'Styl jazdy' ? '#ffc107' :
-                  '#0d6efd'
-                }
-                size={14}
-              />
-            ))}
-          </MapOverlay>
-        </MapPlaceholder>
-      </Card>
-
-      <SectionTitle>ALERTY BEZPIECZEŃSTWA</SectionTitle>
-      <FilterBar>
-        <FilterSelect value={alertTypeFilter} onChange={handleAlertTypeChange}>
-          <FilterOption value="all">Wszystkie typy</FilterOption>
-          <FilterOption value="fatigue">Zmęczenie</FilterOption>
-          <FilterOption value="distraction">Rozproszenie uwagi</FilterOption>
-          <FilterOption value="style">Styl jazdy</FilterOption>
-          <FilterOption value="collision">Ryzyko kolizji</FilterOption>
-        </FilterSelect>
-        
-        <FilterSelect value={timeFilter} onChange={handleTimeChange}>
-          <FilterOption value="all">Wszystkie godziny</FilterOption>
-          <FilterOption value="morning">Rano (6-12)</FilterOption>
-          <FilterOption value="afternoon">Popołudnie (12-18)</FilterOption>
-          <FilterOption value="evening">Wieczór (18-22)</FilterOption>
-        </FilterSelect>
-        
-        <SearchInput 
-          type="text" 
-          placeholder="Szukaj..." 
-          value={searchQuery} 
-          onChange={handleSearchChange}
-        />
-      </FilterBar>
+      <SectionTitle>BEZPIECZEŃSTWO KIEROWCY</SectionTitle>
       
-      <Card fullWidth>
-        <Table 
-          headers={alertHeaders} 
-          data={alertData} 
-          onRowClick={(index) => handleRowClick('safety', index)}
-          emptyMessage="Brak alertów spełniających kryteria filtrowania"
-        />
-      </Card>
+      <TabsContainer>
+        <Tab 
+          active={activeTab === 'alerts'} 
+          onClick={() => setActiveTab('alerts')}
+        >
+          Alerty bezpieczeństwa
+        </Tab>
+        <Tab 
+          active={activeTab === 'analysis'} 
+          onClick={() => setActiveTab('analysis')}
+        >
+          Analiza stylu jazdy
+        </Tab>
+        <Tab 
+          active={activeTab === 'coaching'} 
+          onClick={() => setActiveTab('coaching')}
+        >
+          Coaching kierowców
+        </Tab>
+      </TabsContainer>
       
-      <SectionTitle>ANALIZA ZACHOWANIA KIEROWCÓW</SectionTitle>
-      <GridSection>
-        <Card title="Ranking bezpieczeństwa">
-          <div style={{ padding: '20px' }}>
-            {safetyData.driverRankings.map((driver, index) => (
-              <div key={index} style={{ marginBottom: '15px' }}>
-                <ProgressLabel>
-                  <span>{driver.driver}</span>
-                  <span>{driver.score}%</span>
-                </ProgressLabel>
-                <ProgressBar>
-                  <ProgressFill 
-                    width={driver.score} 
-                    color={
-                      driver.score >= 90 ? '#28a745' :
-                      driver.score >= 80 ? '#17a2b8' :
-                      driver.score >= 70 ? '#ffc107' :
-                      '#dc3545'
-                    } 
-                  />
-                </ProgressBar>
-              </div>
-            ))}
-          </div>
-        </Card>
-        <Card title="Trendy bezpieczeństwa">
-          <ChartPlaceholder>
-            Wykres trendu
-          </ChartPlaceholder>
-        </Card>
-      </GridSection>
+      {activeTab === 'alerts' && (
+        <>
+          {renderFilters()}
+          
+          <Card title="Alerty bezpieczeństwa" fullWidth>
+            {renderAlertsTable()}
+          </Card>
+          
+          {selectedAlert && (
+            <Card title="Szczegóły alertu" fullWidth>
+              {isDetailLoading ? (
+                <LoadingIndicator>Ładowanie szczegółów...</LoadingIndicator>
+              ) : (
+                renderAlertDetails()
+              )}
+            </Card>
+          )}
+          
+          <Card title="Mapa incydentów bezpieczeństwa" fullWidth>
+            <MapContainer>
+              <MapPlaceholder>
+                Mapa incydentów bezpieczeństwa
+                <br />
+                (Integracja z rzeczywistą mapą)
+              </MapPlaceholder>
+            </MapContainer>
+          </Card>
+        </>
+      )}
       
-      <GridSection>
-        <Card title="Styl jazdy">
-          <RadarChart>
-            <RadarBackground>
-              {safetyData.drivingStyle.map((item, index) => (
-                <RadarAxis key={`axis-${index}`} rotation={item.angle} />
-              ))}
-              <svg width="100%" height="100%" viewBox="0 0 100 100" style={{ position: 'absolute', top: 0, left: 0 }}>
-                <RadarPolygon points={radarPoints} />
-              </svg>
-              {safetyData.drivingStyle.map((item, index) => (
-                <RadarLabel 
-                  key={`label-${index}`} 
-                  x={item.labelPosition.x} 
-                  y={item.labelPosition.y}
-                >
-                  {item.category}
-                </RadarLabel>
-              ))}
-            </RadarBackground>
-          </RadarChart>
-        </Card>
-        <Card title="Punktacja">
-          <div style={{ padding: '20px' }}>
-            {safetyData.drivingStyle.map((item, index) => (
-              <div key={index} style={{ marginBottom: '15px' }}>
-                <ProgressLabel>
-                  <span>{item.category}</span>
-                  <span>{item.value}%</span>
-                </ProgressLabel>
-                <ProgressBar>
-                  <ProgressFill 
-                    width={item.value} 
-                    color={
-                      item.value >= 90 ? '#28a745' :
-                      item.value >= 80 ? '#17a2b8' :
-                      item.value >= 70 ? '#ffc107' :
-                      '#dc3545'
-                    } 
-                  />
-                </ProgressBar>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </GridSection>
-
-      <SectionTitle>SYSTEM COACHINGU</SectionTitle>
-      <Card fullWidth>
-        <Table 
-          headers={coachingHeaders} 
-          data={coachingData} 
-          onRowClick={(index) => handleRowClick('coaching', index)}
-        />
-      </Card>
+      {activeTab === 'analysis' && (
+        <GridSection>
+          {renderDriverRanking()}
+          {renderDrivingStyle()}
+        </GridSection>
+      )}
+      
+      {activeTab === 'coaching' && (
+        <>
+          {renderCoachingSessions()}
+        </>
+      )}
     </PageContainer>
   );
 };
