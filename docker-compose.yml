@@ -7,13 +7,10 @@ services:
       context: ./react-app
       dockerfile: Dockerfile
     ports:
-      - "3020:3000"
+      - "3020:80"
     volumes:
-      - ./react-app:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      - REACT_APP_API_URL=http://fleet-backend:5000/api
+      - ./react-app/public:/usr/share/nginx/html
+      - ./react-app/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - fleet-backend
     restart: unless-stopped

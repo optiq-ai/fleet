@@ -1,24 +1,18 @@
-FROM node:16-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+WORKDIR /usr/share/nginx/html
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Remove default nginx static assets
+RUN rm -rf ./*
 
-# Install dependencies
-RUN npm install
+# Copy static files
+COPY ./public /usr/share/nginx/html/
 
-# Copy the rest of the application
-COPY . .
+# Copy nginx configuration
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# Build the application
-RUN npm run build
+# Expose port 80
+EXPOSE 80
 
-# Install serve to run the build
-RUN npm install -g serve
-
-# Expose port 3000
-EXPOSE 3000
-
-# Start the application
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
