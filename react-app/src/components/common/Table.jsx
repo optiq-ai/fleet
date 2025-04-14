@@ -4,6 +4,7 @@ import styled from 'styled-components';
 /**
  * @typedef {Object} TableProps
  * @property {string[]} headers - Column headers for the table
+ * @property {Array} columns - Alternative way to specify columns with objects containing key and label
  * @property {any[][]} data - Table data as a 2D array
  * @property {function} [onRowClick] - Optional callback when a row is clicked
  * @property {boolean} [isLoading] - Whether the table is in loading state
@@ -89,25 +90,29 @@ const LoadingPlaceholder = styled.div`
  */
 const Table = ({ 
   headers, 
+  columns,
   data, 
   onRowClick, 
   isLoading = false,
   emptyMessage = "Brak danych do wyświetlenia"
 }) => {
+  // Handle both headers and columns props
+  const tableHeaders = headers || (columns ? columns.map(col => col.label) : []);
+  
   if (isLoading) {
     return (
       <TableContainer>
         <StyledTable>
           <TableHeader>
             <tr>
-              {headers.map((header, index) => (
+              {tableHeaders.map((header, index) => (
                 <TableHeaderCell key={index}>{header}</TableHeaderCell>
               ))}
             </tr>
           </TableHeader>
           <tbody>
             <LoadingRow>
-              <LoadingCell colSpan={headers.length}>
+              <LoadingCell colSpan={tableHeaders.length}>
                 <LoadingPlaceholder />
                 <LoadingPlaceholder style={{ width: '80%' }} />
                 <LoadingPlaceholder style={{ width: '60%' }} />
@@ -125,14 +130,14 @@ const Table = ({
         <StyledTable>
           <TableHeader>
             <tr>
-              {headers.map((header, index) => (
+              {tableHeaders.map((header, index) => (
                 <TableHeaderCell key={index}>{header}</TableHeaderCell>
               ))}
             </tr>
           </TableHeader>
           <tbody>
             <EmptyRow>
-              <EmptyCell colSpan={headers.length}>
+              <EmptyCell colSpan={tableHeaders.length}>
                 {emptyMessage}
               </EmptyCell>
             </EmptyRow>
@@ -147,7 +152,7 @@ const Table = ({
       <StyledTable>
         <TableHeader>
           <tr>
-            {headers.map((header, index) => (
+            {tableHeaders.map((header, index) => (
               <TableHeaderCell key={index}>{header}</TableHeaderCell>
             ))}
           </tr>
