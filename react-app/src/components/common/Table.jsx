@@ -5,7 +5,7 @@ import styled from 'styled-components';
  * @typedef {Object} TableProps
  * @property {string[]} headers - Column headers for the table
  * @property {Array} columns - Alternative way to specify columns with objects containing key and label
- * @property {any[][]} data - Table data as a 2D array
+ * @property {Array} data - Table data as either a 2D array or an array of objects
  * @property {function} [onRowClick] - Optional callback when a row is clicked
  * @property {boolean} [isLoading] - Whether the table is in loading state
  * @property {string} [emptyMessage] - Message to display when there's no data
@@ -158,17 +158,26 @@ const Table = ({
           </tr>
         </TableHeader>
         <tbody>
-          {data.map((row, rowIndex) => (
-            <TableRow 
-              key={rowIndex} 
-              onClick={() => onRowClick && onRowClick(rowIndex)}
-              clickable={!!onRowClick}
-            >
-              {row.map((cell, cellIndex) => (
-                <TableCell key={cellIndex}>{cell}</TableCell>
-              ))}
-            </TableRow>
-          ))}
+          {data.map((row, rowIndex) => {
+            // Check if row is an array or an object
+            const isRowArray = Array.isArray(row);
+            // If columns are provided and row is an object, extract values based on column keys
+            const cellValues = isRowArray 
+              ? row 
+              : (columns ? columns.map(col => row[col.key]) : Object.values(row));
+            
+            return (
+              <TableRow 
+                key={rowIndex} 
+                onClick={() => onRowClick && onRowClick(rowIndex)}
+                clickable={!!onRowClick}
+              >
+                {cellValues.map((cell, cellIndex) => (
+                  <TableCell key={cellIndex}>{cell}</TableCell>
+                ))}
+              </TableRow>
+            );
+          })}
         </tbody>
       </StyledTable>
     </TableContainer>
