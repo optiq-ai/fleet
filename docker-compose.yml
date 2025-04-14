@@ -1,44 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  db:
-    build:
-      context: ./db
-      dockerfile: Dockerfile
-    container_name: fleet-db
-    restart: always
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - fleet-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Backend API
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: fleet-backend
-    restart: always
-    ports:
-      - "5000:5000"
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      - PORT=5000
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/fleet
-      - NODE_ENV=development
-    networks:
-      - fleet-network
-
   # Frontend React App
   frontend:
     build:
@@ -48,8 +10,6 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
     environment:
       - REACT_APP_API_URL=http://localhost:5000
     networks:
@@ -58,6 +18,3 @@ services:
 networks:
   fleet-network:
     driver: bridge
-
-volumes:
-  postgres_data:
