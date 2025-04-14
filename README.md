@@ -152,6 +152,65 @@ Sekcja bezpieczeństwa kierowcy umożliwia monitorowanie zachowań kierowców, a
 - Tabele i wykresy dostosowują się do dostępnej przestrzeni
 - Specjalne widoki dla urządzeń mobilnych
 
+### Zarządzanie Kierowcami (Drivers)
+
+Sekcja zarządzania kierowcami umożliwia kompleksowe zarządzanie personelem kierowców, ich profilami, wydajnością, dokumentami, harmonogramem oraz lokalizacją w czasie rzeczywistym.
+
+#### Funkcje i metody:
+- `fetchDriversData()` - pobiera listę kierowców, dane KPI i szczegóły wybranego kierowcy
+- `handleDriverSelect()` - obsługuje wybór kierowcy z listy
+- `fetchDriverDetails()` - pobiera szczegółowe dane wybranego kierowcy
+- `handleFilterChange()` - obsługuje zmianę filtrów listy kierowców
+- `handleSearch()` - obsługuje wyszukiwanie kierowców
+- `handlePageChange()` - obsługuje zmianę strony w paginacji listy kierowców
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Zakładki tematyczne** - umożliwiają przełączanie między różnymi widokami (przegląd, szczegóły, wydajność, dokumenty, harmonogram, mapa)
+- **Sekcja KPI** - wyświetla kluczowe wskaźniki dotyczące floty kierowców (aktywni kierowcy, średnia ocena wydajności, aktualne dokumenty, wskaźnik absencji)
+- **Lista kierowców** - tabela z wszystkimi kierowcami, ich statusem, przypisanymi pojazdami i podstawowymi statystykami
+- **Szczegóły kierowcy** - prezentuje szczegółowe informacje o wybranym kierowcy (dane osobowe, zatrudnienie, kwalifikacje)
+- **Wydajność kierowcy** - wyświetla dane wydajności kierowcy z wykresami (przejechane kilometry, zużycie paliwa, terminowość dostaw, styl jazdy)
+- **Dokumenty kierowcy** - zarządza dokumentami kierowcy (prawo jazdy, certyfikaty, badania) z alertami o zbliżających się terminach ważności
+- **Harmonogram kierowcy** - prezentuje zaplanowane trasy, szkolenia, urlopy i inne aktywności
+- **Mapa kierowców** - wizualizuje lokalizacje kierowców na mapie Polski w czasie rzeczywistym
+
+#### Komponenty pomocnicze:
+- **DriverDetails** - komponent wyświetlający szczegółowe informacje o kierowcy
+- **DriverPerformance** - komponent prezentujący dane wydajności kierowcy z wykresami
+- **DriverDocuments** - komponent zarządzający dokumentami kierowcy
+- **DriverMap** - komponent wizualizujący lokalizacje kierowców na mapie
+
+#### Stany (hooks):
+- `drivers` - lista kierowców
+- `selectedDriver` - wybrany kierowca
+- `driverDocuments` - dokumenty kierowcy
+- `performanceData` - dane wydajności kierowcy
+- `driverSchedule` - harmonogram kierowcy
+- `kpiData` - dane KPI kierowców
+- `filters` - filtry dla listy kierowców (status, pojazd, wyszukiwanie, strona)
+- `activeTab` - aktywna zakładka tematyczna
+- `isLoading` - stan ładowania listy kierowców
+- `isDetailLoading` - stan ładowania szczegółów kierowcy
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `driversService` lub `mockDriversService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getDrivers()`, `getDriverDetails()`, `getDriverDocuments()`, `getDriverPerformance()`, `getDriverSchedule()`, `getDriversKPI()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
 ## Serwisy danych
 
 ### dashboardService

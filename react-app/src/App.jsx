@@ -8,6 +8,7 @@ import PredictiveMaintenance from './pages/PredictiveMaintenance';
 import ViewCustomizationUser from './pages/ViewCustomizationUser';
 import ViewCustomizationAdmin from './pages/ViewCustomizationAdmin';
 import Monitoring from './pages/Monitoring';
+import Drivers from './pages/Drivers';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -37,6 +38,11 @@ function App() {
           <Route path="/driver-safety" element={
             <Layout>
               <DriverSafety />
+            </Layout>
+          } />
+          <Route path="/drivers" element={
+            <Layout>
+              <Drivers />
             </Layout>
           } />
           <Route path="/predictive-maintenance" element={
