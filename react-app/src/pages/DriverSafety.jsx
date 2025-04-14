@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
 import driverSafetyService from '../services/api/driverSafetyService';
+import mockDriverSafetyService from '../services/api/mockDriverSafetyService';
 
 /**
  * @typedef {Object} SafetyAlert
@@ -372,11 +373,190 @@ const VideoContainer = styled.div`
   border-radius: 8px;
 `;
 
+const DataToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+`;
+
+const ToggleLabel = styled.span`
+  margin-right: 12px;
+  font-size: 14px;
+  color: #666;
+`;
+
+const ToggleSwitch = styled.label`
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  span {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+    
+    &:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+  }
+  
+  input:checked + span {
+    background-color: #3f51b5;
+  }
+  
+  input:checked + span:before {
+    transform: translateX(26px);
+  }
+`;
+
+const KPIContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+  
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const KPICard = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+`;
+
+const KPITitle = styled.div`
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+`;
+
+const KPIValue = styled.div`
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+`;
+
+const KPITrend = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: ${props => props.up ? '#4caf50' : props.down ? '#f44336' : '#666'};
+`;
+
+const VideoGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const VideoCard = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const VideoThumbnail = styled.div`
+  height: 150px;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  position: relative;
+`;
+
+const VideoInfo = styled.div`
+  padding: 12px;
+`;
+
+const VideoTitle = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+`;
+
+const VideoMeta = styled.div`
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const SeverityBadge = styled.span`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  background-color: ${props => 
+    props.severity === 'high' ? '#f44336' : 
+    props.severity === 'medium' ? '#ff9800' : '#4caf50'};
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+const ChartContainer = styled.div`
+  height: 300px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 /**
  * DriverSafety component for monitoring driver safety
  * @returns {JSX.Element} DriverSafety component
  */
 const DriverSafety = () => {
+  // Toggle for mock data vs API data
+  const [useMockData, setUseMockData] = useState(true);
+  
+  // Get the appropriate service based on toggle
+  const service = useMockData ? mockDriverSafetyService : driverSafetyService;
+  
   // Stan dla alertów bezpieczeństwa
   const [alerts, setAlerts] = useState(null);
   
@@ -392,6 +572,9 @@ const DriverSafety = () => {
   // Stan dla sesji coachingowych
   const [coachingSessions, setCoachingSessions] = useState(null);
   
+  // Stan dla telematyki wideo
+  const [videoTelematics, setVideoTelematics] = useState(null);
+  
   // Stan dla filtrów
   const [filters, setFilters] = useState({
     type: 'all',
@@ -402,14 +585,14 @@ const DriverSafety = () => {
   });
   
   // Stan dla aktywnej zakładki
-  const [activeTab, setActiveTab] = useState('alerts');
+  const [activeTab, setActiveTab] = useState('overview');
   
   // Stany ładowania i błędów
   const [isLoading, setIsLoading] = useState(true);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Pobieranie danych przy montowaniu komponentu
+  // Pobieranie danych przy montowaniu komponentu i zmianie źródła danych
   useEffect(() => {
     const fetchSafetyData = async () => {
       setIsLoading(true);
@@ -417,7 +600,7 @@ const DriverSafety = () => {
       
       try {
         // Pobieranie alertów bezpieczeństwa
-        const alertsResponse = await driverSafetyService.getAlerts(
+        const alertsResponse = await service.getAlerts(
           filters.type !== 'all' ? filters.type : undefined,
           filters.time !== 'all' ? filters.time : undefined,
           filters.search || undefined,
@@ -427,19 +610,27 @@ const DriverSafety = () => {
         setAlerts(alertsResponse);
         
         // Pobieranie rankingu kierowców
-        const rankingResponse = await driverSafetyService.getDriverRanking();
+        const rankingResponse = await service.getDriverRanking();
         setDriverRanking(rankingResponse);
         
         // Pobieranie sesji coachingowych
-        const coachingResponse = await driverSafetyService.getCoachingSessions();
+        const coachingResponse = await service.getCoachingSessions();
         setCoachingSessions(coachingResponse);
         
         // Pobieranie analizy stylu jazdy dla pierwszego kierowcy z rankingu
         if (rankingResponse && rankingResponse.rankings.length > 0) {
-          const drivingStyleResponse = await driverSafetyService.getDriverStyle(
+          const drivingStyleResponse = await service.getDriverStyle(
             rankingResponse.rankings[0].driver
           );
           setDrivingStyle(drivingStyleResponse);
+          
+          // Pobieranie danych telematyki wideo
+          if (service.getVideoTelematics) {
+            const videoResponse = await service.getVideoTelematics(
+              rankingResponse.rankings[0].driver
+            );
+            setVideoTelematics(videoResponse);
+          }
         }
       } catch (err) {
         console.error('Error fetching safety data:', err);
@@ -450,7 +641,7 @@ const DriverSafety = () => {
     };
     
     fetchSafetyData();
-  }, [filters.type, filters.time, filters.page, filters.limit]);
+  }, [service, filters.type, filters.time, filters.page, filters.limit, useMockData]);
   
   // Obsługa zmiany filtrów
   const handleFilterChange = (e) => {
@@ -484,7 +675,7 @@ const DriverSafety = () => {
     setIsDetailLoading(true);
     
     try {
-      const alertDetails = await driverSafetyService.getAlertDetails(alert.id);
+      const alertDetails = await service.getAlertDetails(alert.id);
       setSelectedAlert(alertDetails);
     } catch (err) {
       console.error('Error fetching alert details:', err);
@@ -499,14 +690,96 @@ const DriverSafety = () => {
     setIsDetailLoading(true);
     
     try {
-      const drivingStyleResponse = await driverSafetyService.getDriverStyle(driver.driver);
+      const drivingStyleResponse = await service.getDriverStyle(driver.driver);
       setDrivingStyle(drivingStyleResponse);
+      
+      // Pobieranie danych telematyki wideo
+      if (service.getVideoTelematics) {
+        const videoResponse = await service.getVideoTelematics(driver.driver);
+        setVideoTelematics(videoResponse);
+      }
     } catch (err) {
       console.error('Error fetching driving style:', err);
       setError('Nie udało się pobrać analizy stylu jazdy.');
     } finally {
       setIsDetailLoading(false);
     }
+  };
+  
+  // Renderowanie przełącznika danych
+  const renderDataToggle = () => {
+    return (
+      <DataToggleContainer>
+        <ToggleLabel>Użyj danych testowych:</ToggleLabel>
+        <ToggleSwitch>
+          <input 
+            type="checkbox" 
+            checked={useMockData} 
+            onChange={() => setUseMockData(!useMockData)} 
+          />
+          <span />
+        </ToggleSwitch>
+        <ToggleLabel style={{ marginLeft: '12px' }}>
+          {useMockData ? 'Włączone' : 'Wyłączone'}
+        </ToggleLabel>
+      </DataToggleContainer>
+    );
+  };
+  
+  // Renderowanie zakładek
+  const renderTabs = () => {
+    return (
+      <TabsContainer>
+        <Tab 
+          active={activeTab === 'overview'} 
+          onClick={() => setActiveTab('overview')}
+        >
+          Przegląd
+        </Tab>
+        <Tab 
+          active={activeTab === 'fatigue'} 
+          onClick={() => setActiveTab('fatigue')}
+        >
+          Zmęczenie kierowcy
+        </Tab>
+        <Tab 
+          active={activeTab === 'distraction'} 
+          onClick={() => setActiveTab('distraction')}
+        >
+          Rozproszenie uwagi
+        </Tab>
+        <Tab 
+          active={activeTab === 'style'} 
+          onClick={() => setActiveTab('style')}
+        >
+          Styl jazdy
+        </Tab>
+        <Tab 
+          active={activeTab === 'collision'} 
+          onClick={() => setActiveTab('collision')}
+        >
+          Zapobieganie kolizjom
+        </Tab>
+        <Tab 
+          active={activeTab === 'coaching'} 
+          onClick={() => setActiveTab('coaching')}
+        >
+          Coaching
+        </Tab>
+        <Tab 
+          active={activeTab === 'video'} 
+          onClick={() => setActiveTab('video')}
+        >
+          Telematyka wideo
+        </Tab>
+        <Tab 
+          active={activeTab === 'ranking'} 
+          onClick={() => setActiveTab('ranking')}
+        >
+          Rankingi
+        </Tab>
+      </TabsContainer>
+    );
   };
   
   // Renderowanie sekcji filtrów
@@ -655,97 +928,99 @@ const DriverSafety = () => {
         <DetailTitle>Szczegóły alertu</DetailTitle>
         
         <DetailRow>
-          <DetailLabel>ID:</DetailLabel>
-          <DetailValue>{selectedAlert.id}</DetailValue>
+          <DetailLabel>Typ incydentu:</DetailLabel>
+          <DetailValue>{selectedAlert.details?.incidentType || 'Brak danych'}</DetailValue>
         </DetailRow>
         
         <DetailRow>
-          <DetailLabel>Kierowca:</DetailLabel>
-          <DetailValue>{selectedAlert.driver}</DetailValue>
+          <DetailLabel>Poziom zagrożenia:</DetailLabel>
+          <DetailValue>{selectedAlert.details?.severity || 'Brak danych'}</DetailValue>
         </DetailRow>
         
         <DetailRow>
-          <DetailLabel>Typ:</DetailLabel>
-          <DetailValue>{selectedAlert.type}</DetailValue>
+          <DetailLabel>Stan kierowcy:</DetailLabel>
+          <DetailValue>{selectedAlert.details?.driverState || 'Brak danych'}</DetailValue>
         </DetailRow>
         
         <DetailRow>
-          <DetailLabel>Opis:</DetailLabel>
-          <DetailValue>{selectedAlert.description}</DetailValue>
-        </DetailRow>
-        
-        <DetailRow>
-          <DetailLabel>Czas:</DetailLabel>
-          <DetailValue>{selectedAlert.time}</DetailValue>
+          <DetailLabel>Prędkość pojazdu:</DetailLabel>
+          <DetailValue>{selectedAlert.details?.vehicleSpeed ? `${selectedAlert.details.vehicleSpeed} km/h` : 'Brak danych'}</DetailValue>
         </DetailRow>
         
         <DetailRow>
           <DetailLabel>Lokalizacja:</DetailLabel>
-          <DetailValue>{selectedAlert.location}</DetailValue>
-        </DetailRow>
-        
-        <DetailRow>
-          <DetailLabel>Status:</DetailLabel>
-          <DetailValue>{selectedAlert.status}</DetailValue>
-        </DetailRow>
-        
-        {selectedAlert.details && (
-          <>
-            <DetailTitle>Dodatkowe informacje</DetailTitle>
-            
-            <DetailRow>
-              <DetailLabel>Typ incydentu:</DetailLabel>
-              <DetailValue>{selectedAlert.details.incidentType}</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>Poziom zagrożenia:</DetailLabel>
-              <DetailValue>{selectedAlert.details.severity}</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>Stan kierowcy:</DetailLabel>
-              <DetailValue>{selectedAlert.details.driverState}</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>Prędkość pojazdu:</DetailLabel>
-              <DetailValue>{selectedAlert.details.vehicleSpeed} km/h</DetailValue>
-            </DetailRow>
-            
-            {selectedAlert.details.videoUrl && (
-              <VideoContainer>
-                Nagranie wideo incydentu
-              </VideoContainer>
+          <DetailValue>
+            {selectedAlert.location}
+            {selectedAlert.details?.locationCoordinates && (
+              <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                Lat: {selectedAlert.details.locationCoordinates.latitude.toFixed(6)}, 
+                Lng: {selectedAlert.details.locationCoordinates.longitude.toFixed(6)}
+              </div>
             )}
+          </DetailValue>
+        </DetailRow>
+        
+        {selectedAlert.details?.eventTimeline && (
+          <>
+            <DetailTitle style={{ marginTop: '16px' }}>Oś czasu zdarzenia</DetailTitle>
+            {selectedAlert.details.eventTimeline.map((event, index) => (
+              <DetailRow key={index}>
+                <DetailLabel>{event.time}</DetailLabel>
+                <DetailValue>{event.event}</DetailValue>
+              </DetailRow>
+            ))}
+          </>
+        )}
+        
+        {selectedAlert.details?.recommendations && (
+          <>
+            <DetailTitle style={{ marginTop: '16px' }}>Zalecenia</DetailTitle>
+            {selectedAlert.details.recommendations.map((recommendation, index) => (
+              <DetailRow key={index}>
+                <DetailValue>• {recommendation}</DetailValue>
+              </DetailRow>
+            ))}
+          </>
+        )}
+        
+        {selectedAlert.details?.videoUrl && (
+          <>
+            <DetailTitle style={{ marginTop: '16px' }}>Nagranie wideo</DetailTitle>
+            <VideoContainer>
+              Nagranie wideo incydentu
+            </VideoContainer>
           </>
         )}
       </DetailContainer>
     );
   };
   
-  // Renderowanie rankingu kierowców
-  const renderDriverRanking = () => {
+  // Renderowanie tabeli rankingu kierowców
+  const renderDriverRankingTable = () => {
     if (!driverRanking) return null;
     
     const getTrendIcon = (trend) => {
-      return trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
+      if (trend === 'up') return '↑';
+      if (trend === 'down') return '↓';
+      return '→';
     };
     
     const getTrendColor = (trend) => {
-      return trend === 'up' ? '#4caf50' : trend === 'down' ? '#f44336' : '#757575';
+      if (trend === 'up') return '#4caf50';
+      if (trend === 'down') return '#f44336';
+      return '#666';
     };
     
     // Convert to format expected by our Table component
     const tableHeaders = ['Kierowca', 'Wynik', 'Trend', 'Zmęczenie', 'Rozproszenie', 'Styl jazdy', 'Ryzyko kolizji'];
-    const tableData = driverRanking.rankings.map(driver => [
-      driver.driver,
-      driver.score,
-      <span style={{ color: getTrendColor(driver.trend) }}>{getTrendIcon(driver.trend)}</span>,
-      driver.details.fatigueScore,
-      driver.details.distractionScore,
-      driver.details.drivingStyleScore,
-      driver.details.collisionRiskScore
+    const tableData = driverRanking.rankings.map(ranking => [
+      ranking.driver,
+      ranking.score,
+      <span style={{ color: getTrendColor(ranking.trend) }}>{getTrendIcon(ranking.trend)}</span>,
+      ranking.details.fatigueScore,
+      ranking.details.distractionScore,
+      ranking.details.drivingStyleScore,
+      ranking.details.collisionRiskScore
     ]);
     
     return (
@@ -757,160 +1032,104 @@ const DriverSafety = () => {
     );
   };
   
-  // Renderowanie analizy stylu jazdy
-  const renderDrivingStyle = () => {
+  // Renderowanie wykresu radarowego stylu jazdy
+  const renderDrivingStyleRadarChart = () => {
     if (!drivingStyle) return null;
     
-    // Renderowanie wykresu radarowego
-    const renderRadarChart = () => {
-      const categories = drivingStyle.drivingStyle.map(item => item.category);
-      const values = drivingStyle.drivingStyle.map(item => item.value);
+    const points = drivingStyle.drivingStyle.map(category => {
+      const radians = (category.angle * Math.PI) / 180;
+      const x = Math.cos(radians) * 40 * (category.value / 100);
+      const y = Math.sin(radians) * 40 * (category.value / 100);
       
-      // Obliczanie współrzędnych punktów na wykresie
-      const points = drivingStyle.drivingStyle.map((item, index) => {
-        const angle = (index / categories.length) * 2 * Math.PI;
-        const x = Math.sin(angle) * 45; // 45% od środka
-        const y = -Math.cos(angle) * 45; // 45% od środka, ujemne dla odwrócenia osi Y
+      return { x, y, value: category.value };
+    });
+    
+    const polygonPoints = points.map(point => 
+      `${50 + point.x},${50 + point.y}`
+    ).join(' ');
+    
+    return (
+      <RadarChartContainer>
+        <RadarChartBackground />
         
-        return {
-          category: item.category,
-          value: item.value,
-          x,
-          y,
-          labelX: Math.sin(angle) * 55, // 55% od środka dla etykiety
-          labelY: -Math.cos(angle) * 55 // 55% od środka dla etykiety
-        };
-      });
-      
-      // Tworzenie punktów dla wielokąta
-      const polygonPoints = points.map(point => {
-        const factor = point.value / 100;
-        return `${50 + point.x * factor},${50 + point.y * factor}`;
-      }).join(' ');
-      
-      return (
-        <RadarChartContainer>
-          <RadarChartBackground />
-          
-          {/* Okręgi */}
-          <RadarChartCircle size={20} />
-          <RadarChartCircle size={40} />
-          <RadarChartCircle size={60} />
-          <RadarChartCircle size={80} />
-          
-          {/* Osie */}
-          {points.map((point, index) => (
-            <RadarChartAxis 
-              key={`axis-${index}`} 
-              angle={(index / categories.length) * 360} 
-            />
-          ))}
-          
-          {/* Wielokąt */}
-          <RadarChartPolygon>
-            <svg viewBox="0 0 100 100">
-              <polygon points={polygonPoints} />
-            </svg>
-          </RadarChartPolygon>
-          
-          {/* Punkty */}
-          {points.map((point, index) => (
-            <RadarChartPoint 
-              key={`point-${index}`} 
-              x={point.x} 
-              y={point.y} 
-              value={point.value} 
-            />
-          ))}
-          
-          {/* Etykiety */}
-          {points.map((point, index) => (
-            <RadarChartLabel 
-              key={`label-${index}`} 
-              x={50 + point.labelX} 
-              y={50 + point.labelY}
-            >
-              {point.category}
-            </RadarChartLabel>
-          ))}
-        </RadarChartContainer>
-      );
-    };
-    
-    // Renderowanie historii wyników
-    const renderScoreHistory = () => {
-      return (
-        <div>
-          <DetailTitle>Historia wyników</DetailTitle>
-          
-          {drivingStyle.history.map((item, index) => (
-            <DetailRow key={`history-${index}`}>
-              <DetailLabel>{item.date}</DetailLabel>
-              <DetailValue>
-                {item.score}
-                <ProgressBar>
-                  <ProgressBarFill 
-                    width={item.score} 
-                    color={
-                      item.score >= 80 ? '#4caf50' : 
-                      item.score >= 60 ? '#ff9800' : 
-                      '#f44336'
-                    } 
-                  />
-                </ProgressBar>
-              </DetailValue>
-            </DetailRow>
-          ))}
-        </div>
-      );
-    };
-    
-    // Renderowanie rekomendacji
-    const renderRecommendations = () => {
-      return (
-        <div>
-          <DetailTitle>Rekomendacje</DetailTitle>
-          
-          {drivingStyle.recommendations.map((item, index) => (
-            <DetailRow key={`recommendation-${index}`}>
-              <DetailLabel>{item.category}</DetailLabel>
-              <DetailValue>{item.recommendation}</DetailValue>
-            </DetailRow>
-          ))}
-        </div>
-      );
-    };
+        {/* Osie */}
+        {drivingStyle.drivingStyle.map((category, index) => (
+          <RadarChartAxis key={index} angle={category.angle} />
+        ))}
+        
+        {/* Kółka */}
+        {[25, 50, 75, 100].map(size => (
+          <RadarChartCircle key={size} size={size} />
+        ))}
+        
+        {/* Wielokąt */}
+        <RadarChartPolygon>
+          <svg>
+            <polygon points={polygonPoints} />
+          </svg>
+        </RadarChartPolygon>
+        
+        {/* Punkty */}
+        {points.map((point, index) => (
+          <RadarChartPoint 
+            key={index} 
+            x={point.x} 
+            y={point.y} 
+            value={point.value} 
+          />
+        ))}
+        
+        {/* Etykiety */}
+        {drivingStyle.drivingStyle.map((category, index) => (
+          <RadarChartLabel 
+            key={index} 
+            x={category.labelPosition.x} 
+            y={category.labelPosition.y}
+          >
+            {category.category}
+          </RadarChartLabel>
+        ))}
+      </RadarChartContainer>
+    );
+  };
+  
+  // Renderowanie rekomendacji stylu jazdy
+  const renderDrivingStyleRecommendations = () => {
+    if (!drivingStyle || !drivingStyle.recommendations) return null;
     
     return (
       <DetailContainer>
-        <DetailTitle>Analiza stylu jazdy: {drivingStyle.driver}</DetailTitle>
-        <DetailRow>
-          <DetailLabel>Ogólny wynik:</DetailLabel>
-          <DetailValue>
-            {drivingStyle.overallScore}/100
-            <ProgressBar>
-              <ProgressBarFill 
-                width={drivingStyle.overallScore} 
-                color={
-                  drivingStyle.overallScore >= 80 ? '#4caf50' : 
-                  drivingStyle.overallScore >= 60 ? '#ff9800' : 
-                  '#f44336'
-                } 
-              />
-            </ProgressBar>
-          </DetailValue>
-        </DetailRow>
+        <DetailTitle>Rekomendacje</DetailTitle>
         
-        {renderRadarChart()}
-        {renderScoreHistory()}
-        {renderRecommendations()}
+        {drivingStyle.recommendations.map((recommendation, index) => (
+          <DetailRow key={index}>
+            <DetailLabel>{recommendation.category}:</DetailLabel>
+            <DetailValue>{recommendation.recommendation}</DetailValue>
+          </DetailRow>
+        ))}
       </DetailContainer>
     );
   };
   
-  // Renderowanie sesji coachingowych
+  // Renderowanie tabeli sesji coachingowych
   const renderCoachingSessions = () => {
     if (!coachingSessions) return null;
+    
+    const getStatusBadge = (status) => {
+      const colors = {
+        scheduled: '#2196f3',
+        completed: '#4caf50',
+        cancelled: '#f44336'
+      };
+      
+      return (
+        <Badge color={colors[status] || '#2196f3'}>
+          {status === 'scheduled' ? 'Zaplanowana' : 
+           status === 'completed' ? 'Zakończona' : 
+           status === 'cancelled' ? 'Anulowana' : status}
+        </Badge>
+      );
+    };
     
     // Convert to format expected by our Table component
     const tableHeaders = ['Kierowca', 'Typ', 'Temat', 'Data', 'Status'];
@@ -919,7 +1138,7 @@ const DriverSafety = () => {
       session.type,
       session.topic,
       session.date,
-      session.status
+      getStatusBadge(session.status)
     ]);
     
     return (
@@ -930,71 +1149,671 @@ const DriverSafety = () => {
     );
   };
   
-  if (isLoading) {
+  // Renderowanie sekcji telematyki wideo
+  const renderVideoTelematics = () => {
+    if (!videoTelematics) return null;
+    
     return (
-      <PageContainer>
-        <LoadingIndicator>Ładowanie danych bezpieczeństwa kierowcy...</LoadingIndicator>
-      </PageContainer>
+      <>
+        <SectionTitle>Telematyka wideo - {videoTelematics.driver}</SectionTitle>
+        
+        <VideoGrid>
+          {videoTelematics.videos.map((video, index) => (
+            <VideoCard key={index}>
+              <VideoThumbnail>
+                Podgląd nagrania
+                <SeverityBadge severity={video.severity}>
+                  {video.severity === 'high' ? 'Wysoki' : 
+                   video.severity === 'medium' ? 'Średni' : 'Niski'}
+                </SeverityBadge>
+              </VideoThumbnail>
+              <VideoInfo>
+                <VideoTitle>{video.description}</VideoTitle>
+                <VideoMeta>
+                  <span>{video.timestamp}</span>
+                  <span>{video.duration}s</span>
+                </VideoMeta>
+                <VideoMeta>
+                  <span>{video.location}</span>
+                </VideoMeta>
+              </VideoInfo>
+            </VideoCard>
+          ))}
+        </VideoGrid>
+        
+        <DetailContainer style={{ marginTop: '20px' }}>
+          <DetailTitle>Statystyki nagrań</DetailTitle>
+          
+          <DetailRow>
+            <DetailLabel>Całkowita liczba nagrań:</DetailLabel>
+            <DetailValue>{videoTelematics.statistics.totalVideos}</DetailValue>
+          </DetailRow>
+          
+          <DetailTitle style={{ marginTop: '16px' }}>Według typu</DetailTitle>
+          
+          <DetailRow>
+            <DetailLabel>Zmęczenie:</DetailLabel>
+            <DetailValue>
+              {videoTelematics.statistics.byType.fatigue}
+              <ProgressBar>
+                <ProgressBarFill 
+                  width={(videoTelematics.statistics.byType.fatigue / videoTelematics.statistics.totalVideos) * 100} 
+                  color="#f44336" 
+                />
+              </ProgressBar>
+            </DetailValue>
+          </DetailRow>
+          
+          <DetailRow>
+            <DetailLabel>Rozproszenie uwagi:</DetailLabel>
+            <DetailValue>
+              {videoTelematics.statistics.byType.distraction}
+              <ProgressBar>
+                <ProgressBarFill 
+                  width={(videoTelematics.statistics.byType.distraction / videoTelematics.statistics.totalVideos) * 100} 
+                  color="#ff9800" 
+                />
+              </ProgressBar>
+            </DetailValue>
+          </DetailRow>
+          
+          <DetailRow>
+            <DetailLabel>Styl jazdy:</DetailLabel>
+            <DetailValue>
+              {videoTelematics.statistics.byType.style}
+              <ProgressBar>
+                <ProgressBarFill 
+                  width={(videoTelematics.statistics.byType.style / videoTelematics.statistics.totalVideos) * 100} 
+                  color="#2196f3" 
+                />
+              </ProgressBar>
+            </DetailValue>
+          </DetailRow>
+          
+          <DetailRow>
+            <DetailLabel>Ryzyko kolizji:</DetailLabel>
+            <DetailValue>
+              {videoTelematics.statistics.byType.collision}
+              <ProgressBar>
+                <ProgressBarFill 
+                  width={(videoTelematics.statistics.byType.collision / videoTelematics.statistics.totalVideos) * 100} 
+                  color="#9c27b0" 
+                />
+              </ProgressBar>
+            </DetailValue>
+          </DetailRow>
+        </DetailContainer>
+      </>
     );
-  }
+  };
   
-  if (error) {
+  // Renderowanie sekcji zmęczenia kierowcy
+  const renderDriverFatigue = () => {
+    if (!drivingStyle || !drivingStyle.fatigueData) return null;
+    
     return (
-      <PageContainer>
-        <ErrorMessage>{error}</ErrorMessage>
-      </PageContainer>
+      <>
+        <SectionTitle>Monitorowanie zmęczenia kierowcy - {drivingStyle.driver}</SectionTitle>
+        
+        <KPIContainer>
+          <KPICard>
+            <KPITitle>Liczba incydentów</KPITitle>
+            <KPIValue>{drivingStyle.fatigueData.incidents}</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Średni czas trwania</KPITitle>
+            <KPIValue>{drivingStyle.fatigueData.averageDuration}s</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Najczęstszy objaw</KPITitle>
+            <KPIValue>
+              {drivingStyle.fatigueData.symptoms.sort((a, b) => b.count - a.count)[0].name}
+            </KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Ocena ryzyka</KPITitle>
+            <KPIValue>
+              {drivingStyle.fatigueData.incidents > 3 ? 'Wysokie' : 
+               drivingStyle.fatigueData.incidents > 1 ? 'Średnie' : 'Niskie'}
+            </KPIValue>
+          </KPICard>
+        </KPIContainer>
+        
+        <GridSection>
+          <Card title="Objawy zmęczenia">
+            <DetailContainer>
+              {drivingStyle.fatigueData.symptoms.map((symptom, index) => (
+                <DetailRow key={index}>
+                  <DetailLabel>{symptom.name}:</DetailLabel>
+                  <DetailValue>
+                    {symptom.count}
+                    <ProgressBar>
+                      <ProgressBarFill 
+                        width={(symptom.count / Math.max(...drivingStyle.fatigueData.symptoms.map(s => s.count))) * 100} 
+                        color="#f44336" 
+                      />
+                    </ProgressBar>
+                  </DetailValue>
+                </DetailRow>
+              ))}
+            </DetailContainer>
+          </Card>
+          
+          <Card title="Pora dnia">
+            <DetailContainer>
+              <DetailRow>
+                <DetailLabel>Rano (6-12):</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.fatigueData.timeOfDay.morning}%
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={drivingStyle.fatigueData.timeOfDay.morning} 
+                      color="#2196f3" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Popołudnie (12-18):</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.fatigueData.timeOfDay.afternoon}%
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={drivingStyle.fatigueData.timeOfDay.afternoon} 
+                      color="#ff9800" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Wieczór (18-24):</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.fatigueData.timeOfDay.evening}%
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={drivingStyle.fatigueData.timeOfDay.evening} 
+                      color="#9c27b0" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Noc (0-6):</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.fatigueData.timeOfDay.night}%
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={drivingStyle.fatigueData.timeOfDay.night} 
+                      color="#333" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+            </DetailContainer>
+          </Card>
+        </GridSection>
+        
+        <Card title="Zalecenia">
+          <DetailContainer>
+            <DetailRow>
+              <DetailValue>• Zaplanuj regularne przerwy co 2 godziny jazdy</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Unikaj jazdy w godzinach nocnych (0-6)</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Zadbaj o odpowiednią ilość snu przed długą trasą</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Unikaj ciężkich posiłków przed jazdą</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Utrzymuj odpowiednią temperaturę w kabinie</DetailValue>
+            </DetailRow>
+          </DetailContainer>
+        </Card>
+      </>
     );
-  }
+  };
+  
+  // Renderowanie sekcji rozproszenia uwagi
+  const renderDriverDistraction = () => {
+    if (!drivingStyle || !drivingStyle.distractionData) return null;
+    
+    return (
+      <>
+        <SectionTitle>Wykrywanie rozproszenia uwagi - {drivingStyle.driver}</SectionTitle>
+        
+        <KPIContainer>
+          <KPICard>
+            <KPITitle>Liczba incydentów</KPITitle>
+            <KPIValue>{drivingStyle.distractionData.incidents}</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Średni czas trwania</KPITitle>
+            <KPIValue>{drivingStyle.distractionData.duration}s</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Główne źródło</KPITitle>
+            <KPIValue>
+              {Object.entries(drivingStyle.distractionData.types)
+                .sort((a, b) => b[1] - a[1])[0][0] === 'phone' ? 'Telefon' : 
+                Object.entries(drivingStyle.distractionData.types)
+                  .sort((a, b) => b[1] - a[1])[0][0] === 'eating' ? 'Jedzenie' : 
+                Object.entries(drivingStyle.distractionData.types)
+                  .sort((a, b) => b[1] - a[1])[0][0] === 'radio' ? 'Radio' : 'Inne'}
+            </KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Ocena ryzyka</KPITitle>
+            <KPIValue>
+              {drivingStyle.distractionData.incidents > 5 ? 'Wysokie' : 
+               drivingStyle.distractionData.incidents > 2 ? 'Średnie' : 'Niskie'}
+            </KPIValue>
+          </KPICard>
+        </KPIContainer>
+        
+        <GridSection>
+          <Card title="Typy rozproszenia uwagi">
+            <DetailContainer>
+              <DetailRow>
+                <DetailLabel>Telefon:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.distractionData.types.phone}
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.distractionData.types.phone / 
+                        (drivingStyle.distractionData.types.phone + 
+                         drivingStyle.distractionData.types.eating + 
+                         drivingStyle.distractionData.types.radio + 
+                         drivingStyle.distractionData.types.other)) * 100} 
+                      color="#f44336" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Jedzenie:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.distractionData.types.eating}
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.distractionData.types.eating / 
+                        (drivingStyle.distractionData.types.phone + 
+                         drivingStyle.distractionData.types.eating + 
+                         drivingStyle.distractionData.types.radio + 
+                         drivingStyle.distractionData.types.other)) * 100} 
+                      color="#ff9800" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Radio:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.distractionData.types.radio}
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.distractionData.types.radio / 
+                        (drivingStyle.distractionData.types.phone + 
+                         drivingStyle.distractionData.types.eating + 
+                         drivingStyle.distractionData.types.radio + 
+                         drivingStyle.distractionData.types.other)) * 100} 
+                      color="#2196f3" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Inne:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.distractionData.types.other}
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.distractionData.types.other / 
+                        (drivingStyle.distractionData.types.phone + 
+                         drivingStyle.distractionData.types.eating + 
+                         drivingStyle.distractionData.types.radio + 
+                         drivingStyle.distractionData.types.other)) * 100} 
+                      color="#9c27b0" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+            </DetailContainer>
+          </Card>
+          
+          <Card title="Wpływ na jazdę">
+            <DetailContainer>
+              <DetailRow>
+                <DetailLabel>Odchylenia od toru jazdy:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.distractionData.impact.laneDeviation} cm
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.distractionData.impact.laneDeviation / 10) * 100} 
+                      color="#f44336" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Wahania prędkości:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.distractionData.impact.speedVariation} km/h
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.distractionData.impact.speedVariation / 20) * 100} 
+                      color="#ff9800" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Czas reakcji:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.distractionData.impact.reactionTime} ms
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.distractionData.impact.reactionTime / 100) * 100} 
+                      color="#2196f3" 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+            </DetailContainer>
+          </Card>
+        </GridSection>
+        
+        <Card title="Zalecenia">
+          <DetailContainer>
+            <DetailRow>
+              <DetailValue>• Wyłącz telefon lub używaj trybu "Nie przeszkadzać" podczas jazdy</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Przygotuj posiłki przed jazdą lub zatrzymuj się na posiłki</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Ustaw radio/muzykę przed rozpoczęciem jazdy</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Używaj systemów głośnomówiących do niezbędnej komunikacji</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Regularnie rób przerwy, aby zmniejszyć potrzebę rozpraszania się</DetailValue>
+            </DetailRow>
+          </DetailContainer>
+        </Card>
+      </>
+    );
+  };
+  
+  // Renderowanie sekcji analizy stylu jazdy
+  const renderDrivingStyle = () => {
+    if (!drivingStyle) return null;
+    
+    return (
+      <>
+        <SectionTitle>Analiza stylu jazdy - {drivingStyle.driver}</SectionTitle>
+        
+        <KPIContainer>
+          <KPICard>
+            <KPITitle>Ogólna ocena</KPITitle>
+            <KPIValue>{drivingStyle.overallScore}/100</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Przyspieszanie</KPITitle>
+            <KPIValue>
+              {drivingStyle.drivingStyle.find(item => item.category === 'Przyspieszanie')?.value || 0}/100
+            </KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Hamowanie</KPITitle>
+            <KPIValue>
+              {drivingStyle.drivingStyle.find(item => item.category === 'Hamowanie')?.value || 0}/100
+            </KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Skręcanie</KPITitle>
+            <KPIValue>
+              {drivingStyle.drivingStyle.find(item => item.category === 'Skręcanie')?.value || 0}/100
+            </KPIValue>
+          </KPICard>
+        </KPIContainer>
+        
+        <GridSection>
+          <Card title="Wykres stylu jazdy">
+            {renderDrivingStyleRadarChart()}
+          </Card>
+          
+          <Card title="Historia ocen">
+            <ChartContainer>
+              Wykres historii ocen stylu jazdy
+            </ChartContainer>
+          </Card>
+        </GridSection>
+        
+        {renderDrivingStyleRecommendations()}
+      </>
+    );
+  };
+  
+  // Renderowanie sekcji zapobiegania kolizjom
+  const renderCollisionPrevention = () => {
+    if (!drivingStyle || !drivingStyle.collisionRiskData) return null;
+    
+    return (
+      <>
+        <SectionTitle>Alerty zapobiegania kolizjom - {drivingStyle.driver}</SectionTitle>
+        
+        <KPIContainer>
+          <KPICard>
+            <KPITitle>Liczba incydentów</KPITitle>
+            <KPIValue>{drivingStyle.collisionRiskData.incidents}</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Kolizje czołowe</KPITitle>
+            <KPIValue>{drivingStyle.collisionRiskData.types.frontCollision}</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Zmiana pasa</KPITitle>
+            <KPIValue>{drivingStyle.collisionRiskData.types.laneChange}</KPIValue>
+          </KPICard>
+          
+          <KPICard>
+            <KPITitle>Skrzyżowania</KPITitle>
+            <KPIValue>{drivingStyle.collisionRiskData.types.intersection}</KPIValue>
+          </KPICard>
+        </KPIContainer>
+        
+        <GridSection>
+          <Card title="Czynniki ryzyka">
+            <DetailContainer>
+              {drivingStyle.collisionRiskData.riskFactors.map((factor, index) => (
+                <DetailRow key={index}>
+                  <DetailLabel>{factor.factor}:</DetailLabel>
+                  <DetailValue>
+                    {factor.value}/100
+                    <ProgressBar>
+                      <ProgressBarFill 
+                        width={factor.value} 
+                        color={factor.value > 80 ? '#4caf50' : factor.value > 50 ? '#ff9800' : '#f44336'} 
+                      />
+                    </ProgressBar>
+                  </DetailValue>
+                </DetailRow>
+              ))}
+            </DetailContainer>
+          </Card>
+          
+          <Card title="Średnia odległość od poprzedzającego pojazdu">
+            <DetailContainer>
+              <DetailRow>
+                <DetailLabel>Średnia odległość:</DetailLabel>
+                <DetailValue>
+                  {drivingStyle.collisionRiskData.averageDistance} m
+                  <ProgressBar>
+                    <ProgressBarFill 
+                      width={(drivingStyle.collisionRiskData.averageDistance / 20) * 100} 
+                      color={drivingStyle.collisionRiskData.averageDistance > 10 ? '#4caf50' : 
+                             drivingStyle.collisionRiskData.averageDistance > 5 ? '#ff9800' : '#f44336'} 
+                    />
+                  </ProgressBar>
+                </DetailValue>
+              </DetailRow>
+              
+              <DetailRow>
+                <DetailLabel>Zalecana odległość:</DetailLabel>
+                <DetailValue>
+                  Minimum 10 metrów przy prędkości miejskiej
+                </DetailValue>
+              </DetailRow>
+            </DetailContainer>
+          </Card>
+        </GridSection>
+        
+        <Card title="Zalecenia">
+          <DetailContainer>
+            <DetailRow>
+              <DetailValue>• Zachowuj bezpieczną odległość od poprzedzającego pojazdu (zasada 2 sekund)</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Zmniejszaj prędkość w trudnych warunkach atmosferycznych</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Używaj kierunkowskazów z odpowiednim wyprzedzeniem</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Zachowaj szczególną ostrożność na skrzyżowaniach</DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailValue>• Unikaj gwałtownych manewrów</DetailValue>
+            </DetailRow>
+          </DetailContainer>
+        </Card>
+      </>
+    );
+  };
+  
+  // Renderowanie głównej zawartości
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <LoadingIndicator>
+          Ładowanie danych...
+        </LoadingIndicator>
+      );
+    }
+    
+    if (error) {
+      return (
+        <ErrorMessage>
+          {error}
+        </ErrorMessage>
+      );
+    }
+    
+    if (activeTab === 'overview') {
+      return (
+        <>
+          <SectionTitle>ALERTY BEZPIECZEŃSTWA</SectionTitle>
+          {renderFilters()}
+          {renderAlertsTable()}
+          {selectedAlert && renderAlertDetails()}
+          
+          <SectionTitle style={{ marginTop: '40px' }}>RANKING BEZPIECZEŃSTWA KIEROWCÓW</SectionTitle>
+          {renderDriverRankingTable()}
+          
+          {drivingStyle && (
+            <>
+              <SectionTitle style={{ marginTop: '40px' }}>ANALIZA STYLU JAZDY</SectionTitle>
+              <GridSection>
+                <Card title="Wykres stylu jazdy">
+                  {renderDrivingStyleRadarChart()}
+                </Card>
+                
+                <Card title="Rekomendacje">
+                  {renderDrivingStyleRecommendations()}
+                </Card>
+              </GridSection>
+            </>
+          )}
+          
+          {coachingSessions && (
+            <>
+              <SectionTitle style={{ marginTop: '40px' }}>SESJE COACHINGOWE</SectionTitle>
+              {renderCoachingSessions()}
+            </>
+          )}
+        </>
+      );
+    }
+    
+    if (activeTab === 'fatigue') {
+      return renderDriverFatigue();
+    }
+    
+    if (activeTab === 'distraction') {
+      return renderDriverDistraction();
+    }
+    
+    if (activeTab === 'style') {
+      return renderDrivingStyle();
+    }
+    
+    if (activeTab === 'collision') {
+      return renderCollisionPrevention();
+    }
+    
+    if (activeTab === 'coaching') {
+      return (
+        <>
+          <SectionTitle>SYSTEM COACHINGU KIEROWCÓW</SectionTitle>
+          {renderCoachingSessions()}
+        </>
+      );
+    }
+    
+    if (activeTab === 'video') {
+      return renderVideoTelematics();
+    }
+    
+    if (activeTab === 'ranking') {
+      return (
+        <>
+          <SectionTitle>RANKING BEZPIECZEŃSTWA KIEROWCÓW</SectionTitle>
+          {renderDriverRankingTable()}
+        </>
+      );
+    }
+    
+    return null;
+  };
   
   return (
     <PageContainer>
-      <SectionTitle>BEZPIECZEŃSTWO KIEROWCY</SectionTitle>
-      
-      <TabsContainer>
-        <Tab 
-          active={activeTab === 'alerts'} 
-          onClick={() => setActiveTab('alerts')}
-        >
-          Alerty bezpieczeństwa
-        </Tab>
-        <Tab 
-          active={activeTab === 'ranking'} 
-          onClick={() => setActiveTab('ranking')}
-        >
-          Ranking kierowców
-        </Tab>
-        <Tab 
-          active={activeTab === 'coaching'} 
-          onClick={() => setActiveTab('coaching')}
-        >
-          Sesje coachingowe
-        </Tab>
-      </TabsContainer>
-      
-      {activeTab === 'alerts' && (
-        <>
-          {renderFilters()}
-          <Card title="Alerty bezpieczeństwa" fullWidth>
-            {renderAlertsTable()}
-          </Card>
-          {selectedAlert && renderAlertDetails()}
-        </>
-      )}
-      
-      {activeTab === 'ranking' && (
-        <>
-          <Card title="Ranking bezpieczeństwa kierowców" fullWidth>
-            {renderDriverRanking()}
-          </Card>
-          {drivingStyle && renderDrivingStyle()}
-        </>
-      )}
-      
-      {activeTab === 'coaching' && (
-        <Card title="Sesje coachingowe" fullWidth>
-          {renderCoachingSessions()}
-        </Card>
-      )}
+      {renderDataToggle()}
+      {renderTabs()}
+      {renderContent()}
     </PageContainer>
   );
 };
