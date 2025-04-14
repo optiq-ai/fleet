@@ -99,6 +99,58 @@ Sekcja monitoringu umożliwia śledzenie stanu pojazdów w czasie rzeczywistym, 
 - Układ kafelkowy dostosowuje się do różnych rozmiarów ekranu
 - Zastosowano media queries dla różnych breakpointów
 
+### Bezpieczeństwo Kierowcy (Driver Safety)
+
+Sekcja bezpieczeństwa kierowcy umożliwia monitorowanie zmęczenia kierowców, wykrywanie rozproszenia uwagi, analizę stylu jazdy, zapobieganie kolizjom, coaching kierowców, telematykę wideo oraz rankingi bezpieczeństwa.
+
+#### Funkcje i metody:
+- `fetchSafetyData()` - pobiera dane alertów bezpieczeństwa, rankingów kierowców, sesji coachingowych i analizy stylu jazdy
+- `handleFilterChange()` - obsługuje zmianę filtrów alertów
+- `handleSearch()` - obsługuje wyszukiwanie alertów
+- `handlePageChange()` - obsługuje zmianę strony w paginacji alertów
+- `handleAlertClick()` - obsługuje kliknięcie wiersza alertu i pobiera szczegóły
+- `handleDriverClick()` - obsługuje kliknięcie wiersza kierowcy i pobiera analizę stylu jazdy
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Zakładki tematyczne** - umożliwiają przełączanie między różnymi aspektami bezpieczeństwa kierowcy
+- **Sekcja monitorowania zmęczenia** - prezentuje dane o zmęczeniu kierowców, symptomach i porach dnia
+- **Sekcja wykrywania rozproszenia uwagi** - pokazuje dane o rozproszeniu uwagi kierowców i jego źródłach
+- **Sekcja analizy stylu jazdy** - wyświetla wykres radarowy stylu jazdy i rekomendacje
+- **Sekcja alertów zapobiegania kolizjom** - prezentuje alerty o ryzyku kolizji
+- **Sekcja coachingu kierowców** - pokazuje sesje coachingowe i ich statusy
+- **Sekcja telematyki wideo** - wyświetla nagrania wideo z incydentów i statystyki
+- **Sekcja rankingów bezpieczeństwa** - prezentuje ranking kierowców według oceny bezpieczeństwa
+
+#### Stany (hooks):
+- `alerts` - dane alertów bezpieczeństwa
+- `selectedAlert` - wybrany alert
+- `driverRanking` - dane rankingu kierowców
+- `drivingStyle` - dane analizy stylu jazdy
+- `coachingSessions` - dane sesji coachingowych
+- `videoTelematics` - dane telematyki wideo
+- `filters` - filtry alertów (typ, czas, wyszukiwanie, strona)
+- `activeTab` - aktywna zakładka tematyczna
+- `isLoading` - stan ładowania
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `driverSafetyService` lub `mockDriverSafetyService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getAlerts()`, `getAlertDetails()`, `getDriverRanking()`, `getDriverStyle()`, `getCoachingSessions()`, `getVideoTelematics()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ kafelkowy dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+
 ## Serwisy danych
 
 ### dashboardService
@@ -117,6 +169,20 @@ Serwis dostarczający dane testowe dla komponentu Monitoring, gdy backend nie je
 - Dane zużycia paliwa z historią i statystykami
 - Dane KPI z kluczowymi wskaźnikami floty
 - Dane trendów dla różnych metryk
+
+### driverSafetyService
+Serwis do pobierania danych dla komponentu Bezpieczeństwo Kierowcy z rzeczywistego API.
+
+### mockDriverSafetyService
+Serwis dostarczający dane testowe dla komponentu Bezpieczeństwo Kierowcy, gdy backend nie jest dostępny. Zawiera:
+- Dane alertów bezpieczeństwa (zmęczenie, rozproszenie uwagi, styl jazdy, ryzyko kolizji)
+- Szczegóły alertów z osią czasu zdarzeń i rekomendacjami
+- Dane rankingu kierowców z oceną bezpieczeństwa
+- Dane analizy stylu jazdy z wykresem radarowym i rekomendacjami
+- Dane monitorowania zmęczenia kierowcy z symptomami i porami dnia
+- Dane wykrywania rozproszenia uwagi z typami rozproszenia
+- Dane sesji coachingowych z tematami i statusami
+- Dane telematyki wideo z nagraniami incydentów i statystykami
 
 ## Uruchomienie aplikacji
 
