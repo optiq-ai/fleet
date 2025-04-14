@@ -9,6 +9,7 @@ import ViewCustomizationUser from './pages/ViewCustomizationUser';
 import ViewCustomizationAdmin from './pages/ViewCustomizationAdmin';
 import Monitoring from './pages/Monitoring';
 import Drivers from './pages/Drivers';
+import FleetManagement from './pages/FleetManagement';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -43,6 +44,11 @@ function App() {
           <Route path="/drivers" element={
             <Layout>
               <Drivers />
+            </Layout>
+          } />
+          <Route path="/fleet-management" element={
+            <Layout>
+              <FleetManagement />
             </Layout>
           } />
           <Route path="/predictive-maintenance" element={

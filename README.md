@@ -152,6 +152,63 @@ Sekcja bezpieczeństwa kierowcy umożliwia monitorowanie zachowań kierowców, a
 - Tabele i wykresy dostosowują się do dostępnej przestrzeni
 - Specjalne widoki dla urządzeń mobilnych
 
+### Zarządzanie Flotą (Fleet Management)
+
+Sekcja zarządzania flotą umożliwia kompleksowe zarządzanie pojazdami, ich wydajnością, dokumentami, historią serwisową, aktywami oraz optymalizacją tras.
+
+#### Funkcje i metody:
+- `fetchFleetData()` - pobiera dane pojazdów, zużycia paliwa, wydajności, historii serwisowej, dokumentów, aktywów i optymalizacji tras
+- `handleTabChange()` - obsługuje zmianę zakładki tematycznej
+- `handleFilterChange()` - obsługuje zmianę filtrów danych
+- `handleSearch()` - obsługuje wyszukiwanie danych
+- `handlePageChange()` - obsługuje zmianę strony w paginacji
+- `handleVehicleSelect()` - obsługuje wybór pojazdu z listy
+- `fetchVehicleDetails()` - pobiera szczegółowe dane wybranego pojazdu
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Zakładki tematyczne** - umożliwiają przełączanie między różnymi aspektami zarządzania flotą
+- **Inwentaryzacja i śledzenie pojazdów** - prezentuje listę pojazdów z ich statusem, danymi technicznymi i lokalizacją
+- **Porównanie zużycia paliwa** - analizuje i porównuje zużycie paliwa między pojazdami
+- **Wskaźniki wydajności pojazdów** - monitoruje wykorzystanie, przestoje, koszty utrzymania i ogólną wydajność pojazdów
+- **Śledzenie historii serwisowej** - rejestruje wszystkie serwisy, naprawy i przeglądy pojazdów
+- **Zarządzanie dokumentami** - przechowuje i monitoruje dokumenty pojazdów (dowody rejestracyjne, ubezpieczenia, przeglądy)
+- **Śledzenie aktywów poza pojazdami** - zarządza dodatkowymi aktywami floty (przyczepy, naczepy, wózki widłowe, terminale)
+- **Optymalizacja tras** - analizuje i optymalizuje trasy pod kątem zużycia paliwa, czasu i kosztów
+
+#### Stany (hooks):
+- `activeTab` - aktywna zakładka tematyczna
+- `vehicles` - dane pojazdów
+- `selectedVehicle` - wybrany pojazd
+- `fuelData` - dane zużycia paliwa
+- `performanceData` - dane wydajności pojazdów
+- `serviceHistory` - historia serwisowa
+- `documents` - dokumenty pojazdów
+- `assets` - aktywa poza pojazdami
+- `routeData` - dane optymalizacji tras
+- `kpiData` - dane KPI floty
+- `filters` - filtry dla danych (status, typ, wyszukiwanie, strona)
+- `isLoading` - stan ładowania danych
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `fleetManagementService` lub `mockFleetManagementService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getVehicles()`, `getVehicleDetails()`, `getFuelConsumption()`, `getVehiclePerformance()`, `getServiceHistory()`, `getDocuments()`, `getNonVehicleAssets()`, `getRouteOptimization()`, `getFleetKPIs()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
 ### Zarządzanie Kierowcami (Drivers)
 
 Sekcja zarządzania kierowcami umożliwia kompleksowe zarządzanie personelem kierowców, ich profilami, wydajnością, dokumentami, harmonogramem oraz lokalizacją w czasie rzeczywistym.
