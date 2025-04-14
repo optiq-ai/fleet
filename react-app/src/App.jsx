@@ -7,6 +7,7 @@ import DriverSafety from './pages/DriverSafety';
 import PredictiveMaintenance from './pages/PredictiveMaintenance';
 import ViewCustomizationUser from './pages/ViewCustomizationUser';
 import ViewCustomizationAdmin from './pages/ViewCustomizationAdmin';
+import Monitoring from './pages/Monitoring';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -21,6 +22,11 @@ function App() {
           <Route path="/" element={
             <Layout>
               <Dashboard />
+            </Layout>
+          } />
+          <Route path="/monitoring" element={
+            <Layout>
+              <Monitoring />
             </Layout>
           } />
           <Route path="/fraud-detection" element={
