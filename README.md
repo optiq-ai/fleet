@@ -99,6 +99,56 @@ Sekcja monitoringu umożliwia śledzenie stanu pojazdów w czasie rzeczywistym, 
 - Układ kafelkowy dostosowuje się do różnych rozmiarów ekranu
 - Zastosowano media queries dla różnych breakpointów
 
+### Bezpieczeństwo Kierowcy (Driver Safety)
+
+Sekcja bezpieczeństwa kierowcy umożliwia monitorowanie zachowań kierowców, analizę stylu jazdy, wykrywanie niebezpiecznych sytuacji oraz zapewnienie wsparcia w poprawie bezpieczeństwa.
+
+#### Funkcje i metody:
+- `fetchSafetyData()` - pobiera dane alertów, rankingu kierowców, sesji coachingowych i stylu jazdy
+- `handleFilterChange()` - obsługuje zmianę filtrów alertów
+- `handleSearch()` - obsługuje wyszukiwanie alertów
+- `handlePageChange()` - obsługuje zmianę strony w paginacji
+- `handleAlertClick()` - obsługuje kliknięcie wiersza alertu i pobiera szczegóły
+- `handleDriverClick()` - obsługuje kliknięcie wiersza kierowcy i pobiera dane stylu jazdy
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Monitorowanie zmęczenia kierowcy** - wykrywa oznaki zmęczenia kierowcy poprzez analizę zachowań
+- **Wykrywanie rozproszenia uwagi** - identyfikuje sytuacje, gdy kierowca jest rozproszony
+- **Analiza stylu jazdy** - monitoruje gwałtowne hamowanie, przyspieszanie i inne wzorce jazdy
+- **Alerty zapobiegania kolizjom** - ostrzega o potencjalnych zagrożeniach na drodze
+- **System coachingu kierowców** - dostarcza wskazówki i szkolenia dla kierowców
+- **Telematyka wideo** - integruje nagrania wideo z danymi telematycznymi
+- **Rankingi bezpieczeństwa kierowców** - porównuje wyniki bezpieczeństwa między kierowcami
+
+#### Stany (hooks):
+- `alerts` - dane alertów bezpieczeństwa
+- `selectedAlert` - wybrany alert do szczegółowego widoku
+- `driverRanking` - ranking kierowców
+- `drivingStyle` - dane analizy stylu jazdy
+- `coachingSessions` - dane sesji coachingowych
+- `videoTelematics` - dane telematyki wideo
+- `filters` - filtry dla alertów (typ, czas, wyszukiwanie)
+- `activeTab` - aktywna zakładka (przegląd, zmęczenie, rozproszenie, styl jazdy, itd.)
+- `isLoading` - stan ładowania
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `driverSafetyService` lub `mockDriverSafetyService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Logowanie błędów do konsoli
+- Obsługa błędów dla poszczególnych typów zapytań
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Specjalne widoki dla urządzeń mobilnych
+
 ## Serwisy danych
 
 ### dashboardService
@@ -117,6 +167,17 @@ Serwis dostarczający dane testowe dla komponentu Monitoring, gdy backend nie je
 - Dane zużycia paliwa z historią i statystykami
 - Dane KPI z kluczowymi wskaźnikami floty
 - Dane trendów dla różnych metryk
+
+### driverSafetyService
+Serwis do pobierania danych dla komponentu Bezpieczeństwo Kierowcy z rzeczywistego API.
+
+### mockDriverSafetyService
+Serwis dostarczający dane testowe dla komponentu Bezpieczeństwo Kierowcy, gdy backend nie jest dostępny. Zawiera:
+- Dane alertów bezpieczeństwa różnych typów (zmęczenie, rozproszenie uwagi, styl jazdy, kolizje)
+- Dane rankingu kierowców z ocenami bezpieczeństwa
+- Dane analizy stylu jazdy (gwałtowne hamowanie, przyspieszanie, przekroczenia prędkości)
+- Dane sesji coachingowych dla kierowców
+- Dane telematyki wideo z nagraniami zdarzeń
 
 ## Uruchomienie aplikacji
 
