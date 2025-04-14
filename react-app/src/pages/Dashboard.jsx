@@ -4,6 +4,7 @@ import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
 import dashboardService from '../services/api/dashboardService';
+import mockDashboardService from '../services/api/mockDashboardService';
 
 /**
  * @typedef {Object} KPIData
@@ -218,6 +219,41 @@ const RankingValue = styled.div`
   font-weight: 500;
 `;
 
+const DataSourceToggle = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+`;
+
+const ToggleLabel = styled.label`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+`;
+
+const ToggleSwitch = styled.div`
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background-color: ${props => props.checked ? '#3f51b5' : '#ccc'};
+  border-radius: 12px;
+  margin: 0 8px;
+  transition: background-color 0.3s;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: ${props => props.checked ? '26px' : '2px'};
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: left 0.3s;
+  }
+`;
+
 /**
  * Dashboard component displaying KPIs, alerts, fleet statistics, and fleet map
  * @returns {JSX.Element} Dashboard component
@@ -253,7 +289,13 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Pobieranie danych przy montowaniu komponentu
+  // Stan dla przełącznika źródła danych (API vs Mock)
+  const [useMockData, setUseMockData] = useState(true);
+  
+  // Wybór serwisu danych na podstawie stanu przełącznika
+  const dataService = useMockData ? mockDashboardService : dashboardService;
+  
+  // Pobieranie danych przy montowaniu komponentu lub zmianie źródła danych
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
@@ -261,15 +303,15 @@ const Dashboard = () => {
       
       try {
         // Pobieranie danych KPI
-        const kpiResponse = await dashboardService.getKPIData();
+        const kpiResponse = await dataService.getKPIData();
         setKpiData(kpiResponse);
         
         // Pobieranie alertów
-        const alertsResponse = await dashboardService.getAlerts();
+        const alertsResponse = await dataService.getAlerts();
         setAlerts(alertsResponse);
         
         // Pobieranie danych mapy
-        const mapResponse = await dashboardService.getMapData('vehicles');
+        const mapResponse = await dataService.getMapData('vehicles');
         setMapData(mapResponse);
         
         // Pobieranie statystyk floty (symulacja - w rzeczywistości byłoby to z API)
@@ -316,14 +358,14 @@ const Dashboard = () => {
     };
     
     fetchDashboardData();
-  }, []);
+  }, [dataService, useMockData]);
   
   // Obsługa zmiany typu danych mapy
   const handleMapTypeChange = async (type) => {
     try {
       setIsLoading(true);
       setActiveMapTab(type);
-      const mapResponse = await dashboardService.getMapData(type);
+      const mapResponse = await dataService.getMapData(type);
       setMapData(mapResponse);
     } catch (err) {
       console.error('Error fetching map data:', err);
@@ -350,6 +392,11 @@ const Dashboard = () => {
       ...tooltip,
       visible: false
     });
+  };
+  
+  // Obsługa przełączania źródła danych
+  const handleToggleDataSource = () => {
+    setUseMockData(!useMockData);
   };
   
   // Renderowanie sekcji KPI
@@ -677,20 +724,26 @@ const Dashboard = () => {
     );
   }
   
-  if (error) {
-    return (
-      <PageContainer>
-        <ErrorMessage>{error}</ErrorMessage>
-      </PageContainer>
-    );
-  }
-  
   return (
     <PageContainer>
-      {renderKPISection()}
-      {renderAlertsSection()}
-      {renderFleetStatsSection()}
-      {renderMapSection()}
+      <DataSourceToggle>
+        <ToggleLabel>
+          API
+          <ToggleSwitch checked={useMockData} onClick={handleToggleDataSource} />
+          Dane mockowe
+        </ToggleLabel>
+      </DataSourceToggle>
+      
+      {error ? (
+        <ErrorMessage>{error}</ErrorMessage>
+      ) : (
+        <>
+          {renderKPISection()}
+          {renderAlertsSection()}
+          {renderFleetStatsSection()}
+          {renderMapSection()}
+        </>
+      )}
     </PageContainer>
   );
 };
