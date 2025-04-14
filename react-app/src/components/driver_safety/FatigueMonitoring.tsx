@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { Driver, DriverMetrics, Alert, AlertSeverity, MonitoringStatus, FatigueMonitoringSettings } from '../../types';
 
 interface FatigueMonitoringProps {
   driverId: string;
-  onAlert: (alert: any) => void;
-  onSettingsChange: (settings: any) => void;
+  onAlert: (alert: Alert) => void;
+  onSettingsChange: (settings: FatigueMonitoringSettings) => void;
 }
 
 const Container = styled.div`
@@ -45,7 +46,7 @@ const CardTitle = styled.div`
 
 const CardContent = styled.div``;
 
-const StatusIndicator = styled.div<{ status: 'normal' | 'warning' | 'danger' | 'inactive' }>`
+const StatusIndicator = styled.div<{ status: MonitoringStatus }>`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -66,7 +67,7 @@ const StatusIndicator = styled.div<{ status: 'normal' | 'warning' | 'danger' | '
   };
 `;
 
-const StatusDot = styled.div<{ status: 'normal' | 'warning' | 'danger' | 'inactive' }>`
+const StatusDot = styled.div<{ status: MonitoringStatus }>`
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -123,7 +124,7 @@ const AlertsContainer = styled.div`
   margin-top: 20px;
 `;
 
-const AlertItem = styled.div<{ severity: 'low' | 'medium' | 'high' }>`
+const AlertItem = styled.div<{ severity: AlertSeverity }>`
   padding: 12px;
   border-radius: 4px;
   background-color: ${props => 
@@ -358,9 +359,9 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
   onSettingsChange
 }) => {
   const [activeTab, setActiveTab] = useState<'live' | 'history' | 'settings'>('live');
-  const [monitoringStatus, setMonitoringStatus] = useState<'normal' | 'warning' | 'danger' | 'inactive'>('normal');
-  const [alerts, setAlerts] = useState<any[]>([]);
-  const [driverData, setDriverData] = useState<any>({
+  const [monitoringStatus, setMonitoringStatus] = useState<MonitoringStatus>('normal');
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [driverData, setDriverData] = useState<Driver>({
     name: 'Jan Kowalski',
     id: 'DRV-12345',
     vehicle: 'Ciężarówka #1234',
@@ -381,7 +382,7 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
   });
   
   // Ustawienia
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<FatigueMonitoringSettings>({
     enableFatigueDetection: true,
     enableDistractionDetection: true,
     enableAlerts: true,
@@ -402,7 +403,7 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
       const newDistractions = Math.max(0, Math.min(10, driverData.metrics.distractions + (Math.random() > 0.9 ? 1 : 0)));
       const newFocusScore = Math.max(0, Math.min(100, driverData.metrics.focusScore + (Math.random() - 0.5) * 5));
       
-      const newMetrics = {
+      const newMetrics: DriverMetrics = {
         blinkRate: parseFloat(newBlinkRate.toFixed(1)),
         yawns: newYawns,
         headPosition: driverData.metrics.headPosition,
@@ -414,7 +415,7 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
       // Aktualizacja pozostałego czasu zmiany
       const newRemaining = Math.max(0, driverData.shift.remaining - 1/60);
       
-      setDriverData(prev => ({
+      setDriverData((prev: Driver) => ({
         ...prev,
         metrics: newMetrics,
         shift: {
@@ -424,7 +425,7 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
       }));
       
       // Określenie statusu monitorowania
-      let newStatus: 'normal' | 'warning' | 'danger' | 'inactive' = 'normal';
+      let newStatus: MonitoringStatus = 'normal';
       
       if (newBlinkRate > settings.blinkRateThreshold || 
           newYawns > settings.yawnThreshold || 
@@ -445,12 +446,12 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
       // Generowanie alertów
       if (newStatus === 'danger' && Math.random() > 0.8) {
         const alertTypes = [
-          { title: 'Wykryto zmęczenie kierowcy', details: 'Wysoka częstotliwość mrugnięć i ziewania wskazuje na zmęczenie.', severity: 'high' as const },
-          { title: 'Wykryto rozproszenie uwagi', details: 'Kierowca odwraca wzrok od drogi zbyt często.', severity: 'medium' as const },
-          { title: 'Wykryto mikro-sen', details: 'Oczy kierowcy były zamknięte przez dłuższy czas.', severity: 'high' as const }
+          { title: 'Wykryto zmęczenie kierowcy', details: 'Wysoka częstotliwość mrugnięć i ziewania wskazuje na zmęczenie.', severity: 'high' as AlertSeverity },
+          { title: 'Wykryto rozproszenie uwagi', details: 'Kierowca odwraca wzrok od drogi zbyt często.', severity: 'medium' as AlertSeverity },
+          { title: 'Wykryto mikro-sen', details: 'Oczy kierowcy były zamknięte przez dłuższy czas.', severity: 'high' as AlertSeverity }
         ];
         
-        const newAlert = {
+        const newAlert: Alert = {
           id: `alert-${Date.now()}`,
           ...alertTypes[Math.floor(Math.random() * alertTypes.length)],
           timestamp: new Date().toISOString()
@@ -465,7 +466,7 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
   }, [driverData, settings, onAlert]);
   
   // Obsługa zmiany ustawień
-  const handleSettingChange = (key: string, value: any) => {
+  const handleSettingChange = (key: keyof FatigueMonitoringSettings, value: any) => {
     setSettings(prev => {
       const newSettings = { ...prev, [key]: value };
       onSettingsChange(newSettings);
@@ -594,10 +595,10 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
   const renderHistoryTab = () => {
     return (
       <Card>
-        <CardTitle>Historia monitorowania</CardTitle>
+        <CardTitle>Historia alertów</CardTitle>
         <CardContent>
-          <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-            Funkcjonalność historii będzie dostępna wkrótce.
+          <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+            Funkcja historii alertów będzie dostępna wkrótce.
           </div>
         </CardContent>
       </Card>
@@ -614,67 +615,61 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
             <SettingItem>
               <SettingLabel>Wykrywanie zmęczenia</SettingLabel>
               <SettingDescription>
-                Monitorowanie mrugnięć, ziewania i pozycji głowy w celu wykrycia oznak zmęczenia.
+                Włącz lub wyłącz wykrywanie zmęczenia kierowcy na podstawie analizy twarzy.
               </SettingDescription>
               <ToggleContainer>
                 <ToggleSwitch>
                   <input 
                     type="checkbox" 
-                    checked={settings.enableFatigueDetection}
-                    onChange={(e) => handleSettingChange('enableFatigueDetection', e.target.checked)}
+                    checked={settings.enableFatigueDetection} 
+                    onChange={e => handleSettingChange('enableFatigueDetection', e.target.checked)} 
                   />
                   <span></span>
                 </ToggleSwitch>
-                <ToggleLabel>
-                  {settings.enableFatigueDetection ? 'Włączone' : 'Wyłączone'}
-                </ToggleLabel>
+                <ToggleLabel>{settings.enableFatigueDetection ? 'Włączone' : 'Wyłączone'}</ToggleLabel>
               </ToggleContainer>
             </SettingItem>
             
             <SettingItem>
               <SettingLabel>Wykrywanie rozproszenia uwagi</SettingLabel>
               <SettingDescription>
-                Monitorowanie kierunku wzroku i pozycji głowy w celu wykrycia rozproszenia uwagi.
+                Włącz lub wyłącz wykrywanie rozproszenia uwagi kierowcy.
               </SettingDescription>
               <ToggleContainer>
                 <ToggleSwitch>
                   <input 
                     type="checkbox" 
-                    checked={settings.enableDistractionDetection}
-                    onChange={(e) => handleSettingChange('enableDistractionDetection', e.target.checked)}
+                    checked={settings.enableDistractionDetection} 
+                    onChange={e => handleSettingChange('enableDistractionDetection', e.target.checked)} 
                   />
                   <span></span>
                 </ToggleSwitch>
-                <ToggleLabel>
-                  {settings.enableDistractionDetection ? 'Włączone' : 'Wyłączone'}
-                </ToggleLabel>
+                <ToggleLabel>{settings.enableDistractionDetection ? 'Włączone' : 'Wyłączone'}</ToggleLabel>
               </ToggleContainer>
             </SettingItem>
             
             <SettingItem>
               <SettingLabel>Alerty</SettingLabel>
               <SettingDescription>
-                Powiadomienia dźwiękowe i wizualne w przypadku wykrycia zmęczenia lub rozproszenia uwagi.
+                Włącz lub wyłącz powiadomienia o alertach.
               </SettingDescription>
               <ToggleContainer>
                 <ToggleSwitch>
                   <input 
                     type="checkbox" 
-                    checked={settings.enableAlerts}
-                    onChange={(e) => handleSettingChange('enableAlerts', e.target.checked)}
+                    checked={settings.enableAlerts} 
+                    onChange={e => handleSettingChange('enableAlerts', e.target.checked)} 
                   />
                   <span></span>
                 </ToggleSwitch>
-                <ToggleLabel>
-                  {settings.enableAlerts ? 'Włączone' : 'Wyłączone'}
-                </ToggleLabel>
+                <ToggleLabel>{settings.enableAlerts ? 'Włączone' : 'Wyłączone'}</ToggleLabel>
               </ToggleContainer>
             </SettingItem>
             
             <SettingItem>
-              <SettingLabel>Czułość alertów</SettingLabel>
+              <SettingLabel>Czułość alertów: {settings.alertSensitivity}%</SettingLabel>
               <SettingDescription>
-                Dostosuj czułość systemu wykrywania zmęczenia i rozproszenia uwagi.
+                Dostosuj czułość alertów. Wyższa wartość oznacza więcej alertów.
               </SettingDescription>
               <SliderContainer>
                 <SliderRow>
@@ -682,8 +677,8 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
                     type="range" 
                     min="0" 
                     max="100" 
-                    value={settings.alertSensitivity}
-                    onChange={(e) => handleSettingChange('alertSensitivity', parseInt(e.target.value))}
+                    value={settings.alertSensitivity} 
+                    onChange={e => handleSettingChange('alertSensitivity', parseInt(e.target.value))} 
                   />
                   <SliderValue>{settings.alertSensitivity}%</SliderValue>
                 </SliderRow>
@@ -691,93 +686,105 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
             </SettingItem>
           </SettingsGrid>
           
-          <SettingsContainer>
-            <SettingsTitle>Zaawansowane ustawienia</SettingsTitle>
-            <SettingsGrid>
-              <SettingItem>
-                <SettingLabel>Próg częstotliwości mrugnięć</SettingLabel>
-                <SettingDescription>
-                  Liczba mrugnięć na minutę, powyżej której system generuje alert.
-                </SettingDescription>
-                <SliderContainer>
-                  <SliderRow>
-                    <Slider 
-                      type="range" 
-                      min="5" 
-                      max="20" 
-                      value={settings.blinkRateThreshold}
-                      onChange={(e) => handleSettingChange('blinkRateThreshold', parseInt(e.target.value))}
-                    />
-                    <SliderValue>{settings.blinkRateThreshold}</SliderValue>
-                  </SliderRow>
-                </SliderContainer>
-              </SettingItem>
-              
-              <SettingItem>
-                <SettingLabel>Próg liczby ziewnięć</SettingLabel>
-                <SettingDescription>
-                  Liczba ziewnięć, powyżej której system generuje alert.
-                </SettingDescription>
-                <SliderContainer>
-                  <SliderRow>
-                    <Slider 
-                      type="range" 
-                      min="1" 
-                      max="10" 
-                      value={settings.yawnThreshold}
-                      onChange={(e) => handleSettingChange('yawnThreshold', parseInt(e.target.value))}
-                    />
-                    <SliderValue>{settings.yawnThreshold}</SliderValue>
-                  </SliderRow>
-                </SliderContainer>
-              </SettingItem>
-              
-              <SettingItem>
-                <SettingLabel>Próg czasu zamkniętych oczu</SettingLabel>
-                <SettingDescription>
-                  Procent czasu z zamkniętymi oczami, powyżej którego system generuje alert.
-                </SettingDescription>
-                <SliderContainer>
-                  <SliderRow>
-                    <Slider 
-                      type="range" 
-                      min="0.1" 
-                      max="0.5" 
-                      step="0.05"
-                      value={settings.eyesClosedThreshold}
-                      onChange={(e) => handleSettingChange('eyesClosedThreshold', parseFloat(e.target.value))}
-                    />
-                    <SliderValue>{(settings.eyesClosedThreshold * 100).toFixed(0)}%</SliderValue>
-                  </SliderRow>
-                </SliderContainer>
-              </SettingItem>
-              
-              <SettingItem>
-                <SettingLabel>Próg liczby rozproszeń</SettingLabel>
-                <SettingDescription>
-                  Liczba rozproszeń uwagi, powyżej której system generuje alert.
-                </SettingDescription>
-                <SliderContainer>
-                  <SliderRow>
-                    <Slider 
-                      type="range" 
-                      min="1" 
-                      max="10" 
-                      value={settings.distractionThreshold}
-                      onChange={(e) => handleSettingChange('distractionThreshold', parseInt(e.target.value))}
-                    />
-                    <SliderValue>{settings.distractionThreshold}</SliderValue>
-                  </SliderRow>
-                </SliderContainer>
-              </SettingItem>
-            </SettingsGrid>
+          <SettingsTitle style={{ marginTop: '24px' }}>Progi alertów</SettingsTitle>
+          <SettingsGrid>
+            <SettingItem>
+              <SettingLabel>Próg częstotliwości mrugnięć: {settings.blinkRateThreshold}</SettingLabel>
+              <SettingDescription>
+                Liczba mrugnięć na minutę, powyżej której zostanie wygenerowany alert.
+              </SettingDescription>
+              <SliderContainer>
+                <SliderRow>
+                  <Slider 
+                    type="range" 
+                    min="5" 
+                    max="20" 
+                    value={settings.blinkRateThreshold} 
+                    onChange={e => handleSettingChange('blinkRateThreshold', parseInt(e.target.value))} 
+                  />
+                  <SliderValue>{settings.blinkRateThreshold}</SliderValue>
+                </SliderRow>
+              </SliderContainer>
+            </SettingItem>
             
-            <div style={{ marginTop: '20px', textAlign: 'right' }}>
-              <ActionButton>
-                Zapisz ustawienia
-              </ActionButton>
-            </div>
-          </SettingsContainer>
+            <SettingItem>
+              <SettingLabel>Próg liczby ziewnięć: {settings.yawnThreshold}</SettingLabel>
+              <SettingDescription>
+                Liczba ziewnięć, powyżej której zostanie wygenerowany alert.
+              </SettingDescription>
+              <SliderContainer>
+                <SliderRow>
+                  <Slider 
+                    type="range" 
+                    min="1" 
+                    max="10" 
+                    value={settings.yawnThreshold} 
+                    onChange={e => handleSettingChange('yawnThreshold', parseInt(e.target.value))} 
+                  />
+                  <SliderValue>{settings.yawnThreshold}</SliderValue>
+                </SliderRow>
+              </SliderContainer>
+            </SettingItem>
+            
+            <SettingItem>
+              <SettingLabel>Próg czasu zamkniętych oczu: {(settings.eyesClosedThreshold * 100).toFixed(0)}%</SettingLabel>
+              <SettingDescription>
+                Procent czasu z zamkniętymi oczami, powyżej którego zostanie wygenerowany alert.
+              </SettingDescription>
+              <SliderContainer>
+                <SliderRow>
+                  <Slider 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.05" 
+                    value={settings.eyesClosedThreshold} 
+                    onChange={e => handleSettingChange('eyesClosedThreshold', parseFloat(e.target.value))} 
+                  />
+                  <SliderValue>{(settings.eyesClosedThreshold * 100).toFixed(0)}%</SliderValue>
+                </SliderRow>
+              </SliderContainer>
+            </SettingItem>
+            
+            <SettingItem>
+              <SettingLabel>Próg liczby rozproszeń: {settings.distractionThreshold}</SettingLabel>
+              <SettingDescription>
+                Liczba rozproszeń, powyżej której zostanie wygenerowany alert.
+              </SettingDescription>
+              <SliderContainer>
+                <SliderRow>
+                  <Slider 
+                    type="range" 
+                    min="1" 
+                    max="10" 
+                    value={settings.distractionThreshold} 
+                    onChange={e => handleSettingChange('distractionThreshold', parseInt(e.target.value))} 
+                  />
+                  <SliderValue>{settings.distractionThreshold}</SliderValue>
+                </SliderRow>
+              </SliderContainer>
+            </SettingItem>
+          </SettingsGrid>
+          
+          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+            <ActionButton onClick={() => {
+              // Reset do domyślnych ustawień
+              const defaultSettings: FatigueMonitoringSettings = {
+                enableFatigueDetection: true,
+                enableDistractionDetection: true,
+                enableAlerts: true,
+                alertSensitivity: 70,
+                blinkRateThreshold: 8,
+                yawnThreshold: 5,
+                eyesClosedThreshold: 0.3,
+                distractionThreshold: 3
+              };
+              setSettings(defaultSettings);
+              onSettingsChange(defaultSettings);
+            }}>
+              Przywróć domyślne
+            </ActionButton>
+          </div>
         </CardContent>
       </Card>
     );
@@ -790,22 +797,13 @@ const FatigueMonitoring: React.FC<FatigueMonitoringProps> = ({
       </Header>
       
       <TabsContainer>
-        <Tab 
-          active={activeTab === 'live'} 
-          onClick={() => setActiveTab('live')}
-        >
+        <Tab active={activeTab === 'live'} onClick={() => setActiveTab('live')}>
           Na żywo
         </Tab>
-        <Tab 
-          active={activeTab === 'history'} 
-          onClick={() => setActiveTab('history')}
-        >
+        <Tab active={activeTab === 'history'} onClick={() => setActiveTab('history')}>
           Historia
         </Tab>
-        <Tab 
-          active={activeTab === 'settings'} 
-          onClick={() => setActiveTab('settings')}
-        >
+        <Tab active={activeTab === 'settings'} onClick={() => setActiveTab('settings')}>
           Ustawienia
         </Tab>
       </TabsContainer>
