@@ -503,6 +503,6 @@ class MockMonitoringService {
   }
 }
 
-// Export service instance
-export const mockMonitoringService = new MockMonitoringService();
+// Create and export a single instance
+const mockMonitoringService = new MockMonitoringService();
 export default mockMonitoringService;
