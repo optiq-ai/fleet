@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
@@ -230,7 +230,7 @@ const FleetManagement = () => {
   const service = useMockData ? mockFleetManagementService : fleetManagementService;
   
   // Fetch fleet data
-  const fetchFleetData = async () => {
+  const fetchFleetData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
@@ -278,10 +278,10 @@ const FleetManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeTab, filters, service]);
   
   // Fetch vehicle details
-  const fetchVehicleDetails = async (vehicleId) => {
+  const fetchVehicleDetails = useCallback(async (vehicleId) => {
     setIsLoading(true);
     
     try {
@@ -292,23 +292,21 @@ const FleetManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service]);
   
   // Fetch data on component mount and when filters or mock data toggle changes
   useEffect(() => {
     fetchFleetData();
-  }, [filters.page, useMockData, fetchFleetData]);
+  }, [fetchFleetData]);
   
-  // Fetch data when search or filter changes
+  // Fetch data when active tab changes
   useEffect(() => {
-    if (filters.search !== '' || filters.status !== 'all' || filters.type !== 'all') {
-      fetchFleetData();
-    }
-  }, [filters.search, filters.status, filters.type, fetchFleetData]);
+    fetchFleetData();
+  }, [activeTab, fetchFleetData]);
   
   // Fetch vehicle details when selected vehicle changes
   useEffect(() => {
-    if (selectedVehicle) {
+    if (selectedVehicle && selectedVehicle.id) {
       fetchVehicleDetails(selectedVehicle.id);
     }
   }, [selectedVehicle, fetchVehicleDetails]);
@@ -317,7 +315,6 @@ const FleetManagement = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setSelectedVehicle(null);
-    fetchFleetData();
   };
   
   // Handle filter change
