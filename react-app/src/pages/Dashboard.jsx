@@ -13,6 +13,7 @@ import dashboardService from '../services/api/dashboardService';
  * @property {number} potentialSavings - Potential savings
  * @property {number} safetyIndex - Safety index
  * @property {number} maintenanceForecast - Maintenance forecast
+ * @property {number} fraudAlerts - Number of fraud alerts
  */
 
 /**
@@ -28,6 +29,14 @@ import dashboardService from '../services/api/dashboardService';
 /**
  * @typedef {Object} MapData
  * @property {Array} points - Map points
+ */
+
+/**
+ * @typedef {Object} FleetStatistics
+ * @property {Object} fuelConsumption - Fuel consumption data
+ * @property {Object} driverEfficiency - Driver efficiency data
+ * @property {Object} operationalCosts - Operational costs data
+ * @property {Object} routeCompletion - Route completion data
  */
 
 const PageContainer = styled.div`
@@ -156,8 +165,61 @@ const Tab = styled.div`
   }
 `;
 
+const ViewAllButton = styled.button`
+  background-color: transparent;
+  border: none;
+  color: #3f51b5;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  display: block;
+  margin: 16px auto 0;
+  
+  &:hover {
+    text-decoration: underline;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+`;
+
+const ChartContainer = styled.div`
+  height: 250px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #666;
+  margin-top: 12px;
+`;
+
+const RankingContainer = styled.div`
+  margin-top: 12px;
+`;
+
+const RankingItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const RankingName = styled.div`
+  font-weight: ${props => props.highlighted ? '500' : 'normal'};
+`;
+
+const RankingValue = styled.div`
+  color: ${props => props.positive ? '#4caf50' : props.negative ? '#f44336' : '#666'};
+  font-weight: 500;
+`;
+
 /**
- * Dashboard component displaying KPIs, alerts, and fleet map
+ * Dashboard component displaying KPIs, alerts, fleet statistics, and fleet map
  * @returns {JSX.Element} Dashboard component
  */
 const Dashboard = () => {
@@ -170,8 +232,14 @@ const Dashboard = () => {
   // Stan dla danych mapy
   const [mapData, setMapData] = useState(null);
   
+  // Stan dla statystyk floty
+  const [fleetStats, setFleetStats] = useState(null);
+  
   // Stan dla aktywnej zakładki alertów
   const [activeAlertTab, setActiveAlertTab] = useState('fraud');
+  
+  // Stan dla aktywnej zakładki mapy
+  const [activeMapTab, setActiveMapTab] = useState('vehicles');
   
   // Stan dla tooltipa mapy
   const [tooltip, setTooltip] = useState({
@@ -203,6 +271,42 @@ const Dashboard = () => {
         // Pobieranie danych mapy
         const mapResponse = await dashboardService.getMapData('vehicles');
         setMapData(mapResponse);
+        
+        // Pobieranie statystyk floty (symulacja - w rzeczywistości byłoby to z API)
+        setFleetStats({
+          fuelConsumption: {
+            current: 8.5,
+            previous: 9.2,
+            trend: 'down',
+            trendValue: '7.6%',
+            chartData: [8.9, 9.1, 9.0, 8.8, 8.7, 8.6, 8.5]
+          },
+          driverEfficiency: {
+            drivers: [
+              { id: 'D001', name: 'Jan Kowalski', score: 92, trend: 'up' },
+              { id: 'D002', name: 'Anna Nowak', score: 88, trend: 'up' },
+              { id: 'D003', name: 'Piotr Wiśniewski', score: 85, trend: 'down' },
+              { id: 'D004', name: 'Katarzyna Dąbrowska', score: 82, trend: 'up' },
+              { id: 'D005', name: 'Tomasz Lewandowski', score: 78, trend: 'down' }
+            ]
+          },
+          operationalCosts: {
+            total: 125000,
+            breakdown: [
+              { category: 'Paliwo', value: 45000, percentage: 36 },
+              { category: 'Utrzymanie', value: 30000, percentage: 24 },
+              { category: 'Ubezpieczenie', value: 25000, percentage: 20 },
+              { category: 'Opłaty drogowe', value: 15000, percentage: 12 },
+              { category: 'Inne', value: 10000, percentage: 8 }
+            ]
+          },
+          routeCompletion: {
+            completed: 87,
+            onTime: 82,
+            delayed: 5,
+            cancelled: 13
+          }
+        });
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
         setError('Nie udało się pobrać danych dashboardu. Spróbuj odświeżyć stronę.');
@@ -218,6 +322,7 @@ const Dashboard = () => {
   const handleMapTypeChange = async (type) => {
     try {
       setIsLoading(true);
+      setActiveMapTab(type);
       const mapResponse = await dashboardService.getMapData(type);
       setMapData(mapResponse);
     } catch (err) {
@@ -294,11 +399,11 @@ const Dashboard = () => {
             trendPositive
           />
           <KPICard 
-            title="Prognoza konserwacji" 
-            value={kpiData.maintenanceForecast.toString()} 
-            icon="🔧"
+            title="Alerty o oszustwach" 
+            value={alerts ? alerts.fraudAlerts.length.toString() : "0"} 
+            icon="⚠️"
             trend="down"
-            trendValue="10%"
+            trendValue="15%"
             trendPositive
           />
         </GridSection>
@@ -327,7 +432,7 @@ const Dashboard = () => {
     
     return (
       <>
-        <SectionTitle>ALERTY</SectionTitle>
+        <SectionTitle>WYKRYWANIE OSZUSTW</SectionTitle>
         <Card fullWidth>
           <TabsContainer>
             <Tab 
@@ -352,7 +457,7 @@ const Dashboard = () => {
           
           <Table 
             headers={['Priorytet', 'Opis', 'Pojazd', 'Data', 'Status']}
-            data={currentAlerts.map(alert => [
+            data={currentAlerts.slice(0, 5).map(alert => [
               alert.priority,
               alert.description,
               alert.vehicle,
@@ -361,7 +466,102 @@ const Dashboard = () => {
             ])}
             onRowClick={(index) => console.log('Clicked row:', currentAlerts[index])}
           />
+          
+          <ViewAllButton onClick={() => console.log('View all alerts')}>
+            Zobacz wszystkie alerty
+          </ViewAllButton>
         </Card>
+        
+        <GridSection>
+          <Card title="Mapa fraudów">
+            <MapContainer style={{ height: '200px' }}>
+              <MapPlaceholder>Mapa Polski z oznaczeniami fraudów</MapPlaceholder>
+            </MapContainer>
+          </Card>
+          
+          <Card title="Wskaźnik ryzyka oszustw">
+            <ChartContainer>Wykres trendu ryzyka oszustw</ChartContainer>
+          </Card>
+        </GridSection>
+      </>
+    );
+  };
+  
+  // Renderowanie sekcji statystyk floty
+  const renderFleetStatsSection = () => {
+    if (!fleetStats) return null;
+    
+    return (
+      <>
+        <SectionTitle>STATYSTYKI FLOTY</SectionTitle>
+        <GridSection>
+          <Card title="Zużycie paliwa">
+            <div>
+              <strong>Średnie zużycie: </strong> 
+              {fleetStats.fuelConsumption.current} l/100km
+              <span style={{ 
+                color: fleetStats.fuelConsumption.trend === 'down' ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {fleetStats.fuelConsumption.trend === 'down' ? '↓' : '↑'} {fleetStats.fuelConsumption.trendValue}
+              </span>
+            </div>
+            <ChartContainer>Wykres trendu zużycia paliwa</ChartContainer>
+          </Card>
+          
+          <Card title="Efektywność kierowców">
+            <RankingContainer>
+              {fleetStats.driverEfficiency.drivers.map((driver, index) => (
+                <RankingItem key={driver.id}>
+                  <RankingName highlighted={index < 3}>
+                    {index + 1}. {driver.name}
+                  </RankingName>
+                  <RankingValue positive={driver.trend === 'up'} negative={driver.trend === 'down'}>
+                    {driver.score} {driver.trend === 'up' ? '↑' : driver.trend === 'down' ? '↓' : ''}
+                  </RankingValue>
+                </RankingItem>
+              ))}
+            </RankingContainer>
+          </Card>
+          
+          <Card title="Koszty operacyjne">
+            <div>
+              <strong>Całkowite koszty: </strong> 
+              {fleetStats.operationalCosts.total.toLocaleString()} zł
+            </div>
+            <ChartContainer>Wykres struktury kosztów</ChartContainer>
+          </Card>
+          
+          <Card title="Realizacja tras">
+            <div style={{ marginBottom: '12px' }}>
+              <strong>Ukończone trasy: </strong> 
+              {fleetStats.routeCompletion.completed}%
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                <div style={{ width: '100px' }}>Na czas:</div>
+                <div style={{ flex: 1, height: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ width: `${fleetStats.routeCompletion.onTime}%`, height: '100%', backgroundColor: '#4caf50' }}></div>
+                </div>
+                <div style={{ marginLeft: '8px' }}>{fleetStats.routeCompletion.onTime}%</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                <div style={{ width: '100px' }}>Opóźnione:</div>
+                <div style={{ flex: 1, height: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ width: `${fleetStats.routeCompletion.delayed}%`, height: '100%', backgroundColor: '#ff9800' }}></div>
+                </div>
+                <div style={{ marginLeft: '8px' }}>{fleetStats.routeCompletion.delayed}%</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: '100px' }}>Anulowane:</div>
+                <div style={{ flex: 1, height: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ width: `${fleetStats.routeCompletion.cancelled}%`, height: '100%', backgroundColor: '#f44336' }}></div>
+                </div>
+                <div style={{ marginLeft: '8px' }}>{fleetStats.routeCompletion.cancelled}%</div>
+              </div>
+            </div>
+          </Card>
+        </GridSection>
       </>
     );
   };
@@ -395,23 +595,23 @@ const Dashboard = () => {
     
     return (
       <>
-        <SectionTitle>MAPA FLOTY</SectionTitle>
+        <SectionTitle>MONITORING POJAZDÓW</SectionTitle>
         <Card fullWidth>
           <TabsContainer>
             <Tab 
-              active={true} 
+              active={activeMapTab === 'vehicles'} 
               onClick={() => handleMapTypeChange('vehicles')}
             >
               Pojazdy
             </Tab>
             <Tab 
-              active={false} 
+              active={activeMapTab === 'fraud'} 
               onClick={() => handleMapTypeChange('fraud')}
             >
               Oszustwa
             </Tab>
             <Tab 
-              active={false} 
+              active={activeMapTab === 'safety'} 
               onClick={() => handleMapTypeChange('safety')}
             >
               Bezpieczeństwo
@@ -445,6 +645,25 @@ const Dashboard = () => {
               </>
             )}
           </MapContainer>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
+              <div style={{ fontWeight: 500 }}>W trasie</div>
+              <div style={{ fontSize: '20px', marginTop: '4px' }}>78</div>
+            </div>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
+              <div style={{ fontWeight: 500 }}>Postój</div>
+              <div style={{ fontSize: '20px', marginTop: '4px' }}>32</div>
+            </div>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
+              <div style={{ fontWeight: 500 }}>Serwis</div>
+              <div style={{ fontSize: '20px', marginTop: '4px' }}>12</div>
+            </div>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
+              <div style={{ fontWeight: 500 }}>Inne</div>
+              <div style={{ fontSize: '20px', marginTop: '4px' }}>3</div>
+            </div>
+          </div>
         </Card>
       </>
     );
@@ -470,6 +689,7 @@ const Dashboard = () => {
     <PageContainer>
       {renderKPISection()}
       {renderAlertsSection()}
+      {renderFleetStatsSection()}
       {renderMapSection()}
     </PageContainer>
   );
