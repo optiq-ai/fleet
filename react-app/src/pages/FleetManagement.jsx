@@ -229,25 +229,6 @@ const FleetManagement = () => {
   // Get service based on mock data toggle
   const service = useMockData ? mockFleetManagementService : fleetManagementService;
   
-  // Fetch data on component mount and when filters or mock data toggle changes
-  useEffect(() => {
-    fetchFleetData();
-  }, [filters.page, useMockData, fetchFleetData]);
-  
-  // Fetch data when search or filter changes
-  useEffect(() => {
-    if (filters.search !== '' || filters.status !== 'all' || filters.type !== 'all') {
-      fetchFleetData();
-    }
-  }, [filters.search, filters.status, filters.type, fetchFleetData]);
-  
-  // Fetch vehicle details when selected vehicle changes
-  useEffect(() => {
-    if (selectedVehicle) {
-      fetchVehicleDetails(selectedVehicle.id);
-    }
-  }, [selectedVehicle, fetchVehicleDetails]);
-  
   // Fetch fleet data
   const fetchFleetData = async () => {
     setIsLoading(true);
@@ -312,6 +293,25 @@ const FleetManagement = () => {
       setIsLoading(false);
     }
   };
+  
+  // Fetch data on component mount and when filters or mock data toggle changes
+  useEffect(() => {
+    fetchFleetData();
+  }, [filters.page, useMockData, fetchFleetData]);
+  
+  // Fetch data when search or filter changes
+  useEffect(() => {
+    if (filters.search !== '' || filters.status !== 'all' || filters.type !== 'all') {
+      fetchFleetData();
+    }
+  }, [filters.search, filters.status, filters.type, fetchFleetData]);
+  
+  // Fetch vehicle details when selected vehicle changes
+  useEffect(() => {
+    if (selectedVehicle) {
+      fetchVehicleDetails(selectedVehicle.id);
+    }
+  }, [selectedVehicle, fetchVehicleDetails]);
   
   // Handle tab change
   const handleTabChange = (tab) => {

@@ -154,6 +154,13 @@ const Sidebar = () => {
         </MenuItem>
         
         <MenuItem 
+          active={isActive('/fleet-management')} 
+          onClick={() => handleNavigate('/fleet-management')}
+        >
+          Fleet Management
+        </MenuItem>
+        
+        <MenuItem 
           active={isActive('/fuel-analysis')} 
           onClick={() => handleNavigate('/fuel-analysis')}
         >
