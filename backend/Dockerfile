@@ -1,6 +1,3 @@
-# This is a placeholder Dockerfile for the backend
-# In a real implementation, this would be replaced with the actual backend technology stack
-
 FROM node:20-alpine
 
 WORKDIR /app
