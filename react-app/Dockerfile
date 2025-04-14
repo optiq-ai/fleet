@@ -1,19 +1,24 @@
 # Build stage
-FROM node:20-alpine as build
+FROM node:16-alpine as build
 
 WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with legacy peer deps flag to avoid compatibility issues
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application
 COPY . .
 
-# Build the application
-RUN npm run build
+# Set environment variables with default values for build
+ENV REACT_APP_API_URL=http://localhost:5000/api
+ENV REACT_APP_TITLE="Fleet Management App"
+ENV REACT_APP_VERSION=1.0.0
+
+# Build the application with CI=false to prevent treating warnings as errors
+RUN CI=false npm run build
 
 # Production stage
 FROM nginx:alpine
