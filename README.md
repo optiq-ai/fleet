@@ -1,93 +1,145 @@
 # Fleet App - Dokumentacja
 
-## Sekcja Dashboard
+## Przegląd projektu
 
-### Streszczenie
+Fleet App to zaawansowana aplikacja do zarządzania flotą pojazdów, która integruje funkcje wykrywania oszustw, monitorowania pojazdów, bezpieczeństwa kierowców, komunikacji i współpracy, oraz analizy danych.
 
-Sekcja Dashboard to główny pulpit aplikacji Fleet App, który prezentuje kluczowe wskaźniki, alerty, statystyki floty oraz mapę monitoringu pojazdów. Komponent został zaimplementowany jako responsywny interfejs React, który dostosowuje się do różnych rozmiarów ekranu.
+## Struktura projektu
 
-### Komponenty
+Projekt składa się z trzech głównych komponentów:
+- **Frontend (react-app)** - aplikacja React z JSX
+- **Backend** - serwer Node.js
+- **Baza danych** - struktura SQL (PostgreSQL)
 
-#### Komponenty główne
+## Komponenty aplikacji
 
-- **Dashboard** - Główny komponent pulpitu, który integruje wszystkie sekcje i zarządza pobieraniem danych.
+### Dashboard
 
-#### Komponenty stylizowane
+Dashboard to główny ekran aplikacji, który prezentuje najważniejsze informacje i wskaźniki dotyczące floty pojazdów. Komponent ten zawiera:
 
-- `PageContainer` - Główny kontener strony z układem kolumnowym
-- `SectionTitle` - Stylizowany nagłówek sekcji
-- `GridSection` - Kontener z układem kafelkowym (grid), który zmienia liczbę kolumn w zależności od szerokości ekranu
-- `MapContainer` - Kontener dla interaktywnej mapy
-- `MapPoint` - Punkt na mapie z efektami hover
-- `MapTooltip` - Tooltip wyświetlany po najechaniu na punkt mapy
-- `TabsContainer` i `Tab` - Komponenty do przełączania między różnymi widokami
-- `ViewAllButton` - Przycisk "Zobacz wszystkie" dla list z paginacją
-- `ChartContainer` - Kontener dla wykresów
-- `RankingContainer`, `RankingItem`, `RankingName`, `RankingValue` - Komponenty do wyświetlania rankingów
+#### Funkcje i metody:
+- `fetchDashboardData()` - pobiera dane KPI, alerty, dane mapy i statystyki floty
+- `handleMapTypeChange()` - zmienia typ wyświetlanych danych na mapie
+- `handleMapPointHover()` - obsługuje najechanie kursorem na punkt na mapie
+- `handleMapPointLeave()` - obsługuje opuszczenie kursorem punktu na mapie
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
 
-### Funkcje i metody
+#### Komponenty:
+- **Sekcja KPI** - wyświetla kluczowe wskaźniki wydajności floty
+- **Sekcja wykrywania oszustw** - prezentuje alerty dotyczące potencjalnych oszustw
+- **Sekcja statystyk floty** - pokazuje dane dotyczące zużycia paliwa, efektywności kierowców, kosztów operacyjnych i realizacji tras
+- **Mapa floty** - wizualizuje lokalizacje pojazdów i punktów oszustw
 
-#### Funkcje pobierania danych
+#### Stany (hooks):
+- `kpiData` - dane KPI
+- `alerts` - dane alertów
+- `mapData` - dane mapy
+- `fleetStats` - statystyki floty
+- `activeAlertTab` - aktywna zakładka alertów
+- `activeMapTab` - aktywna zakładka mapy
+- `tooltip` - dane tooltipa mapy
+- `isLoading` - stan ładowania
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
 
-- `fetchDashboardData()` - Asynchroniczna funkcja pobierająca wszystkie dane dashboardu z API
-- `handleMapTypeChange(type)` - Funkcja zmieniająca typ danych wyświetlanych na mapie
+#### Integracja z API:
+- Komponent korzysta z `dashboardService` lub `mockDashboardService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
 
-#### Funkcje obsługi interakcji
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Logowanie błędów do konsoli
 
-- `handleMapPointHover(point, event)` - Obsługuje najechanie na punkt mapy, wyświetlając tooltip
-- `handleMapPointLeave()` - Obsługuje opuszczenie punktu mapy, ukrywając tooltip
-- `setActiveAlertTab(tab)` - Zmienia aktywną zakładkę w sekcji alertów
-- `setActiveMapTab(tab)` - Zmienia aktywną zakładkę w sekcji mapy
+#### Responsywność:
+- Układ kafelkowy dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
 
-#### Funkcje renderujące
+### Monitoring
 
-- `renderKPISection()` - Renderuje sekcję kluczowych wskaźników (KPI)
-- `renderAlertsSection()` - Renderuje sekcję alertów o oszustwach
-- `renderFleetStatsSection()` - Renderuje sekcję statystyk floty
-- `renderMapSection()` - Renderuje sekcję mapy z monitoringiem pojazdów
+Sekcja monitoringu umożliwia śledzenie stanu pojazdów w czasie rzeczywistym, ich lokalizacji GPS, zużycia paliwa oraz generowanie alertów i raportów.
 
-#### Funkcje pomocnicze
+#### Funkcje i metody:
+- `fetchMonitoringData()` - pobiera dane pojazdów, alertów, KPI, zużycia paliwa i trendów
+- `handleVehicleSelect()` - obsługuje wybór pojazdu
+- `handleAcknowledgeAlert()` - obsługuje potwierdzenie alertu
+- `handleMapPointHover()` - obsługuje najechanie kursorem na punkt na mapie
+- `handleMapPointLeave()` - obsługuje opuszczenie kursorem punktu na mapie
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+- `getVehicleStatusCounts()` - oblicza liczby pojazdów w różnych stanach
 
-- `getCoordinates(id)` - Generuje współrzędne punktu na mapie na podstawie ID
-- `getPointColor(type)` - Określa kolor punktu na mapie na podstawie typu
-- `getAlertsByType()` - Filtruje alerty według wybranego typu
+#### Komponenty:
+- **Sekcja KPI** - wyświetla kluczowe wskaźniki monitoringu
+- **Mapa GPS** - wizualizuje lokalizacje pojazdów na mapie Polski
+- **Sekcja monitorowania pojazdów** - pokazuje listę pojazdów, alertów i dane o zużyciu paliwa
+- **Sekcja szczegółów pojazdu** - prezentuje szczegółowe informacje o wybranym pojeździe
+- **Sekcja analizy trendów** - wyświetla wykresy trendów zużycia paliwa, przejechanych kilometrów i alertów
 
-### Stany (Hooks)
+#### Stany (hooks):
+- `vehicles` - dane pojazdów
+- `selectedVehicle` - wybrany pojazd
+- `alerts` - dane alertów
+- `kpiData` - dane KPI
+- `fuelData` - dane zużycia paliwa
+- `trendData` - dane trendów
+- `tooltip` - dane tooltipa mapy
+- `activeTab` - aktywna zakładka
+- `isLoading` - stan ładowania
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
 
-- `kpiData` - Przechowuje dane kluczowych wskaźników
-- `alerts` - Przechowuje dane alertów różnych typów
-- `mapData` - Przechowuje dane punktów na mapie
-- `fleetStats` - Przechowuje dane statystyk floty
-- `activeAlertTab` - Śledzi aktywną zakładkę w sekcji alertów
-- `activeMapTab` - Śledzi aktywną zakładkę w sekcji mapy
-- `tooltip` - Zarządza stanem tooltipa na mapie
-- `isLoading` - Śledzi stan ładowania danych
-- `error` - Przechowuje informacje o błędach
+#### Integracja z API:
+- Komponent korzysta z `monitoringService` lub `mockMonitoringService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
 
-### Integracja z API
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Logowanie błędów do konsoli
 
-Dashboard korzysta z serwisu `dashboardService` do komunikacji z API:
+#### Responsywność:
+- Układ kafelkowy dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
 
-- `getKPIData()` - Pobiera dane kluczowych wskaźników
-- `getAlerts()` - Pobiera dane alertów
-- `getMapData(type)` - Pobiera dane mapy dla określonego typu
+## Serwisy danych
 
-### Obsługa błędów
+### dashboardService
+Serwis do pobierania danych dla komponentu Dashboard z rzeczywistego API.
 
-- Wszystkie zapytania API są zabezpieczone blokami try-catch
-- W przypadku błędu wyświetlany jest komunikat dla użytkownika
-- Podczas ładowania danych wyświetlany jest wskaźnik ładowania
+### mockDashboardService
+Serwis dostarczający dane testowe dla komponentu Dashboard, gdy backend nie jest dostępny.
 
-### Responsywność
+### monitoringService
+Serwis do pobierania danych dla komponentu Monitoring z rzeczywistego API.
 
-Dashboard jest w pełni responsywny:
-- Układ grid zmienia liczbę kolumn w zależności od szerokości ekranu (3 kolumny na dużych ekranach, 2 na średnich, 1 na małych)
-- Komponenty dostosowują swój rozmiar do dostępnej przestrzeni
-- Wszystkie elementy są czytelne na urządzeniach mobilnych
+### mockMonitoringService
+Serwis dostarczający dane testowe dla komponentu Monitoring, gdy backend nie jest dostępny. Zawiera:
+- Dane pojazdów z informacjami o statusie, lokalizacji, kierowcy, zużyciu paliwa i wydajności
+- Dane alertów różnych typów i priorytetów
+- Dane zużycia paliwa z historią i statystykami
+- Dane KPI z kluczowymi wskaźnikami floty
+- Dane trendów dla różnych metryk
 
-### Rozszerzalność
+## Uruchomienie aplikacji
 
-Komponent został zaprojektowany z myślą o łatwej rozszerzalności:
-- Modułowa struktura z oddzielnymi funkcjami renderującymi dla każdej sekcji
-- Dane pobierane z API, co umożliwia łatwą zmianę źródła danych
-- Możliwość dodawania nowych sekcji bez modyfikacji istniejących
+### Z użyciem Docker Compose
+```bash
+docker-compose up
+```
+
+### Ręczne uruchomienie
+1. Uruchom bazę danych PostgreSQL
+2. Zainicjalizuj bazę danych skryptem `db/init.sql`
+3. Uruchom backend:
+   ```bash
+   cd backend
+   npm install
+   npm start
+   ```
+4. Uruchom frontend:
+   ```bash
+   cd react-app
+   npm install
+   npm start
+   ```
+
+## Tryb testowy
+Aplikacja domyślnie działa w trybie testowym, korzystając z danych mockowych. Można przełączać się między danymi z API a danymi mockowymi za pomocą przełącznika w górnej części każdej sekcji.
