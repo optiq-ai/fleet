@@ -7,427 +7,368 @@ interface ThemeSettingsProps {
 }
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-`;
-
-const Title = styled.h3`
-  margin: 0;
-  font-size: 18px;
-  font-weight: 500;
-`;
-
-const Card = styled.div`
-  background-color: var(--color-surface);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  margin-bottom: 20px;
 `;
 
-const CardTitle = styled.div`
-  font-weight: 500;
-  font-size: 16px;
+const Title = styled.h2`
+  margin-bottom: 24px;
+`;
+
+const SettingsSection = styled.div`
+  margin-bottom: 32px;
+`;
+
+const SectionTitle = styled.h3`
   margin-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  font-size: 18px;
 `;
 
-const CardContent = styled.div``;
-
-const ThemeGrid = styled.div`
+const OptionGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 `;
 
 const ThemeOption = styled.div<{ selected: boolean; themeColor: string }>`
   border-radius: 8px;
-  border: 2px solid ${props => props.selected ? props.themeColor : 'transparent'};
-  overflow: hidden;
+  padding: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  border: 2px solid ${props => props.selected ? '#3f51b5' : 'transparent'};
+  background-color: ${props => {
+    switch(props.themeColor) {
+      case 'light': return '#ffffff';
+      case 'dark': return '#333333';
+      case 'blue': return '#e3f2fd';
+      case 'green': return '#e8f5e9';
+      case 'purple': return '#f3e5f5';
+      default: return '#ffffff';
+    }
+  }};
+  color: ${props => props.themeColor === 'dark' ? '#ffffff' : '#333333'};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const ThemePreview = styled.div<{ bgColor: string; primaryColor: string }>`
-  height: 120px;
-  background-color: ${props => props.bgColor};
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 60%;
-    height: 20px;
-    background-color: ${props => props.primaryColor};
-    border-radius: 4px;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50px;
-    left: 20px;
-    width: 80%;
-    height: 50px;
-    background-color: white;
-    border-radius: 4px;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 `;
 
 const ThemeName = styled.div`
-  padding: 12px;
-  text-align: center;
   font-weight: 500;
-  background-color: white;
+  margin-bottom: 4px;
 `;
 
-const ToggleContainer = styled.div`
+const ThemeDescription = styled.div`
+  font-size: 12px;
+  opacity: 0.7;
+`;
+
+const SettingRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background-color: var(--color-background);
-  border-radius: 8px;
-  margin-bottom: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
 `;
 
-const ToggleLabel = styled.div`
+const SettingLabel = styled.div`
   font-weight: 500;
+`;
+
+const SettingDescription = styled.div`
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
 `;
 
 const ToggleSwitch = styled.label`
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
-`;
-
-const ToggleInput = styled.input`
-  opacity: 0;
-  width: 0;
-  height: 0;
+  width: 48px;
+  height: 24px;
   
-  &:checked + span {
-    background-color: var(--color-primary);
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
   }
   
-  &:checked + span:before {
-    transform: translateX(26px);
-  }
-`;
-
-const ToggleSlider = styled.span`
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-  border-radius: 34px;
-  
-  &:before {
+  span {
     position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
     transition: .4s;
-    border-radius: 50%;
+    border-radius: 24px;
+    
+    &:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
   }
-`;
-
-const Section = styled.div`
-  margin-bottom: 24px;
-`;
-
-const SectionTitle = styled.div`
-  font-weight: 500;
-  margin-bottom: 16px;
-`;
-
-const Button = styled.button`
-  padding: 10px 16px;
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
   
-  &:hover {
-    opacity: 0.9;
+  input:checked + span {
+    background-color: #3f51b5;
+  }
+  
+  input:checked + span:before {
+    transform: translateX(24px);
   }
 `;
 
-const FontSizeOptions = styled.div`
+const SliderContainer = styled.div`
   display: flex;
+  flex-direction: column;
+  width: 200px;
+`;
+
+const SliderRow = styled.div`
+  display: flex;
+  align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
 `;
 
-const FontSizeOption = styled.div<{ selected: boolean }>`
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: 1px solid ${props => props.selected ? 'var(--color-primary)' : 'var(--color-border)'};
-  background-color: ${props => props.selected ? 'var(--color-primary)' : 'transparent'};
-  color: ${props => props.selected ? 'white' : 'var(--color-text)'};
-  cursor: pointer;
-  transition: all 0.2s ease;
+const Slider = styled.input`
+  flex: 1;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #ddd;
+  outline: none;
   
-  &:hover {
-    border-color: var(--color-primary);
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #3f51b5;
+    cursor: pointer;
+  }
+  
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #3f51b5;
+    cursor: pointer;
   }
 `;
 
-const AnimationToggle = styled.div`
-  margin-bottom: 16px;
+const SliderValue = styled.div`
+  width: 40px;
+  text-align: right;
+  font-size: 14px;
 `;
 
-const PreviewContainer = styled.div`
-  padding: 16px;
-  background-color: var(--color-surface);
-  border-radius: 8px;
-  margin-bottom: 24px;
-  border: 1px solid var(--color-border);
+const ButtonRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
 `;
 
-const PreviewTitle = styled.div`
-  font-weight: 500;
-  margin-bottom: 16px;
-  color: var(--color-primary);
-`;
-
-const PreviewContent = styled.div`
-  color: var(--color-text);
-`;
-
-const PreviewButton = styled.button`
+const Button = styled.button<{ primary?: boolean }>`
   padding: 8px 16px;
-  background-color: var(--color-primary);
-  color: white;
+  border-radius: 4px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  margin-top: 16px;
+  font-weight: 500;
+  background-color: ${props => props.primary ? '#3f51b5' : '#f5f5f5'};
+  color: ${props => props.primary ? 'white' : '#333'};
   
   &:hover {
-    opacity: 0.9;
+    background-color: ${props => props.primary ? '#303f9f' : '#e0e0e0'};
   }
 `;
 
-const ThemeSettings: React.FC<ThemeSettingsProps> = ({
-  onSavePreferences
-}) => {
-  const { currentTheme, changeTheme, isDarkMode, toggleDarkMode, themeColors } = useTheme();
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
-  const [reduceAnimations, setReduceAnimations] = useState<boolean>(false);
-  const [highContrast, setHighContrast] = useState<boolean>(false);
+const ThemeSettings: React.FC<ThemeSettingsProps> = ({ onSavePreferences }) => {
+  const { 
+    theme, 
+    setTheme, 
+    isDarkMode, 
+    toggleDarkMode, 
+    fontSize, 
+    setFontSize, 
+    highContrast, 
+    setHighContrast, 
+    reducedMotion, 
+    setReducedMotion 
+  } = useTheme();
   
-  // Dostępne motywy
-  const availableThemes: { type: ThemeType; name: string; primaryColor: string; bgColor: string }[] = [
-    { type: 'light', name: 'Jasny', primaryColor: '#3f51b5', bgColor: '#f5f5f5' },
-    { type: 'dark', name: 'Ciemny', primaryColor: '#7986cb', bgColor: '#121212' },
-    { type: 'blue', name: 'Niebieski', primaryColor: '#1976d2', bgColor: '#e3f2fd' },
-    { type: 'green', name: 'Zielony', primaryColor: '#388e3c', bgColor: '#e8f5e9' },
-    { type: 'purple', name: 'Fioletowy', primaryColor: '#7b1fa2', bgColor: '#f3e5f5' }
-  ];
+  const [localTheme, setLocalTheme] = useState<ThemeType>(theme);
+  const [localIsDarkMode, setLocalIsDarkMode] = useState<boolean>(isDarkMode);
+  const [localFontSize, setLocalFontSize] = useState<number>(fontSize);
+  const [localHighContrast, setLocalHighContrast] = useState<boolean>(highContrast);
+  const [localReducedMotion, setLocalReducedMotion] = useState<boolean>(reducedMotion);
   
-  // Obsługa zapisywania preferencji
-  const handleSavePreferences = async () => {
-    const preferences = {
-      theme: currentTheme,
-      darkMode: isDarkMode,
-      fontSize,
-      reduceAnimations,
-      highContrast
-    };
-    
-    try {
-      await onSavePreferences(preferences);
-      alert('Preferencje zostały zapisane');
-    } catch (error) {
-      console.error('Error saving preferences:', error);
-      alert('Wystąpił błąd podczas zapisywania preferencji');
+  const handleSave = async () => {
+    // Apply all settings
+    setTheme(localTheme);
+    if (localIsDarkMode !== isDarkMode) {
+      toggleDarkMode();
     }
+    setFontSize(localFontSize);
+    setHighContrast(localHighContrast);
+    setReducedMotion(localReducedMotion);
+    
+    // Save to backend (if needed)
+    await onSavePreferences({
+      theme: localTheme,
+      isDarkMode: localIsDarkMode,
+      fontSize: localFontSize,
+      highContrast: localHighContrast,
+      reducedMotion: localReducedMotion
+    });
   };
   
-  // Obsługa zmiany rozmiaru czcionki
-  const handleFontSizeChange = (size: 'small' | 'medium' | 'large') => {
-    setFontSize(size);
-    
-    // Ustawienie zmiennej CSS dla rozmiaru czcionki
-    const root = document.documentElement;
-    const fontSizeMap = {
-      small: '14px',
-      medium: '16px',
-      large: '18px'
-    };
-    
-    root.style.setProperty('--font-size-base', fontSizeMap[size]);
-  };
-  
-  // Obsługa przełączania animacji
-  const handleToggleAnimations = () => {
-    setReduceAnimations(!reduceAnimations);
-    
-    // Ustawienie zmiennej CSS dla animacji
-    const root = document.documentElement;
-    root.style.setProperty('--transition-speed', !reduceAnimations ? '0s' : '0.3s');
-  };
-  
-  // Obsługa przełączania wysokiego kontrastu
-  const handleToggleHighContrast = () => {
-    setHighContrast(!highContrast);
-    
-    // Ustawienie zmiennych CSS dla wysokiego kontrastu
-    const root = document.documentElement;
-    
-    if (!highContrast) {
-      // Włączenie wysokiego kontrastu
-      root.style.setProperty('--color-text', '#000000');
-      root.style.setProperty('--color-background', '#ffffff');
-      root.style.setProperty('--color-border', '#000000');
-    } else {
-      // Przywrócenie normalnego kontrastu
-      root.style.setProperty('--color-text', themeColors.text);
-      root.style.setProperty('--color-background', themeColors.background);
-      root.style.setProperty('--color-border', themeColors.border);
-    }
+  const handleReset = () => {
+    setLocalTheme(theme);
+    setLocalIsDarkMode(isDarkMode);
+    setLocalFontSize(fontSize);
+    setLocalHighContrast(highContrast);
+    setLocalReducedMotion(reducedMotion);
   };
   
   return (
     <Container>
-      <Header>
-        <Title>Ustawienia motywu</Title>
-      </Header>
+      <Title>Ustawienia wyglądu</Title>
       
-      <Card>
-        <CardTitle>Wybierz motyw</CardTitle>
-        <CardContent>
-          <ThemeGrid>
-            {availableThemes.map(theme => (
-              <ThemeOption 
-                key={theme.type} 
-                selected={currentTheme === theme.type}
-                themeColor={theme.primaryColor}
-                onClick={() => changeTheme(theme.type)}
-              >
-                <ThemePreview 
-                  bgColor={theme.bgColor}
-                  primaryColor={theme.primaryColor}
-                />
-                <ThemeName>{theme.name}</ThemeName>
-              </ThemeOption>
-            ))}
-          </ThemeGrid>
+      <SettingsSection>
+        <SectionTitle>Motyw</SectionTitle>
+        <OptionGrid>
+          <ThemeOption 
+            selected={localTheme === 'light'} 
+            themeColor="light"
+            onClick={() => setLocalTheme('light')}
+          >
+            <ThemeName>Jasny</ThemeName>
+            <ThemeDescription>Domyślny jasny motyw</ThemeDescription>
+          </ThemeOption>
           
-          <ToggleContainer>
-            <ToggleLabel>Tryb ciemny</ToggleLabel>
-            <ToggleSwitch>
-              <ToggleInput 
-                type="checkbox" 
-                checked={isDarkMode}
-                onChange={toggleDarkMode}
+          <ThemeOption 
+            selected={localTheme === 'dark'} 
+            themeColor="dark"
+            onClick={() => setLocalTheme('dark')}
+          >
+            <ThemeName>Ciemny</ThemeName>
+            <ThemeDescription>Ciemny motyw, mniej męczący dla oczu</ThemeDescription>
+          </ThemeOption>
+          
+          <ThemeOption 
+            selected={localTheme === 'blue'} 
+            themeColor="blue"
+            onClick={() => setLocalTheme('blue')}
+          >
+            <ThemeName>Niebieski</ThemeName>
+            <ThemeDescription>Spokojny niebieski motyw</ThemeDescription>
+          </ThemeOption>
+          
+          <ThemeOption 
+            selected={localTheme === 'green'} 
+            themeColor="green"
+            onClick={() => setLocalTheme('green')}
+          >
+            <ThemeName>Zielony</ThemeName>
+            <ThemeDescription>Przyjazny dla środowiska</ThemeDescription>
+          </ThemeOption>
+          
+          <ThemeOption 
+            selected={localTheme === 'purple'} 
+            themeColor="purple"
+            onClick={() => setLocalTheme('purple')}
+          >
+            <ThemeName>Fioletowy</ThemeName>
+            <ThemeDescription>Elegancki fioletowy motyw</ThemeDescription>
+          </ThemeOption>
+        </OptionGrid>
+        
+        <SettingRow>
+          <div>
+            <SettingLabel>Tryb ciemny</SettingLabel>
+            <SettingDescription>Przełącz na ciemny motyw</SettingDescription>
+          </div>
+          <ToggleSwitch>
+            <input 
+              type="checkbox" 
+              checked={localIsDarkMode} 
+              onChange={() => setLocalIsDarkMode(!localIsDarkMode)} 
+            />
+            <span></span>
+          </ToggleSwitch>
+        </SettingRow>
+      </SettingsSection>
+      
+      <SettingsSection>
+        <SectionTitle>Dostępność</SectionTitle>
+        
+        <SettingRow>
+          <div>
+            <SettingLabel>Rozmiar czcionki: {localFontSize}px</SettingLabel>
+            <SettingDescription>Dostosuj rozmiar tekstu</SettingDescription>
+          </div>
+          <SliderContainer>
+            <SliderRow>
+              <Slider 
+                type="range" 
+                min="12" 
+                max="24" 
+                value={localFontSize} 
+                onChange={e => setLocalFontSize(parseInt(e.target.value))} 
               />
-              <ToggleSlider />
-            </ToggleSwitch>
-          </ToggleContainer>
-        </CardContent>
-      </Card>
+              <SliderValue>{localFontSize}px</SliderValue>
+            </SliderRow>
+          </SliderContainer>
+        </SettingRow>
+        
+        <SettingRow>
+          <div>
+            <SettingLabel>Wysoki kontrast</SettingLabel>
+            <SettingDescription>Zwiększa kontrast kolorów dla lepszej czytelności</SettingDescription>
+          </div>
+          <ToggleSwitch>
+            <input 
+              type="checkbox" 
+              checked={localHighContrast} 
+              onChange={() => setLocalHighContrast(!localHighContrast)} 
+            />
+            <span></span>
+          </ToggleSwitch>
+        </SettingRow>
+        
+        <SettingRow>
+          <div>
+            <SettingLabel>Zredukowane animacje</SettingLabel>
+            <SettingDescription>Wyłącza lub ogranicza animacje interfejsu</SettingDescription>
+          </div>
+          <ToggleSwitch>
+            <input 
+              type="checkbox" 
+              checked={localReducedMotion} 
+              onChange={() => setLocalReducedMotion(!localReducedMotion)} 
+            />
+            <span></span>
+          </ToggleSwitch>
+        </SettingRow>
+      </SettingsSection>
       
-      <Card>
-        <CardTitle>Dostępność</CardTitle>
-        <CardContent>
-          <Section>
-            <SectionTitle>Rozmiar czcionki</SectionTitle>
-            <FontSizeOptions>
-              <FontSizeOption 
-                selected={fontSize === 'small'}
-                onClick={() => handleFontSizeChange('small')}
-              >
-                Mały
-              </FontSizeOption>
-              <FontSizeOption 
-                selected={fontSize === 'medium'}
-                onClick={() => handleFontSizeChange('medium')}
-              >
-                Średni
-              </FontSizeOption>
-              <FontSizeOption 
-                selected={fontSize === 'large'}
-                onClick={() => handleFontSizeChange('large')}
-              >
-                Duży
-              </FontSizeOption>
-            </FontSizeOptions>
-          </Section>
-          
-          <Section>
-            <ToggleContainer>
-              <ToggleLabel>Wysoki kontrast</ToggleLabel>
-              <ToggleSwitch>
-                <ToggleInput 
-                  type="checkbox" 
-                  checked={highContrast}
-                  onChange={handleToggleHighContrast}
-                />
-                <ToggleSlider />
-              </ToggleSwitch>
-            </ToggleContainer>
-            
-            <ToggleContainer>
-              <ToggleLabel>Ogranicz animacje</ToggleLabel>
-              <ToggleSwitch>
-                <ToggleInput 
-                  type="checkbox" 
-                  checked={reduceAnimations}
-                  onChange={handleToggleAnimations}
-                />
-                <ToggleSlider />
-              </ToggleSwitch>
-            </ToggleContainer>
-          </Section>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardTitle>Podgląd</CardTitle>
-        <CardContent>
-          <PreviewContainer>
-            <PreviewTitle>Przykładowy tytuł</PreviewTitle>
-            <PreviewContent>
-              To jest przykładowy tekst pokazujący, jak będzie wyglądać zawartość w wybranym motywie.
-              Możesz dostosować wygląd aplikacji według swoich preferencji.
-            </PreviewContent>
-            <PreviewButton>Przykładowy przycisk</PreviewButton>
-          </PreviewContainer>
-          
-          <Button onClick={handleSavePreferences}>Zapisz preferencje</Button>
-        </CardContent>
-      </Card>
+      <ButtonRow>
+        <Button onClick={handleReset}>Anuluj</Button>
+        <Button primary onClick={handleSave}>Zapisz zmiany</Button>
+      </ButtonRow>
     </Container>
   );
 };

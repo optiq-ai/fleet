@@ -73,7 +73,7 @@ const ViewItem = styled.div<{ active: boolean }>`
 `;
 
 const ViewTitle = styled.div`
-  font-weight: ${props => props.theme.isDarkMode ? '400' : '500'};
+  font-weight: 500;
   margin-bottom: 2px;
 `;
 

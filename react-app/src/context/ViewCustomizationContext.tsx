@@ -1,79 +1,143 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import viewCustomizationService, { UserView } from '../services/api/viewCustomizationService';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { View } from '../types';
 
-// Interfejs dla kontekstu personalizacji widoków
 interface ViewCustomizationContextType {
-  currentView: UserView | null;
-  setCurrentView: (view: UserView | null) => void;
-  isElementVisible: (elementId: string) => boolean;
+  views: View[];
+  currentView: string;
+  setCurrentView: (viewId: string) => void;
+  userViews: View[];
+  defaultViews: View[];
+  saveView: (view: View) => Promise<void>;
+  deleteView: (viewId: string) => Promise<void>;
 }
 
-// Domyślna wartość kontekstu
-const defaultContextValue: ViewCustomizationContextType = {
-  currentView: null,
-  setCurrentView: () => {},
-  isElementVisible: () => true
-};
+const ViewCustomizationContext = createContext<ViewCustomizationContextType | undefined>(undefined);
 
-// Utworzenie kontekstu
-export const ViewCustomizationContext = createContext<ViewCustomizationContextType>(defaultContextValue);
-
-// Interfejs dla props providera
 interface ViewCustomizationProviderProps {
   children: ReactNode;
 }
 
-// Provider kontekstu personalizacji widoków
 export const ViewCustomizationProvider: React.FC<ViewCustomizationProviderProps> = ({ children }) => {
-  // Stan dla aktualnego widoku
-  const [currentView, setCurrentView] = useState<UserView | null>(null);
-  
-  // ID użytkownika (w rzeczywistej aplikacji pobierane z kontekstu autoryzacji)
-  const userId = "current-user-id";
-  
-  // Pobieranie domyślnego widoku przy montowaniu komponentu
-  useEffect(() => {
-    const fetchDefaultView = async () => {
-      try {
-        // Pobieranie widoków użytkownika
-        const viewsResponse = await viewCustomizationService.getUserViews(userId);
-        
-        // Ustawienie domyślnego widoku
-        const defaultView = viewsResponse.views.find(view => view.isDefault);
-        if (defaultView) {
-          setCurrentView(defaultView);
-        } else if (viewsResponse.views.length > 0) {
-          setCurrentView(viewsResponse.views[0]);
-        }
-      } catch (err) {
-        console.error('Error fetching default view:', err);
-      }
-    };
-    
-    fetchDefaultView();
-  }, []);
-  
-  // Funkcja sprawdzająca, czy element jest widoczny w aktualnym widoku
-  const isElementVisible = (elementId: string): boolean => {
-    if (!currentView) {
-      return true; // Jeśli nie ma aktualnego widoku, wszystkie elementy są widoczne
+  // Sample views data
+  const [views, setViews] = useState<View[]>([
+    {
+      id: "default-admin",
+      name: "Widok administratora",
+      description: "Pełny widok ze wszystkimi sekcjami",
+      isDefault: true,
+      sections: [
+        { id: "kpi", name: "KPI", type: "kpi", visible: true, order: 1 },
+        { id: "fraud", name: "Oszustwa", type: "fraud", visible: true, order: 2 },
+        { id: "safety", name: "Bezpieczeństwo", type: "safety", visible: true, order: 3 },
+        { id: "maintenance", name: "Konserwacja", type: "maintenance", visible: true, order: 4 },
+        { id: "map", name: "Mapa", type: "map", visible: true, order: 5 }
+      ],
+      userGroups: ["admin"]
+    },
+    {
+      id: "default-manager",
+      name: "Widok menedżera",
+      description: "Widok z naciskiem na zarządzanie flotą",
+      isDefault: false,
+      sections: [
+        { id: "kpi", name: "KPI", type: "kpi", visible: true, order: 1 },
+        { id: "vehicles", name: "Pojazdy", type: "vehicles", visible: true, order: 2 },
+        { id: "maintenance", name: "Konserwacja", type: "maintenance", visible: true, order: 3 },
+        { id: "map", name: "Mapa", type: "map", visible: true, order: 4 }
+      ],
+      userGroups: ["manager"]
+    },
+    {
+      id: "default-driver",
+      name: "Widok kierowcy",
+      description: "Uproszczony widok dla kierowców",
+      isDefault: false,
+      sections: [
+        { id: "safety_score", name: "Wynik bezpieczeństwa", type: "safety_score", visible: true, order: 1 },
+        { id: "vehicle", name: "Pojazd", type: "vehicle", visible: true, order: 2 },
+        { id: "map", name: "Trasa", type: "map", visible: true, order: 3 }
+      ],
+      userGroups: ["driver"]
+    },
+    {
+      id: "custom-1",
+      name: "Mój widok 1",
+      description: "Niestandardowy widok użytkownika",
+      isDefault: false,
+      sections: [
+        { id: "kpi", name: "KPI", type: "kpi", visible: true, order: 1 },
+        { id: "fraud", name: "Oszustwa", type: "fraud", visible: true, order: 2 },
+        { id: "map", name: "Mapa", type: "map", visible: true, order: 3 }
+      ],
+      userGroups: ["admin", "manager"]
     }
+  ]);
+  
+  const [currentView, setCurrentView] = useState<string>(() => {
+    const savedView = localStorage.getItem('currentView');
+    return savedView || "default-admin";
+  });
+  
+  // Save current view to localStorage
+  React.useEffect(() => {
+    localStorage.setItem('currentView', currentView);
+  }, [currentView]);
+  
+  // Filter views by user type (in a real app, this would check user permissions)
+  const userViews = views.filter(view => view.id.startsWith('custom'));
+  const defaultViews = views.filter(view => view.id.startsWith('default'));
+  
+  // Save a new view or update existing one
+  const saveView = async (view: View): Promise<void> => {
+    setViews(prevViews => {
+      const existingIndex = prevViews.findIndex(v => v.id === view.id);
+      if (existingIndex >= 0) {
+        // Update existing view
+        const updatedViews = [...prevViews];
+        updatedViews[existingIndex] = view;
+        return updatedViews;
+      } else {
+        // Add new view
+        return [...prevViews, view];
+      }
+    });
     
-    return currentView.elements.includes(elementId);
+    // In a real app, this would make an API call to save the view
+    return Promise.resolve();
   };
   
-  // Wartość kontekstu
-  const contextValue: ViewCustomizationContextType = {
-    currentView,
-    setCurrentView,
-    isElementVisible
+  // Delete a view
+  const deleteView = async (viewId: string): Promise<void> => {
+    setViews(prevViews => prevViews.filter(view => view.id !== viewId));
+    
+    // If the deleted view was the current view, switch to default
+    if (currentView === viewId) {
+      setCurrentView("default-admin");
+    }
+    
+    // In a real app, this would make an API call to delete the view
+    return Promise.resolve();
   };
   
   return (
-    <ViewCustomizationContext.Provider value={contextValue}>
+    <ViewCustomizationContext.Provider value={{
+      views,
+      currentView,
+      setCurrentView,
+      userViews,
+      defaultViews,
+      saveView,
+      deleteView
+    }}>
       {children}
     </ViewCustomizationContext.Provider>
   );
 };
 
-export default ViewCustomizationProvider;
+export const useViewCustomization = (): ViewCustomizationContextType => {
+  const context = useContext(ViewCustomizationContext);
+  if (context === undefined) {
+    throw new Error('useViewCustomization must be used within a ViewCustomizationProvider');
+  }
+  return context;
+};

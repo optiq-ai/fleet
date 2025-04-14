@@ -1,44 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
+import { Alert, Stop, Route, Vehicle } from '../../types';
 
 interface AutonomousDispatchProps {
-  vehicles: any[];
-  orders: any[];
-  onDispatchPlan: (plan: any) => Promise<void>;
-  onApproveDispatch: (planId: string) => Promise<void>;
-  onRejectDispatch: (planId: string, reason: string) => Promise<void>;
+  onDispatch: (plan: any) => Promise<void>;
 }
 
+// Styled components
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  padding: 20px;
 `;
 
-const Header = styled.div`
+const Title = styled.h2`
+  margin-bottom: 24px;
+`;
+
+const Card = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+`;
+
+const CardHeader = styled.div`
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
 `;
 
-const Title = styled.h3`
+const CardTitle = styled.h3`
   margin: 0;
   font-size: 18px;
   font-weight: 500;
 `;
 
-const ActionButton = styled.button`
-  padding: 8px 16px;
-  background-color: #3f51b5;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #303f9f;
-  }
+const CardContent = styled.div`
+  padding: 20px;
 `;
 
 const TabsContainer = styled.div`
@@ -61,215 +60,139 @@ const Tab = styled.div<{ active: boolean }>`
   }
 `;
 
-const Card = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 20px;
-`;
-
-const CardTitle = styled.div`
-  font-weight: 500;
-  font-size: 16px;
-  margin-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const CardContent = styled.div``;
-
-const MetricsGrid = styled.div`
+const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
   
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (max-width: 480px) {
+  @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
 `;
 
-const MetricCard = styled.div`
+const MapContainer = styled.div`
+  height: 500px;
   background-color: #f5f5f5;
   border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  position: relative;
+  overflow: hidden;
 `;
 
-const MetricValue = styled.div`
-  font-size: 24px;
+const MapPlaceholder = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 14px;
+`;
+
+const FormSection = styled.div`
+  margin-bottom: 24px;
+`;
+
+const FormTitle = styled.h4`
+  margin-bottom: 16px;
   font-weight: 500;
+`;
+
+const FormRow = styled.div`
+  margin-bottom: 16px;
+`;
+
+const Label = styled.label`
+  display: block;
   margin-bottom: 8px;
-`;
-
-const MetricLabel = styled.div`
-  font-size: 14px;
-  color: #666;
-`;
-
-const DispatchPlanCard = styled.div`
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-`;
-
-const PlanHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-`;
-
-const PlanTitle = styled.div`
   font-weight: 500;
 `;
 
-const PlanMeta = styled.div`
-  font-size: 14px;
-  color: #666;
-`;
-
-const PlanDetails = styled.div`
-  margin-bottom: 16px;
-`;
-
-const PlanMetrics = styled.div`
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-`;
-
-const PlanMetric = styled.div`
-  background-color: white;
+const Input = styled.input`
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  padding: 8px 12px;
   font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  
+  &:focus {
+    outline: none;
+    border-color: #3f51b5;
+  }
 `;
 
-const PlanActions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+const Select = styled.select`
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  
+  &:focus {
+    outline: none;
+    border-color: #3f51b5;
+  }
 `;
 
-const ApproveButton = styled.button`
-  padding: 8px 16px;
-  background-color: #4caf50;
-  color: white;
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  min-height: 100px;
+  resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: #3f51b5;
+  }
+`;
+
+const Button = styled.button<{ primary?: boolean }>`
+  padding: 10px 16px;
+  border-radius: 4px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  
-  &:hover {
-    background-color: #388e3c;
-  }
-`;
-
-const RejectButton = styled.button`
-  padding: 8px 16px;
-  background-color: white;
-  color: #f44336;
-  border: 1px solid #f44336;
-  border-radius: 4px;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #ffebee;
-  }
-`;
-
-const DetailsButton = styled.button`
-  padding: 8px 16px;
-  background-color: white;
-  color: #3f51b5;
-  border: 1px solid #3f51b5;
-  border-radius: 4px;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #e8eaf6;
-  }
-`;
-
-const RoutesList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const RouteItem = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-`;
-
-const RouteHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-`;
-
-const RouteTitle = styled.div`
   font-weight: 500;
-`;
-
-const RouteDetails = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 12px;
+  background-color: ${props => props.primary ? '#3f51b5' : '#f5f5f5'};
+  color: ${props => props.primary ? 'white' : '#333'};
   
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+  &:hover {
+    background-color: ${props => props.primary ? '#303f9f' : '#e0e0e0'};
+  }
+  
+  &:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
   }
 `;
 
-const RouteDetail = styled.div`
+const ButtonGroup = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const DetailLabel = styled.div`
-  font-size: 12px;
-  color: #666;
-`;
-
-const DetailValue = styled.div`
-  font-weight: 500;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
 `;
 
 const StopsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
+  margin-top: 16px;
 `;
 
 const StopItem = styled.div`
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e0e0e0;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 8px;
   
-  &:last-child {
-    border-bottom: none;
+  &:hover {
+    background-color: #f9f9f9;
   }
 `;
 
@@ -282,8 +205,9 @@ const StopNumber = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
   font-weight: 500;
+  margin-right: 12px;
+  flex-shrink: 0;
 `;
 
 const StopDetails = styled.div`
@@ -295,740 +219,916 @@ const StopAddress = styled.div`
   margin-bottom: 4px;
 `;
 
-const StopTime = styled.div`
+const StopInfo = styled.div`
   font-size: 12px;
   color: #666;
 `;
 
-const StopType = styled.div<{ type: 'pickup' | 'delivery' }>`
-  padding: 4px 8px;
+const StopActions = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+`;
+
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
   border-radius: 4px;
-  font-size: 12px;
-  background-color: ${props => props.type === 'pickup' ? '#e8f5e9' : '#e3f2fd'};
-  color: ${props => props.type === 'pickup' ? '#2e7d32' : '#1976d2'};
-`;
-
-const MapContainer = styled.div`
-  height: 400px;
-  background-color: #e9e9e9;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  position: relative;
-`;
-
-const MapOverlay = styled.div`
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 12px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1;
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  
+  &:hover {
+    background-color: #f0f0f0;
+  }
+  
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: #666;
+  }
 `;
 
-const ModalContent = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  width: 600px;
-  max-width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+const RoutesList = styled.div`
+  margin-top: 16px;
 `;
 
-const ModalHeader = styled.div`
-  padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
+const RouteItem = styled.div`
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  overflow: hidden;
+`;
+
+const RouteHeader = styled.div`
+  padding: 12px;
+  background-color: #f5f5f5;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
-const ModalTitle = styled.h3`
-  margin: 0;
-  font-size: 18px;
+const RouteTitle = styled.div`
   font-weight: 500;
 `;
 
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #666;
-  
-  &:hover {
-    color: #333;
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: 16px;
-`;
-
-const ModalFooter = styled.div`
-  padding: 16px;
-  border-top: 1px solid #e0e0e0;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
+const RouteDetails = styled.div`
   padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  min-height: 100px;
-  margin-bottom: 16px;
+  font-size: 14px;
   
-  &:focus {
-    border-color: #3f51b5;
-    outline: none;
+  & > div {
+    margin-bottom: 4px;
   }
 `;
 
-const AutonomousDispatch: React.FC<AutonomousDispatchProps> = ({
-  vehicles,
-  orders,
-  onDispatchPlan,
-  onApproveDispatch,
-  onRejectDispatch
-}) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'plans' | 'routes'>('dashboard');
-  const [dispatchPlans, setDispatchPlans] = useState<any[]>([]);
-  const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
-  const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
-  const [rejectReason, setRejectReason] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+const Badge = styled.span<{ color?: string }>`
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: ${props => {
+    switch(props.color) {
+      case 'green': return '#e8f5e9';
+      case 'blue': return '#e3f2fd';
+      case 'orange': return '#fff3e0';
+      case 'red': return '#ffebee';
+      default: return '#f5f5f5';
+    }
+  }};
+  color: ${props => {
+    switch(props.color) {
+      case 'green': return '#2e7d32';
+      case 'blue': return '#1565c0';
+      case 'orange': return '#ef6c00';
+      case 'red': return '#c62828';
+      default: return '#757575';
+    }
+  }};
+  margin-left: 8px;
+`;
+
+const AlertsList = styled.div`
+  margin-top: 16px;
+`;
+
+const AlertItem = styled.div<{ severity: 'low' | 'medium' | 'high' }>`
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background-color: ${props => 
+    props.severity === 'high' ? '#ffebee' : 
+    props.severity === 'medium' ? '#fff8e1' : 
+    '#e8f5e9'
+  };
+  border-left: 4px solid ${props => 
+    props.severity === 'high' ? '#f44336' : 
+    props.severity === 'medium' ? '#ffc107' : 
+    '#4caf50'
+  };
+`;
+
+const AlertHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+`;
+
+const AlertTitle = styled.div`
+  font-weight: 500;
+`;
+
+const AlertTime = styled.div`
+  font-size: 12px;
+  color: #666;
+`;
+
+const AlertDetails = styled.div`
+  font-size: 14px;
+  color: #666;
+`;
+
+const Divider = styled.div`
+  height: 1px;
+  background-color: #eee;
+  margin: 24px 0;
+`;
+
+const InfoBox = styled.div`
+  background-color: #e3f2fd;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   
-  // Przykładowe dane
-  useEffect(() => {
-    // Symulacja pobrania planów wysyłki
-    const samplePlans = [
-      {
-        id: 'plan1',
-        title: 'Plan wysyłki - 12.04.2025',
-        timestamp: '2025-04-12T08:30:00Z',
-        status: 'pending',
-        vehiclesCount: 12,
-        ordersCount: 45,
-        totalDistance: 1250,
-        fuelSavings: 15.2,
-        co2Reduction: 320,
-        routes: [
-          {
-            id: 'route1',
-            vehicle: {
-              id: 'v1',
-              name: 'Ciężarówka #1234',
-              type: 'Ciężarówka 10t',
-              driver: 'Jan Kowalski'
-            },
-            startTime: '2025-04-12T09:00:00Z',
-            endTime: '2025-04-12T17:30:00Z',
-            distance: 210,
-            stops: [
-              {
-                id: 'stop1',
-                type: 'pickup',
-                address: 'Magazyn Centralny, ul. Przemysłowa 10, Warszawa',
-                time: '2025-04-12T09:00:00Z',
-                orderId: 'order1'
-              },
-              {
-                id: 'stop2',
-                type: 'delivery',
-                address: 'Centrum Dystrybucyjne, ul. Logistyczna 5, Łódź',
-                time: '2025-04-12T11:30:00Z',
-                orderId: 'order2'
-              },
-              {
-                id: 'stop3',
-                type: 'pickup',
-                address: 'Fabryka XYZ, ul. Fabryczna 15, Łódź',
-                time: '2025-04-12T12:30:00Z',
-                orderId: 'order3'
-              },
-              {
-                id: 'stop4',
-                type: 'delivery',
-                address: 'Hurtownia ABC, ul. Handlowa 8, Poznań',
-                time: '2025-04-12T15:00:00Z',
-                orderId: 'order4'
-              },
-              {
-                id: 'stop5',
-                type: 'delivery',
-                address: 'Sklep Firmowy, ul. Kupiecka 22, Poznań',
-                time: '2025-04-12T16:30:00Z',
-                orderId: 'order5'
-              }
-            ]
-          },
-          {
-            id: 'route2',
-            vehicle: {
-              id: 'v2',
-              name: 'Ciężarówka #5678',
-              type: 'Ciężarówka 15t',
-              driver: 'Anna Nowak'
-            },
-            startTime: '2025-04-12T08:30:00Z',
-            endTime: '2025-04-12T16:00:00Z',
-            distance: 180,
-            stops: [
-              {
-                id: 'stop6',
-                type: 'pickup',
-                address: 'Magazyn Centralny, ul. Przemysłowa 10, Warszawa',
-                time: '2025-04-12T08:30:00Z',
-                orderId: 'order6'
-              },
-              {
-                id: 'stop7',
-                type: 'delivery',
-                address: 'Centrum Handlowe, ul. Zakupowa 100, Radom',
-                time: '2025-04-12T10:30:00Z',
-                orderId: 'order7'
-              },
-              {
-                id: 'stop8',
-                type: 'delivery',
-                address: 'Supermarket XYZ, ul. Spożywcza 5, Kielce',
-                time: '2025-04-12T13:00:00Z',
-                orderId: 'order8'
-              },
-              {
-                id: 'stop9',
-                type: 'pickup',
-                address: 'Producent Żywności, ul. Rolnicza 15, Kielce',
-                time: '2025-04-12T14:00:00Z',
-                orderId: 'order9'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'plan2',
-        title: 'Plan wysyłki - 11.04.2025',
-        timestamp: '2025-04-11T08:00:00Z',
-        status: 'approved',
-        vehiclesCount: 10,
-        ordersCount: 38,
-        totalDistance: 1120,
-        fuelSavings: 12.8,
-        co2Reduction: 280,
-        routes: []
-      },
-      {
-        id: 'plan3',
-        title: 'Plan wysyłki - 10.04.2025',
-        timestamp: '2025-04-10T08:15:00Z',
-        status: 'completed',
-        vehiclesCount: 11,
-        ordersCount: 42,
-        totalDistance: 1180,
-        fuelSavings: 13.5,
-        co2Reduction: 295,
-        routes: []
-      }
-    ];
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: #1565c0;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+`;
+
+const InfoContent = styled.div`
+  flex: 1;
+`;
+
+const InfoTitle = styled.div`
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #1565c0;
+`;
+
+const InfoText = styled.div`
+  font-size: 14px;
+  color: #333;
+`;
+
+const ProgressContainer = styled.div`
+  margin-top: 24px;
+`;
+
+const ProgressSteps = styled.div`
+  display: flex;
+  margin-bottom: 24px;
+`;
+
+const ProgressStep = styled.div<{ active: boolean; completed: boolean }>`
+  flex: 1;
+  text-align: center;
+  position: relative;
+  
+  &:not(:last-child):after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: calc(50% + 16px);
+    right: calc(50% - 16px);
+    height: 2px;
+    background-color: ${props => props.completed ? '#4caf50' : '#e0e0e0'};
+    z-index: 1;
+  }
+`;
+
+const StepCircle = styled.div<{ active: boolean; completed: boolean }>`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: ${props => 
+    props.completed ? '#4caf50' : 
+    props.active ? '#3f51b5' : 
+    '#e0e0e0'
+  };
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  position: relative;
+  z-index: 2;
+  
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+  }
+`;
+
+const StepLabel = styled.div<{ active: boolean; completed: boolean }>`
+  font-size: 12px;
+  color: ${props => 
+    props.completed ? '#4caf50' : 
+    props.active ? '#3f51b5' : 
+    '#999'
+  };
+  font-weight: ${props => (props.active || props.completed) ? '500' : 'normal'};
+`;
+
+// Define interfaces for the component's state
+interface DispatchStop extends Stop {
+  id: string;
+  address: string;
+  timeWindow: string;
+  notes: string;
+}
+
+interface DispatchRoute extends Route {
+  id: string;
+  vehicle: Vehicle;
+  stops: DispatchStop[];
+  distance: number;
+  duration: number;
+  startTime: string;
+  endTime: string;
+}
+
+interface DispatchPlan {
+  id: string;
+  name: string;
+  date: string;
+  routes: DispatchRoute[];
+  totalDistance: number;
+  totalDuration: number;
+  vehicleCount: number;
+  stopCount: number;
+}
+
+const AutonomousDispatch: React.FC<AutonomousDispatchProps> = ({ onDispatch }) => {
+  const [activeTab, setActiveTab] = React.useState<'create' | 'view'>('create');
+  const [step, setStep] = React.useState<number>(1);
+  const [isGenerating, setIsGenerating] = React.useState<boolean>(false);
+  const [isOptimizing, setIsOptimizing] = React.useState<boolean>(false);
+  
+  // Form state
+  const [date, setDate] = React.useState<string>('');
+  const [stops, setStops] = React.useState<DispatchStop[]>([]);
+  const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
+  const [constraints, setConstraints] = React.useState<string>('');
+  
+  // Generated plans
+  const [generatedPlans, setGeneratedPlans] = React.useState<DispatchPlan[]>([]);
+  const [selectedPlan, setSelectedPlan] = React.useState<DispatchPlan | null>(null);
+  
+  // Alerts
+  const [alerts, setAlerts] = React.useState<Alert[]>([]);
+  
+  // Sample data for demonstration
+  React.useEffect(() => {
+    // Sample vehicles
+    setVehicles([
+      { id: 'v1', registrationNumber: 'WA12345', make: 'Volvo', model: 'FH16', year: 2022, status: 'active' },
+      { id: 'v2', registrationNumber: 'WA67890', make: 'Mercedes', model: 'Actros', year: 2021, status: 'active' },
+      { id: 'v3', registrationNumber: 'WA54321', make: 'Scania', model: 'R450', year: 2023, status: 'active' }
+    ]);
     
-    setDispatchPlans(samplePlans);
+    // Sample stops
+    setStops([
+      { id: 's1', address: 'ul. Marszałkowska 10, Warszawa', timeWindow: '8:00 - 10:00', notes: 'Dostawa towaru' },
+      { id: 's2', address: 'ul. Puławska 25, Warszawa', timeWindow: '9:00 - 11:00', notes: 'Odbiór przesyłki' },
+      { id: 's3', address: 'ul. Wołoska 5, Warszawa', timeWindow: '10:00 - 12:00', notes: 'Dostawa paczek' },
+      { id: 's4', address: 'ul. Świętokrzyska 31, Warszawa', timeWindow: '12:00 - 14:00', notes: 'Odbiór dokumentów' },
+      { id: 's5', address: 'ul. Mokotowska 15, Warszawa', timeWindow: '13:00 - 15:00', notes: 'Dostawa materiałów' }
+    ]);
+    
+    // Sample alerts
+    setAlerts([
+      { 
+        id: 'a1', 
+        title: 'Wykryto korki na trasie', 
+        details: 'Możliwe opóźnienia na trasie Volvo FH16 (WA12345) z powodu korków na ul. Marszałkowskiej.', 
+        severity: 'medium',
+        timestamp: new Date().toISOString()
+      },
+      { 
+        id: 'a2', 
+        title: 'Konflikt czasowy', 
+        details: 'Wykryto potencjalny konflikt czasowy dla pojazdu Mercedes Actros (WA67890). Przybycie do punktu może nastąpić po zamknięciu okna czasowego.', 
+        severity: 'high',
+        timestamp: new Date().toISOString()
+      }
+    ]);
+    
+    // Set default date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setDate(tomorrow.toISOString().split('T')[0]);
   }, []);
   
-  // Generowanie nowego planu wysyłki
-  const handleGeneratePlan = async () => {
+  // Generate sample plans
+  const generatePlans = () => {
     setIsGenerating(true);
     
-    try {
-      // Symulacja generowania planu
-      await new Promise(resolve => setTimeout(resolve, 2000));
+    // Simulate API call delay
+    setTimeout(() => {
+      const plans: DispatchPlan[] = [
+        {
+          id: 'plan1',
+          name: 'Plan optymalny',
+          date: date,
+          routes: [
+            {
+              id: 'r1',
+              vehicle: vehicles[0],
+              stops: [stops[0], stops[2], stops[4]],
+              distance: 15.3,
+              duration: 75,
+              startTime: '08:00',
+              endTime: '14:30'
+            },
+            {
+              id: 'r2',
+              vehicle: vehicles[1],
+              stops: [stops[1], stops[3]],
+              distance: 12.7,
+              duration: 65,
+              startTime: '09:00',
+              endTime: '13:45'
+            }
+          ],
+          totalDistance: 28.0,
+          totalDuration: 140,
+          vehicleCount: 2,
+          stopCount: 5
+        },
+        {
+          id: 'plan2',
+          name: 'Plan alternatywny',
+          date: date,
+          routes: [
+            {
+              id: 'r3',
+              vehicle: vehicles[0],
+              stops: [stops[0], stops[1]],
+              distance: 8.5,
+              duration: 45,
+              startTime: '08:00',
+              endTime: '11:30'
+            },
+            {
+              id: 'r4',
+              vehicle: vehicles[1],
+              stops: [stops[2], stops[3]],
+              distance: 10.2,
+              duration: 55,
+              startTime: '10:00',
+              endTime: '13:15'
+            },
+            {
+              id: 'r5',
+              vehicle: vehicles[2],
+              stops: [stops[4]],
+              distance: 6.8,
+              duration: 30,
+              startTime: '13:00',
+              endTime: '15:30'
+            }
+          ],
+          totalDistance: 25.5,
+          totalDuration: 130,
+          vehicleCount: 3,
+          stopCount: 5
+        }
+      ];
       
-      // W rzeczywistej aplikacji, tutaj byłoby wywołanie API
-      // const plan = await onDispatchPlan({...});
-      
-      // Symulacja nowego planu
-      const newPlan = {
-        id: `plan${Date.now()}`,
-        title: `Plan wysyłki - ${new Date().toLocaleDateString()}`,
-        timestamp: new Date().toISOString(),
-        status: 'pending',
-        vehiclesCount: Math.floor(Math.random() * 5) + 8,
-        ordersCount: Math.floor(Math.random() * 20) + 30,
-        totalDistance: Math.floor(Math.random() * 300) + 1000,
-        fuelSavings: Math.floor(Math.random() * 10) + 10 + Math.random(),
-        co2Reduction: Math.floor(Math.random() * 100) + 200,
-        routes: []
+      setGeneratedPlans(plans);
+      setSelectedPlan(plans[0]);
+      setIsGenerating(false);
+      setStep(2);
+    }, 2000);
+  };
+  
+  // Optimize selected plan
+  const optimizePlan = () => {
+    if (!selectedPlan) return;
+    
+    setIsOptimizing(true);
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      const optimizedPlan: DispatchPlan = {
+        ...selectedPlan,
+        name: 'Plan zoptymalizowany',
+        totalDistance: selectedPlan.totalDistance * 0.9,
+        totalDuration: selectedPlan.totalDuration * 0.85,
+        routes: selectedPlan.routes.map(route => ({
+          ...route,
+          distance: route.distance * 0.9,
+          duration: route.duration * 0.85
+        }))
       };
       
-      setDispatchPlans(prev => [newPlan, ...prev]);
-      setActiveTab('plans');
-    } catch (error) {
-      console.error('Error generating dispatch plan:', error);
-    } finally {
-      setIsGenerating(false);
-    }
+      setSelectedPlan(optimizedPlan);
+      setIsOptimizing(false);
+      setStep(3);
+    }, 2000);
   };
   
-  // Obsługa zatwierdzenia planu
-  const handleApprovePlan = async (planId: string) => {
-    try {
-      await onApproveDispatch(planId);
-      
-      // Aktualizacja stanu planów
-      setDispatchPlans(prev => 
-        prev.map(plan => 
-          plan.id === planId ? { ...plan, status: 'approved' } : plan
-        )
-      );
-    } catch (error) {
-      console.error('Error approving dispatch plan:', error);
-    }
-  };
-  
-  // Obsługa odrzucenia planu
-  const handleRejectPlan = async () => {
-    if (!selectedPlan || !rejectReason.trim()) return;
+  // Dispatch the selected plan
+  const dispatchSelectedPlan = async () => {
+    if (!selectedPlan) return;
     
     try {
-      await onRejectDispatch(selectedPlan.id, rejectReason);
-      
-      // Aktualizacja stanu planów
-      setDispatchPlans(prev => 
-        prev.map(plan => 
-          plan.id === selectedPlan.id ? { ...plan, status: 'rejected' } : plan
-        )
-      );
-      
-      setShowRejectModal(false);
-      setRejectReason('');
-      setSelectedPlan(null);
+      await onDispatch(selectedPlan);
+      setStep(4);
     } catch (error) {
-      console.error('Error rejecting dispatch plan:', error);
+      console.error('Error dispatching plan:', error);
+      // Handle error
     }
   };
   
-  // Obsługa wyświetlania szczegółów planu
-  const handleViewPlanDetails = (plan: any) => {
-    setSelectedPlan(plan);
-  };
-  
-  // Formatowanie daty
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
-  };
-  
-  // Renderowanie dashboardu
-  const renderDashboard = () => {
-    // Obliczanie metryk
-    const totalVehicles = vehicles.length;
-    const activeVehicles = vehicles.filter(v => v.status === 'active').length;
-    const pendingOrders = orders.filter(o => o.status === 'pending').length;
-    const completedOrders = orders.filter(o => o.status === 'completed').length;
-    const totalDistance = dispatchPlans.reduce((sum, plan) => sum + plan.totalDistance, 0);
-    const totalFuelSavings = dispatchPlans.reduce((sum, plan) => sum + plan.fuelSavings, 0);
-    const totalCO2Reduction = dispatchPlans.reduce((sum, plan) => sum + plan.co2Reduction, 0);
+  // Add a new stop
+  const addStop = () => {
+    const newStop: DispatchStop = {
+      id: `s${stops.length + 1}`,
+      address: '',
+      timeWindow: '',
+      notes: ''
+    };
     
+    setStops([...stops, newStop]);
+  };
+  
+  // Remove a stop
+  const removeStop = (stopId: string) => {
+    setStops(stops.filter(stop => stop.id !== stopId));
+  };
+  
+  // Format time duration
+  const formatDuration = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}m`;
+  };
+  
+  // Render create tab content
+  const renderCreateTab = () => {
     return (
       <>
-        <Card>
-          <CardTitle>Przegląd floty i zamówień</CardTitle>
-          <CardContent>
-            <MetricsGrid>
-              <MetricCard>
-                <MetricValue>{totalVehicles}</MetricValue>
-                <MetricLabel>Całkowita liczba pojazdów</MetricLabel>
-              </MetricCard>
-              <MetricCard>
-                <MetricValue>{activeVehicles}</MetricValue>
-                <MetricLabel>Aktywne pojazdy</MetricLabel>
-              </MetricCard>
-              <MetricCard>
-                <MetricValue>{pendingOrders}</MetricValue>
-                <MetricLabel>Oczekujące zamówienia</MetricLabel>
-              </MetricCard>
-              <MetricCard>
-                <MetricValue>{completedOrders}</MetricValue>
-                <MetricLabel>Zrealizowane zamówienia</MetricLabel>
-              </MetricCard>
-              <MetricCard>
-                <MetricValue>{totalDistance.toLocaleString()} km</MetricValue>
-                <MetricLabel>Całkowity dystans</MetricLabel>
-              </MetricCard>
-              <MetricCard>
-                <MetricValue>{totalFuelSavings.toFixed(1)}%</MetricValue>
-                <MetricLabel>Oszczędność paliwa</MetricLabel>
-              </MetricCard>
-            </MetricsGrid>
-          </CardContent>
-        </Card>
+        <ProgressContainer>
+          <ProgressSteps>
+            <ProgressStep active={step === 1} completed={step > 1}>
+              <StepCircle active={step === 1} completed={step > 1}>
+                {step > 1 ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                  </svg>
+                ) : 1}
+              </StepCircle>
+              <StepLabel active={step === 1} completed={step > 1}>Dane wejściowe</StepLabel>
+            </ProgressStep>
+            
+            <ProgressStep active={step === 2} completed={step > 2}>
+              <StepCircle active={step === 2} completed={step > 2}>
+                {step > 2 ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                  </svg>
+                ) : 2}
+              </StepCircle>
+              <StepLabel active={step === 2} completed={step > 2}>Wybór planu</StepLabel>
+            </ProgressStep>
+            
+            <ProgressStep active={step === 3} completed={step > 3}>
+              <StepCircle active={step === 3} completed={step > 3}>
+                {step > 3 ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                  </svg>
+                ) : 3}
+              </StepCircle>
+              <StepLabel active={step === 3} completed={step > 3}>Optymalizacja</StepLabel>
+            </ProgressStep>
+            
+            <ProgressStep active={step === 4} completed={step > 4}>
+              <StepCircle active={step === 4} completed={step > 4}>
+                {step > 4 ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                  </svg>
+                ) : 4}
+              </StepCircle>
+              <StepLabel active={step === 4} completed={step > 4}>Wysyłka</StepLabel>
+            </ProgressStep>
+          </ProgressSteps>
+        </ProgressContainer>
         
-        <Card>
-          <CardTitle>Mapa aktywnych tras</CardTitle>
-          <MapContainer>
-            {/* Tutaj będzie mapa z Google Maps lub innej biblioteki */}
-            <MapOverlay>
-              <div>Aktywne pojazdy: {activeVehicles}</div>
-              <div>Aktywne trasy: {dispatchPlans.filter(p => p.status === 'approved').length}</div>
-            </MapOverlay>
-          </MapContainer>
-        </Card>
+        {step === 1 && (
+          <GridContainer>
+            <div>
+              <FormSection>
+                <FormTitle>Informacje podstawowe</FormTitle>
+                <FormRow>
+                  <Label htmlFor="date">Data</Label>
+                  <Input 
+                    id="date" 
+                    type="date" 
+                    value={date} 
+                    onChange={e => setDate(e.target.value)} 
+                  />
+                </FormRow>
+              </FormSection>
+              
+              <FormSection>
+                <FormTitle>Przystanki</FormTitle>
+                {stops.map((stop, index) => (
+                  <StopItem key={stop.id}>
+                    <StopNumber>{index + 1}</StopNumber>
+                    <StopDetails>
+                      <FormRow>
+                        <Label htmlFor={`address-${stop.id}`}>Adres</Label>
+                        <Input 
+                          id={`address-${stop.id}`} 
+                          value={stop.address} 
+                          onChange={e => {
+                            const updatedStops = [...stops];
+                            updatedStops[index].address = e.target.value;
+                            setStops(updatedStops);
+                          }} 
+                        />
+                      </FormRow>
+                      <FormRow>
+                        <Label htmlFor={`timeWindow-${stop.id}`}>Okno czasowe</Label>
+                        <Input 
+                          id={`timeWindow-${stop.id}`} 
+                          value={stop.timeWindow} 
+                          placeholder="np. 8:00 - 10:00" 
+                          onChange={e => {
+                            const updatedStops = [...stops];
+                            updatedStops[index].timeWindow = e.target.value;
+                            setStops(updatedStops);
+                          }} 
+                        />
+                      </FormRow>
+                      <FormRow>
+                        <Label htmlFor={`notes-${stop.id}`}>Uwagi</Label>
+                        <Input 
+                          id={`notes-${stop.id}`} 
+                          value={stop.notes} 
+                          onChange={e => {
+                            const updatedStops = [...stops];
+                            updatedStops[index].notes = e.target.value;
+                            setStops(updatedStops);
+                          }} 
+                        />
+                      </FormRow>
+                    </StopDetails>
+                    <StopActions>
+                      <IconButton onClick={() => removeStop(stop.id)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                        </svg>
+                      </IconButton>
+                    </StopActions>
+                  </StopItem>
+                ))}
+                <Button onClick={addStop}>+ Dodaj przystanek</Button>
+              </FormSection>
+              
+              <FormSection>
+                <FormTitle>Dodatkowe ograniczenia</FormTitle>
+                <FormRow>
+                  <Label htmlFor="constraints">Ograniczenia (opcjonalnie)</Label>
+                  <Textarea 
+                    id="constraints" 
+                    value={constraints} 
+                    onChange={e => setConstraints(e.target.value)} 
+                    placeholder="Np. Kierowca Jan może obsługiwać tylko trasy na północy miasta. Pojazd WA12345 ma ograniczenie tonażu."
+                  />
+                </FormRow>
+              </FormSection>
+              
+              <ButtonGroup>
+                <Button onClick={() => setActiveTab('view')}>Anuluj</Button>
+                <Button 
+                  primary 
+                  onClick={generatePlans}
+                  disabled={isGenerating || stops.length === 0 || !date}
+                >
+                  {isGenerating ? 'Generowanie...' : 'Wygeneruj plany'}
+                </Button>
+              </ButtonGroup>
+            </div>
+            
+            <div>
+              <MapContainer>
+                <MapPlaceholder>
+                  Mapa z wizualizacją przystanków zostanie wyświetlona tutaj
+                </MapPlaceholder>
+              </MapContainer>
+              
+              <InfoBox>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                </svg>
+                <InfoContent>
+                  <InfoTitle>Autonomiczne planowanie tras</InfoTitle>
+                  <InfoText>
+                    System wykorzystuje sztuczną inteligencję do automatycznego planowania optymalnych tras dla floty pojazdów.
+                    Wystarczy podać listę przystanków, a system zaproponuje najlepsze rozwiązanie, uwzględniając czas przejazdu,
+                    odległości, okna czasowe i inne ograniczenia.
+                  </InfoText>
+                </InfoContent>
+              </InfoBox>
+              
+              {alerts.length > 0 && (
+                <>
+                  <FormTitle>Alerty</FormTitle>
+                  <AlertsList>
+                    {alerts.map(alert => (
+                      <AlertItem key={alert.id} severity={alert.severity}>
+                        <AlertHeader>
+                          <AlertTitle>{alert.title}</AlertTitle>
+                          <AlertTime>{new Date(alert.timestamp).toLocaleTimeString()}</AlertTime>
+                        </AlertHeader>
+                        <AlertDetails>{alert.details}</AlertDetails>
+                      </AlertItem>
+                    ))}
+                  </AlertsList>
+                </>
+              )}
+            </div>
+          </GridContainer>
+        )}
         
-        <Card>
-          <CardTitle>Ostatnie plany wysyłki</CardTitle>
-          <CardContent>
-            {dispatchPlans.slice(0, 3).map(plan => (
-              <DispatchPlanCard key={plan.id}>
-                <PlanHeader>
-                  <PlanTitle>{plan.title}</PlanTitle>
-                  <PlanMeta>
-                    Status: {plan.status === 'pending' ? 'Oczekujący' : 
-                             plan.status === 'approved' ? 'Zatwierdzony' : 
-                             plan.status === 'rejected' ? 'Odrzucony' : 
-                             'Zakończony'}
-                  </PlanMeta>
-                </PlanHeader>
-                <PlanMetrics>
-                  <PlanMetric>
-                    <span>Pojazdy:</span> {plan.vehiclesCount}
-                  </PlanMetric>
-                  <PlanMetric>
-                    <span>Zamówienia:</span> {plan.ordersCount}
-                  </PlanMetric>
-                  <PlanMetric>
-                    <span>Dystans:</span> {plan.totalDistance} km
-                  </PlanMetric>
-                  <PlanMetric>
-                    <span>Oszczędność paliwa:</span> {plan.fuelSavings.toFixed(1)}%
-                  </PlanMetric>
-                </PlanMetrics>
-                <PlanActions>
-                  <DetailsButton onClick={() => handleViewPlanDetails(plan)}>
-                    Szczegóły
-                  </DetailsButton>
-                </PlanActions>
-              </DispatchPlanCard>
-            ))}
-          </CardContent>
-        </Card>
+        {step === 2 && (
+          <>
+            <InfoBox>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+              <InfoContent>
+                <InfoTitle>Wybierz plan</InfoTitle>
+                <InfoText>
+                  System wygenerował kilka wariantów planu. Wybierz ten, który najlepiej odpowiada Twoim potrzebom.
+                  Możesz również zoptymalizować wybrany plan, aby jeszcze bardziej poprawić jego efektywność.
+                </InfoText>
+              </InfoContent>
+            </InfoBox>
+            
+            <GridContainer>
+              <div>
+                <FormTitle>Wygenerowane plany</FormTitle>
+                {generatedPlans.map(plan => (
+                  <Card key={plan.id} style={{ cursor: 'pointer' }} onClick={() => setSelectedPlan(plan)}>
+                    <CardHeader>
+                      <CardTitle>{plan.name}</CardTitle>
+                      {selectedPlan?.id === plan.id && (
+                        <Badge color="blue">Wybrano</Badge>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      <div><strong>Data:</strong> {plan.date}</div>
+                      <div><strong>Liczba pojazdów:</strong> {plan.vehicleCount}</div>
+                      <div><strong>Liczba przystanków:</strong> {plan.stopCount}</div>
+                      <div><strong>Całkowita odległość:</strong> {plan.totalDistance.toFixed(1)} km</div>
+                      <div><strong>Całkowity czas:</strong> {formatDuration(plan.totalDuration)}</div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              <div>
+                {selectedPlan && (
+                  <>
+                    <FormTitle>Szczegóły planu</FormTitle>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{selectedPlan.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div><strong>Data:</strong> {selectedPlan.date}</div>
+                        <Divider />
+                        
+                        <h5>Trasy</h5>
+                        <RoutesList>
+                          {selectedPlan.routes.map(route => (
+                            <RouteItem key={route.id}>
+                              <RouteHeader>
+                                <RouteTitle>{route.vehicle.make} {route.vehicle.model}</RouteTitle>
+                                <div>{route.vehicle.registrationNumber}</div>
+                              </RouteHeader>
+                              <RouteDetails>
+                                <div><strong>Czas rozpoczęcia:</strong> {route.startTime}</div>
+                                <div><strong>Czas zakończenia:</strong> {route.endTime}</div>
+                                <div><strong>Odległość:</strong> {route.distance.toFixed(1)} km</div>
+                                <div><strong>Czas trwania:</strong> {formatDuration(route.duration)}</div>
+                              </RouteDetails>
+                              <StopsList>
+                                {route.stops.map((stop, index) => (
+                                  <StopItem key={stop.id}>
+                                    <StopNumber>{index + 1}</StopNumber>
+                                    <StopDetails>
+                                      <StopAddress>{stop.address}</StopAddress>
+                                      <StopInfo>
+                                        <div><strong>Okno czasowe:</strong> {stop.timeWindow}</div>
+                                        {stop.notes && <div><strong>Uwagi:</strong> {stop.notes}</div>}
+                                      </StopInfo>
+                                    </StopDetails>
+                                  </StopItem>
+                                ))}
+                              </StopsList>
+                            </RouteItem>
+                          ))}
+                        </RoutesList>
+                      </CardContent>
+                    </Card>
+                    
+                    <ButtonGroup>
+                      <Button onClick={() => setStep(1)}>Wróć</Button>
+                      <Button 
+                        primary 
+                        onClick={optimizePlan}
+                        disabled={isOptimizing}
+                      >
+                        {isOptimizing ? 'Optymalizacja...' : 'Optymalizuj plan'}
+                      </Button>
+                    </ButtonGroup>
+                  </>
+                )}
+              </div>
+            </GridContainer>
+          </>
+        )}
+        
+        {step === 3 && selectedPlan && (
+          <>
+            <InfoBox>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+              <InfoContent>
+                <InfoTitle>Plan zoptymalizowany</InfoTitle>
+                <InfoText>
+                  System zoptymalizował wybrany plan, uwzględniając aktualne warunki drogowe, prognozy ruchu i inne czynniki.
+                  Możesz teraz wysłać plan do realizacji lub wrócić do poprzednich kroków, aby wprowadzić zmiany.
+                </InfoText>
+              </InfoContent>
+            </InfoBox>
+            
+            <GridContainer>
+              <div>
+                <MapContainer>
+                  <MapPlaceholder>
+                    Mapa z wizualizacją zoptymalizowanych tras zostanie wyświetlona tutaj
+                  </MapPlaceholder>
+                </MapContainer>
+              </div>
+              
+              <div>
+                <FormTitle>Szczegóły zoptymalizowanego planu</FormTitle>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{selectedPlan.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div><strong>Data:</strong> {selectedPlan.date}</div>
+                    <div><strong>Całkowita odległość:</strong> {selectedPlan.totalDistance.toFixed(1)} km</div>
+                    <div><strong>Całkowity czas:</strong> {formatDuration(selectedPlan.totalDuration)}</div>
+                    <Divider />
+                    
+                    <h5>Trasy</h5>
+                    <RoutesList>
+                      {selectedPlan.routes.map(route => (
+                        <RouteItem key={route.id}>
+                          <RouteHeader>
+                            <RouteTitle>{route.vehicle.name}</RouteTitle>
+                            <div>{route.vehicle.registrationNumber}</div>
+                          </RouteHeader>
+                          <RouteDetails>
+                            <div><strong>Czas rozpoczęcia:</strong> {route.startTime}</div>
+                            <div><strong>Czas zakończenia:</strong> {route.endTime}</div>
+                            <div><strong>Odległość:</strong> {route.distance.toFixed(1)} km</div>
+                            <div><strong>Czas trwania:</strong> {formatDuration(route.duration)}</div>
+                          </RouteDetails>
+                          <StopsList>
+                            {route.stops.map((stop, index) => (
+                              <StopItem key={stop.id}>
+                                <StopNumber>{index + 1}</StopNumber>
+                                <StopDetails>
+                                  <StopAddress>{stop.address}</StopAddress>
+                                  <StopInfo>
+                                    <div><strong>Okno czasowe:</strong> {stop.timeWindow}</div>
+                                    {stop.notes && <div><strong>Uwagi:</strong> {stop.notes}</div>}
+                                  </StopInfo>
+                                </StopDetails>
+                              </StopItem>
+                            ))}
+                          </StopsList>
+                        </RouteItem>
+                      ))}
+                    </RoutesList>
+                  </CardContent>
+                </Card>
+                
+                <ButtonGroup>
+                  <Button onClick={() => setStep(2)}>Wróć</Button>
+                  <Button primary onClick={dispatchSelectedPlan}>
+                    Wyślij plan do realizacji
+                  </Button>
+                </ButtonGroup>
+              </div>
+            </GridContainer>
+          </>
+        )}
+        
+        {step === 4 && (
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style={{ width: '64px', height: '64px', fill: '#4caf50', margin: '0 auto 24px' }}>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            <h2 style={{ marginBottom: '16px' }}>Plan został wysłany do realizacji</h2>
+            <p style={{ fontSize: '16px', color: '#666', marginBottom: '32px' }}>
+              Kierowcy otrzymali powiadomienia o nowych trasach. Możesz śledzić postęp realizacji w zakładce "Podgląd".
+            </p>
+            <Button primary onClick={() => setActiveTab('view')}>
+              Przejdź do podglądu
+            </Button>
+          </div>
+        )}
       </>
     );
   };
   
-  // Renderowanie planów wysyłki
-  const renderPlans = () => {
+  // Render view tab content
+  const renderViewTab = () => {
     return (
-      <>
-        <Card>
-          <CardTitle>
-            Plany wysyłki
-            <ActionButton onClick={handleGeneratePlan} disabled={isGenerating}>
-              {isGenerating ? 'Generowanie...' : 'Generuj nowy plan'}
-            </ActionButton>
-          </CardTitle>
-          <CardContent>
-            {dispatchPlans.map(plan => (
-              <DispatchPlanCard key={plan.id}>
-                <PlanHeader>
-                  <PlanTitle>{plan.title}</PlanTitle>
-                  <PlanMeta>
-                    Wygenerowano: {formatDate(plan.timestamp)}
-                  </PlanMeta>
-                </PlanHeader>
-                <PlanDetails>
-                  Status: {plan.status === 'pending' ? 'Oczekujący' : 
-                           plan.status === 'approved' ? 'Zatwierdzony' : 
-                           plan.status === 'rejected' ? 'Odrzucony' : 
-                           'Zakończony'}
-                </PlanDetails>
-                <PlanMetrics>
-                  <PlanMetric>
-                    <span>Pojazdy:</span> {plan.vehiclesCount}
-                  </PlanMetric>
-                  <PlanMetric>
-                    <span>Zamówienia:</span> {plan.ordersCount}
-                  </PlanMetric>
-                  <PlanMetric>
-                    <span>Dystans:</span> {plan.totalDistance} km
-                  </PlanMetric>
-                  <PlanMetric>
-                    <span>Oszczędność paliwa:</span> {plan.fuelSavings.toFixed(1)}%
-                  </PlanMetric>
-                  <PlanMetric>
-                    <span>Redukcja CO2:</span> {plan.co2Reduction} kg
-                  </PlanMetric>
-                </PlanMetrics>
-                <PlanActions>
-                  {plan.status === 'pending' && (
-                    <>
-                      <ApproveButton onClick={() => handleApprovePlan(plan.id)}>
-                        Zatwierdź
-                      </ApproveButton>
-                      <RejectButton onClick={() => {
-                        setSelectedPlan(plan);
-                        setShowRejectModal(true);
-                      }}>
-                        Odrzuć
-                      </RejectButton>
-                    </>
-                  )}
-                  <DetailsButton onClick={() => handleViewPlanDetails(plan)}>
-                    Szczegóły
-                  </DetailsButton>
-                </PlanActions>
-              </DispatchPlanCard>
-            ))}
-          </CardContent>
-        </Card>
-      </>
-    );
-  };
-  
-  // Renderowanie tras
-  const renderRoutes = () => {
-    // Pobieranie wszystkich tras ze wszystkich planów
-    const allRoutes = dispatchPlans
-      .filter(plan => plan.routes && plan.routes.length > 0)
-      .flatMap(plan => plan.routes);
-    
-    return (
-      <>
-        <Card>
-          <CardTitle>Trasy</CardTitle>
-          <MapContainer>
-            {/* Tutaj będzie mapa z Google Maps lub innej biblioteki */}
-            <MapOverlay>
-              <div>Liczba tras: {allRoutes.length}</div>
-            </MapOverlay>
-          </MapContainer>
-          
-          <RoutesList>
-            {allRoutes.map(route => (
-              <RouteItem key={route.id}>
-                <RouteHeader>
-                  <RouteTitle>{route.vehicle.name}</RouteTitle>
-                  <div>Kierowca: {route.vehicle.driver}</div>
-                </RouteHeader>
-                <RouteDetails>
-                  <RouteDetail>
-                    <DetailLabel>Czas rozpoczęcia</DetailLabel>
-                    <DetailValue>{formatDate(route.startTime)}</DetailValue>
-                  </RouteDetail>
-                  <RouteDetail>
-                    <DetailLabel>Czas zakończenia</DetailLabel>
-                    <DetailValue>{formatDate(route.endTime)}</DetailValue>
-                  </RouteDetail>
-                  <RouteDetail>
-                    <DetailLabel>Dystans</DetailLabel>
-                    <DetailValue>{route.distance} km</DetailValue>
-                  </RouteDetail>
-                  <RouteDetail>
-                    <DetailLabel>Liczba przystanków</DetailLabel>
-                    <DetailValue>{route.stops.length}</DetailValue>
-                  </RouteDetail>
-                </RouteDetails>
-                <StopsList>
-                  {route.stops.map((stop, index) => (
-                    <StopItem key={stop.id}>
-                      <StopNumber>{index + 1}</StopNumber>
-                      <StopDetails>
-                        <StopAddress>{stop.address}</StopAddress>
-                        <StopTime>{formatDate(stop.time)}</StopTime>
-                      </StopDetails>
-                      <StopType type={stop.type}>
-                        {stop.type === 'pickup' ? 'Odbiór' : 'Dostawa'}
-                      </StopType>
-                    </StopItem>
-                  ))}
-                </StopsList>
-              </RouteItem>
-            ))}
-          </RoutesList>
-        </Card>
-      </>
+      <div>
+        <InfoBox>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+          </svg>
+          <InfoContent>
+            <InfoTitle>Podgląd tras</InfoTitle>
+            <InfoText>
+              W tej sekcji możesz przeglądać aktywne trasy, śledzić postęp realizacji i reagować na alerty.
+              Funkcja podglądu będzie dostępna wkrótce.
+            </InfoText>
+          </InfoContent>
+        </InfoBox>
+        
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <p style={{ fontSize: '16px', color: '#666', marginBottom: '32px' }}>
+            Funkcja podglądu tras jest w trakcie implementacji i będzie dostępna wkrótce.
+          </p>
+          <Button primary onClick={() => setActiveTab('create')}>
+            Utwórz nowy plan
+          </Button>
+        </div>
+      </div>
     );
   };
   
   return (
     <Container>
-      <Header>
-        <Title>Autonomiczna wysyłka</Title>
-      </Header>
+      <Title>Autonomiczna wysyłka</Title>
       
-      <TabsContainer>
-        <Tab 
-          active={activeTab === 'dashboard'} 
-          onClick={() => setActiveTab('dashboard')}
-        >
-          Dashboard
-        </Tab>
-        <Tab 
-          active={activeTab === 'plans'} 
-          onClick={() => setActiveTab('plans')}
-        >
-          Plany wysyłki
-        </Tab>
-        <Tab 
-          active={activeTab === 'routes'} 
-          onClick={() => setActiveTab('routes')}
-        >
-          Trasy
-        </Tab>
-      </TabsContainer>
-      
-      {activeTab === 'dashboard' && renderDashboard()}
-      {activeTab === 'plans' && renderPlans()}
-      {activeTab === 'routes' && renderRoutes()}
-      
-      {/* Modal odrzucania planu */}
-      {showRejectModal && (
-        <ModalOverlay onClick={() => setShowRejectModal(false)}>
-          <ModalContent onClick={e => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>Odrzuć plan</ModalTitle>
-              <CloseButton onClick={() => setShowRejectModal(false)}>×</CloseButton>
-            </ModalHeader>
-            <ModalBody>
-              <p>Podaj powód odrzucenia planu:</p>
-              <TextArea 
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Wpisz powód odrzucenia..."
-              />
-            </ModalBody>
-            <ModalFooter>
-              <RejectButton 
-                onClick={handleRejectPlan}
-                disabled={!rejectReason.trim()}
-              >
-                Odrzuć plan
-              </RejectButton>
-            </ModalFooter>
-          </ModalContent>
-        </ModalOverlay>
-      )}
-      
-      {/* Modal szczegółów planu */}
-      {selectedPlan && !showRejectModal && (
-        <ModalOverlay onClick={() => setSelectedPlan(null)}>
-          <ModalContent onClick={e => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>Szczegóły planu</ModalTitle>
-              <CloseButton onClick={() => setSelectedPlan(null)}>×</CloseButton>
-            </ModalHeader>
-            <ModalBody>
-              <h4>{selectedPlan.title}</h4>
-              <p>Wygenerowano: {formatDate(selectedPlan.timestamp)}</p>
-              <p>Status: {selectedPlan.status === 'pending' ? 'Oczekujący' : 
-                          selectedPlan.status === 'approved' ? 'Zatwierdzony' : 
-                          selectedPlan.status === 'rejected' ? 'Odrzucony' : 
-                          'Zakończony'}</p>
-              
-              <h5>Metryki</h5>
-              <PlanMetrics>
-                <PlanMetric>
-                  <span>Pojazdy:</span> {selectedPlan.vehiclesCount}
-                </PlanMetric>
-                <PlanMetric>
-                  <span>Zamówienia:</span> {selectedPlan.ordersCount}
-                </PlanMetric>
-                <PlanMetric>
-                  <span>Dystans:</span> {selectedPlan.totalDistance} km
-                </PlanMetric>
-                <PlanMetric>
-                  <span>Oszczędność paliwa:</span> {selectedPlan.fuelSavings.toFixed(1)}%
-                </PlanMetric>
-                <PlanMetric>
-                  <span>Redukcja CO2:</span> {selectedPlan.co2Reduction} kg
-                </PlanMetric>
-              </PlanMetrics>
-              
-              {selectedPlan.routes && selectedPlan.routes.length > 0 && (
-                <>
-                  <h5>Trasy</h5>
-                  <RoutesList>
-                    {selectedPlan.routes.map(route => (
-                      <RouteItem key={route.id}>
-                        <RouteHeader>
-                          <RouteTitle>{route.vehicle.name}</RouteTitle>
-                          <div>Kierowca: {route.vehicle.driver}</div>
-                        </RouteHeader>
-                        <RouteDetails>
-                          <RouteDetail>
-                            <DetailLabel>Czas rozpoczęcia</DetailLabel>
-                            <DetailValue>{formatDate(route.startTime)}</DetailValue>
-                          </RouteDetail>
-                          <RouteDetail>
-                            <DetailLabel>Czas zakończenia</DetailLabel>
-                            <DetailValue>{formatDate(route.endTime)}</DetailValue>
-                          </RouteDetail>
-                          <RouteDetail>
-                            <DetailLabel>Dystans</DetailLabel>
-                            <DetailValue>{route.distance} km</DetailValue>
-                          </RouteDetail>
-                          <RouteDetail>
-                            <DetailLabel>Liczba przystanków</DetailLabel>
-                            <DetailValue>{route.stops.length}</DetailValue>
-                          </RouteDetail>
-                        </RouteDetails>
-                        <StopsList>
-                          {route.stops.map((stop, index) => (
-                            <StopItem key={stop.id}>
-                              <StopNumber>{index + 1}</StopNumber>
-                              <StopDetails>
-                                <StopAddress>{stop.address}</StopAddress>
-                                <StopTime>{formatDate(stop.time)}</StopTime>
-                              </StopDetails>
-                              <StopType type={stop.type}>
-                                {stop.type === 'pickup' ? 'Odbiór' : 'Dostawa'}
-                              </StopType>
-                            </StopItem>
-                          ))}
-                        </StopsList>
-                      </RouteItem>
-                    ))}
-                  </RoutesList>
-                </>
-              )}
-            </ModalBody>
-            <ModalFooter>
-              {selectedPlan.status === 'pending' && (
-                <>
-                  <ApproveButton onClick={() => {
-                    handleApprovePlan(selectedPlan.id);
-                    setSelectedPlan(null);
-                  }}>
-                    Zatwierdź
-                  </ApproveButton>
-                  <RejectButton onClick={() => {
-                    setShowRejectModal(true);
-                  }}>
-                    Odrzuć
-                  </RejectButton>
-                </>
-              )}
-            </ModalFooter>
-          </ModalContent>
-        </ModalOverlay>
-      )}
+      <Card>
+        <TabsContainer>
+          <Tab 
+            active={activeTab === 'create'} 
+            onClick={() => setActiveTab('create')}
+          >
+            Utwórz plan
+          </Tab>
+          <Tab 
+            active={activeTab === 'view'} 
+            onClick={() => setActiveTab('view')}
+          >
+            Podgląd
+          </Tab>
+        </TabsContainer>
+        
+        <CardContent>
+          {activeTab === 'create' && renderCreateTab()}
+          {activeTab === 'view' && renderViewTab()}
+        </CardContent>
+      </Card>
     </Container>
   );
 };
