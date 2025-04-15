@@ -464,7 +464,7 @@ const PredictiveMaintenance = () => {
   const [activeTab, setActiveTab] = useState('alerts');
   
   // Stan dla przełącznika danych (API vs Mock)
-  const [useMockData, setUseMockData] = useState(false);
+  const [useMockData, setUseMockData] = useState(true);
   
   // Stany ładowania i błędów
   const [isLoading, setIsLoading] = useState(true);
