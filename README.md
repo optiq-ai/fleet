@@ -288,24 +288,126 @@ Sekcja pojazdów umożliwia kompleksowe zarządzanie flotą pojazdów, ich stane
 - **Parts (Części)** - inwentaryzacja i zarządzanie częściami zamiennymi
 - **Tires (Opony)** - zarządzanie oponami, ich stanem, rotacją i wymianą sezonową
 
-#### Komponenty Overview:
-- **Dashboard KPI** - wyświetla kluczowe wskaźniki floty (liczba pojazdów, średni wiek, przebieg, wykorzystanie, zgodność z harmonogramem)
-- **Mapa floty** - interaktywna mapa pokazująca lokalizacje wszystkich pojazdów z kolorowym oznaczeniem statusu
-- **Lista pojazdów** - tabela z filtrowaniem i sortowaniem zawierająca dane pojazdów (ID, model, rok, przebieg, status, stan techniczny)
-- **Szczegóły pojazdu** - panel z pełnymi danymi technicznymi, historią przeglądów, przypisanymi kierowcami, zużyciem paliwa
-- **Statystyki floty** - wykresy i trendy pokazujące strukturę floty, wiek pojazdów, zużycie paliwa, koszty utrzymania
+### Vehicles Overview (Przegląd Pojazdów)
+
+Podstrona Overview zapewnia kompleksowy widok całej floty pojazdów z kluczowymi wskaźnikami i statystykami. Jest to główny punkt wejścia do zarządzania pojazdami, umożliwiający szybki dostęp do najważniejszych informacji o flocie.
+
+#### Funkcje i metody:
+- `fetchFleetData()` - pobiera dane pojazdów, KPI, lokalizacje pojazdów i statystyki floty
+- `fetchVehicleDetails()` - pobiera szczegółowe dane wybranego pojazdu
+- `handleFilterChange()` - obsługuje zmianę filtrów listy pojazdów (status, wyszukiwanie)
+- `handleSearch()` - obsługuje wyszukiwanie pojazdów
+- `handleSort()` - obsługuje sortowanie listy pojazdów według wybranej kolumny
+- `handlePageChange()` - obsługuje zmianę strony w paginacji listy pojazdów
+- `handleVehicleSelect()` - obsługuje wybór pojazdu z listy i wyświetla jego szczegóły
+- `handleTabChange()` - obsługuje przełączanie między zakładkami w widoku szczegółów pojazdu
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+- `handleExportCSV()` - eksportuje dane pojazdów do pliku CSV
+- `handleExportPDF()` - eksportuje dane pojazdów do pliku PDF
+
+#### Komponenty:
+- **Dashboard KPI** - wyświetla kluczowe wskaźniki floty:
+  - Liczba pojazdów aktywnych
+  - Liczba pojazdów w serwisie
+  - Średni wiek floty
+  - Średni przebieg
+  - Wskaźnik wykorzystania pojazdów
+  - Wskaźnik zgodności z harmonogramem przeglądów
+  - Każdy wskaźnik zawiera trend procentowy w porównaniu do poprzedniego okresu
+
+- **Mapa floty** - interaktywna mapa pokazująca lokalizacje wszystkich pojazdów:
+  - Kolorowe oznaczenia statusu pojazdów (aktywny, w serwisie, nieaktywny)
+  - Tooltip z podstawowymi informacjami po najechaniu na punkt
+  - Możliwość wyboru pojazdu bezpośrednio z mapy
+  - Legenda statusów pojazdów
+
+- **Lista pojazdów** - tabela z zaawansowanym filtrowaniem i sortowaniem:
+  - ID/numer rejestracyjny pojazdu
+  - Marka i model
+  - Rok produkcji
+  - Przebieg
+  - Status (aktywny, w serwisie, nieaktywny)
+  - Stan techniczny (wskaźnik procentowy)
+  - Przypisany kierowca
+  - Data ostatniego przeglądu
+  - Data następnego przeglądu
+  - Filtrowanie według statusu
+  - Wyszukiwanie według ID, marki, modelu
+  - Sortowanie według dowolnej kolumny
+  - Paginacja z wyborem liczby wyników na stronę
+
+- **Szczegóły pojazdu** - panel z zakładkami wyświetlający szczegółowe informacje o wybranym pojeździe:
+  - **Dane techniczne** - pełne dane techniczne pojazdu (marka, model, rok, VIN, numer rejestracyjny, typ nadwozia, rodzaj paliwa, pojemność silnika, moc, skrzynia biegów, napęd, masa, ładowność)
+  - **Historia przeglądów** - lista wszystkich przeglądów i napraw z datami, opisami, kosztami i wykonawcami
+  - **Historia kierowców** - lista kierowców przypisanych do pojazdu w przeszłości z datami rozpoczęcia i zakończenia, przebiegiem i liczbą incydentów
+  - **Zużycie paliwa** - wykres i tabela zużycia paliwa w czasie, z kosztami i przebiegiem
+  - **Przebieg** - wykres przebiegu w czasie z miesięcznymi przyrostami
+  - **Dokumenty** - lista dokumentów pojazdu (dowód rejestracyjny, ubezpieczenie, przegląd techniczny) z datami ważności i linkami do plików
+
+- **Statystyki floty** - wykresy i trendy:
+  - Struktura floty według marek/modeli
+  - Struktura wiekowa pojazdów
+  - Trendy zużycia paliwa w czasie
+  - Trendy kosztów utrzymania w czasie
 
 #### Stany (hooks):
-- `vehicles` - lista pojazdów
-- `selectedVehicle` - wybrany pojazd
-- `vehicleDetails` - szczegóły pojazdu
-- `vehicleLocations` - dane lokalizacji pojazdów dla mapy
-- `fleetStatistics` - statystyki floty
+- `vehicles` - dane pojazdów (lista, paginacja, filtry)
+- `selectedVehicle` - wybrany pojazd do wyświetlenia szczegółów
 - `kpiData` - dane KPI floty
-- `filters` - filtry dla listy pojazdów (status, typ, wyszukiwanie, strona)
-- `isLoading` - stan ładowania listy pojazdów
+- `mapData` - dane lokalizacji pojazdów dla mapy
+- `fleetStats` - statystyki floty (struktura, trendy)
+- `activeTab` - aktywna zakładka w widoku szczegółów pojazdu
+- `isLoading` - stan ładowania głównych danych
 - `isDetailLoading` - stan ładowania szczegółów pojazdu
 - `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+- `filters` - filtry dla listy pojazdów (status, wyszukiwanie, sortowanie, paginacja)
+
+#### Integracja z API:
+- Komponent korzysta z `vehiclesService` lub `mockVehiclesService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody:
+  - `getVehicles()` - pobiera listę pojazdów z filtrowaniem, sortowaniem i paginacją
+  - `getVehicleDetails()` - pobiera szczegółowe dane pojazdu
+  - `getFleetKPIs()` - pobiera kluczowe wskaźniki floty
+  - `getVehicleLocations()` - pobiera dane lokalizacji pojazdów dla mapy
+  - `getFleetStatistics()` - pobiera statystyki floty
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów pojazdu
+- Logowanie błędów do konsoli
+- Automatyczne ponowienie próby pobierania danych w przypadku błędu
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+- Mapa floty zmienia rozmiar w zależności od dostępnej przestrzeni
+- Karty KPI układają się w stos na mniejszych ekranach
+
+#### Eksport danych:
+- Eksport listy pojazdów do pliku CSV
+- Eksport listy pojazdów do pliku PDF (planowana funkcjonalność)
+- Eksport szczegółów pojazdu do pliku PDF (planowana funkcjonalność)
+
+#### Wydajność:
+- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
+- Paginacja danych zmniejsza obciążenie przeglądarki
+- Lazy loading komponentów szczegółów pojazdu
+- Opóźnione ładowanie danych mapy i statystyk
+
+#### Bezpieczeństwo:
+- Walidacja danych wejściowych
+- Sanityzacja danych przed wyświetleniem
+- Obsługa błędów API
+- Zabezpieczenie przed atakami XSS
+
+#### Integracja z innymi modułami:
+- Połączenie z modułem Maintenance (Konserwacja) dla danych o przeglądach
+- Połączenie z modułem Drivers (Kierowcy) dla danych o przypisanych kierowcach
+- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach i wydajnościor` - stan błędu
 - `useMockData` - przełącznik źródła danych (API vs Mock)
 
 #### Integracja z API:
