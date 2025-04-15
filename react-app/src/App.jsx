@@ -12,6 +12,7 @@ import Drivers from './pages/Drivers';
 import FleetManagement from './pages/FleetManagement';
 import VehiclesOverview from './pages/VehiclesOverview';
 import VehicleParts from './pages/VehicleParts';
+import VehicleTires from './pages/VehicleTires';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -61,6 +62,11 @@ function App() {
           <Route path="/vehicles/parts" element={
             <Layout>
               <VehicleParts />
+            </Layout>
+          } />
+          <Route path="/vehicles/tires" element={
+            <Layout>
+              <VehicleTires />
             </Layout>
           } />
           <Route path="/predictive-maintenance" element={

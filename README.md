@@ -634,3 +634,250 @@ Serwis dostarczający dane testowe dla komponentu Parts (Części), gdy backend 
 - Dane analizy zużycia części z wykresami najczęściej wymienianych części, kosztów według kategorii, trendów
 - Dane kompatybilności części z informacjami o modelach pojazdów, alternatywnych częściach
 - Dane dostawców z informacjami o ID, nazwie, osobie kontaktowej, ocenie, historii współpracy
+
+
+### Maintenance (Konserwacja)
+
+Podstrona Maintenance (Konserwacja) umożliwia zarządzanie harmonogramem przeglądów, napraw i serwisów pojazdów. Pozwala na przewidywanie potencjalnych awarii, monitorowanie stanu technicznego pojazdów oraz planowanie prac konserwacyjnych.
+
+#### Funkcje i metody:
+- `fetchMaintenanceData()` - pobiera dane alertów konserwacji, stanu technicznego, historii konserwacji i harmonogramu
+- `handleFilterChange()` - obsługuje zmianę filtrów danych (priorytet, status, komponent, pojazd)
+- `handleSearch()` - obsługuje wyszukiwanie danych
+- `handlePageChange()` - obsługuje zmianę strony w paginacji
+- `handleAlertClick()` - obsługuje wybór alertu konserwacji i wyświetla jego szczegóły
+- `handleVehicleSelect()` - obsługuje wybór pojazdu i wyświetla jego stan techniczny
+- `handleExportData()` - obsługuje eksport danych do CSV/PDF
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Alerty konserwacji** - tabela z alertami o potencjalnych awariach z priorytetami i rekomendacjami
+- **Stan techniczny pojazdów** - wskaźniki zdrowia komponentów pojazdów z wykresami i wartościami procentowymi
+- **Historia konserwacji** - rejestr wykonanych prac konserwacyjnych z datami, kosztami i wykonawcami
+- **Harmonogram konserwacji** - planowane przeglądy i naprawy z terminami i statusami
+- **Analiza kosztów** - koszty konserwacji z podziałem na kategorie (części, robocizna, materiały eksploatacyjne)
+
+#### Stany (hooks):
+- `maintenanceAlerts` - dane alertów konserwacji
+- `selectedAlert` - wybrany alert do szczegółowego widoku
+- `vehicleHealth` - dane stanu technicznego pojazdów
+- `maintenanceHistory` - historia konserwacji
+- `maintenanceSchedule` - harmonogram konserwacji
+- `costAnalysis` - dane analizy kosztów
+- `filters` - filtry dla danych (priorytet, status, komponent, pojazd, strona)
+- `activeTab` - aktywna zakładka tematyczna
+- `isLoading` - stan ładowania
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `predictiveMaintenanceService` lub `mockPredictiveMaintenanceService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getMaintenanceAlerts()`, `getAlertDetails()`, `getVehicleHealth()`, `getMaintenanceHistory()`, `getMaintenanceSchedule()`, `getCostAnalysis()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+- Automatyczne ponowienie próby pobierania danych w przypadku błędu
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
+#### Eksport danych:
+- Eksport alertów konserwacji do pliku CSV
+- Eksport historii konserwacji do pliku CSV
+- Eksport harmonogramu konserwacji do pliku CSV
+- Eksport analizy kosztów do pliku PDF
+
+#### Wydajność:
+- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
+- Paginacja danych zmniejsza obciążenie przeglądarki
+- Lazy loading komponentów szczegółów
+- Opóźnione ładowanie danych wykresów i statystyk
+
+#### Bezpieczeństwo:
+- Walidacja danych wejściowych
+- Sanityzacja danych przed wyświetleniem
+- Obsługa błędów API
+- Zabezpieczenie przed atakami XSS
+
+#### Integracja z innymi modułami:
+- Połączenie z modułem Vehicles (Pojazdy) dla danych o pojazdach
+- Połączenie z modułem Parts (Części) dla danych o częściach zamiennych
+- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach
+
+### Parts (Części)
+
+Podstrona Parts (Części) umożliwia zarządzanie inwentarzem części zamiennych i ich wykorzystaniem. Pozwala na śledzenie stanu magazynowego, zarządzanie zamówieniami, analizę zużycia części oraz sprawdzanie kompatybilności z różnymi modelami pojazdów.
+
+#### Funkcje i metody:
+- `fetchPartsData()` - pobiera dane inwentarza części, zamówień, analizy zużycia, kompatybilności i dostawców
+- `handleTabChange()` - obsługuje zmianę zakładki tematycznej
+- `handleFilterChange()` - obsługuje zmianę filtrów danych (kategoria, dostawca, status, kompatybilność)
+- `handleSearch()` - obsługuje wyszukiwanie danych
+- `handlePageChange()` - obsługuje zmianę strony w paginacji
+- `handlePartSelect()` - obsługuje wybór części z listy i wyświetla jej szczegóły
+- `handleOrderSelect()` - obsługuje wybór zamówienia i wyświetla jego szczegóły
+- `handleSupplierSelect()` - obsługuje wybór dostawcy i wyświetla jego szczegóły
+- `handleExportData()` - obsługuje eksport danych do CSV/PDF
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Inwentarz części** - tabela z częściami zamiennymi, ich ilością, ceną, statusem i kompatybilnością
+- **Zarządzanie zamówieniami** - system śledzenia zamówień części z historią i automatycznymi powiadomieniami
+- **Wykorzystanie części** - analiza zużycia części z wykresami najczęściej wymienianych części i kosztów
+- **Kompatybilność części** - wyszukiwarka kompatybilnych części z filtrowaniem według modelu pojazdu
+- **Zarządzanie dostawcami** - baza dostawców części z danymi kontaktowymi i historią współpracy
+
+#### Stany (hooks):
+- `parts` - dane inwentarza części
+- `selectedPart` - wybrana część do szczegółowego widoku
+- `orders` - dane zamówień części
+- `selectedOrder` - wybrane zamówienie do szczegółowego widoku
+- `usageAnalytics` - dane analizy zużycia części
+- `compatibility` - dane kompatybilności części
+- `suppliers` - dane dostawców
+- `selectedSupplier` - wybrany dostawca do szczegółowego widoku
+- `filters` - filtry dla danych (kategoria, dostawca, status, kompatybilność, strona)
+- `activeTab` - aktywna zakładka tematyczna
+- `isLoading` - stan ładowania
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `partsService` lub `mockPartsService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getParts()`, `getPartDetails()`, `getOrders()`, `getOrderDetails()`, `getUsageAnalytics()`, `getCompatibility()`, `getSuppliers()`, `getSupplierDetails()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+- Automatyczne ponowienie próby pobierania danych w przypadku błędu
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
+#### Eksport danych:
+- Eksport inwentarza części do pliku CSV
+- Eksport zamówień do pliku CSV
+- Eksport analizy zużycia do pliku PDF
+- Eksport listy dostawców do pliku CSV
+
+#### Wydajność:
+- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
+- Paginacja danych zmniejsza obciążenie przeglądarki
+- Lazy loading komponentów szczegółów
+- Opóźnione ładowanie danych wykresów i statystyk
+
+#### Bezpieczeństwo:
+- Walidacja danych wejściowych
+- Sanityzacja danych przed wyświetleniem
+- Obsługa błędów API
+- Zabezpieczenie przed atakami XSS
+
+#### Integracja z innymi modułami:
+- Połączenie z modułem Vehicles (Pojazdy) dla danych o kompatybilności
+- Połączenie z modułem Maintenance (Konserwacja) dla danych o zużyciu części
+- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach
+
+### Tires (Opony)
+
+Podstrona Tires (Opony) umożliwia kompleksowe zarządzanie oponami floty pojazdów. Pozwala na śledzenie stanu opon, planowanie rotacji, zarządzanie wymianą sezonową oraz analizę wydajności i kosztów.
+
+#### Funkcje i metody:
+- `fetchTiresData()` - pobiera dane inwentarza opon, stanu opon, harmonogramu rotacji, wymiany sezonowej i analityki
+- `handleTabChange()` - obsługuje zmianę zakładki tematycznej
+- `handleFilterChange()` - obsługuje zmianę filtrów danych (marka, typ, status, pojazd)
+- `handleSearch()` - obsługuje wyszukiwanie danych
+- `handlePageChange()` - obsługuje zmianę strony w paginacji
+- `handleTireSelect()` - obsługuje wybór opony z listy i wyświetla jej szczegóły
+- `handleVehicleSelect()` - obsługuje wybór pojazdu i wyświetla stan jego opon
+- `handleRotationSelect()` - obsługuje wybór harmonogramu rotacji i wyświetla jego szczegóły
+- `handleSeasonalChangeSelect()` - obsługuje wybór wymiany sezonowej i wyświetla jej szczegóły
+- `handleExportData()` - obsługuje eksport danych do CSV/PDF
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Inwentarz opon** - tabela z oponami, ich marką, modelem, rozmiarem, typem, głębokością bieżnika, statusem
+- **Monitorowanie stanu opon** - wskaźniki stanu opon z pomiarami głębokości bieżnika, ciśnienia, wzoru zużycia
+- **Harmonogram rotacji** - planowanie i śledzenie rotacji opon z datami, przebiegami i wzorcami rotacji
+- **Zarządzanie wymianą sezonową** - planowanie i śledzenie wymiany opon sezonowych z lokalizacją przechowywania
+- **Analityka opon** - analiza wydajności opon różnych marek, kosztów, wpływu na zużycie paliwa i rekomendacje
+
+#### Stany (hooks):
+- `tires` - dane inwentarza opon
+- `selectedTire` - wybrana opona do szczegółowego widoku
+- `tireConditions` - dane stanu opon
+- `rotationSchedules` - dane harmonogramu rotacji
+- `selectedRotation` - wybrany harmonogram rotacji do szczegółowego widoku
+- `seasonalChanges` - dane wymiany sezonowej
+- `selectedSeasonalChange` - wybrana wymiana sezonowa do szczegółowego widoku
+- `tireAnalytics` - dane analityki opon
+- `filters` - filtry dla danych (marka, typ, status, pojazd, strona)
+- `activeTab` - aktywna zakładka tematyczna
+- `isLoading` - stan ładowania
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `tiresService` lub `mockTiresService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getTires()`, `getTireDetails()`, `getTireConditions()`, `getRotationSchedules()`, `getRotationDetails()`, `getSeasonalChanges()`, `getSeasonalChangeDetails()`, `getTireAnalytics()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+- Automatyczne ponowienie próby pobierania danych w przypadku błędu
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
+#### Eksport danych:
+- Eksport inwentarza opon do pliku CSV
+- Eksport stanu opon do pliku CSV
+- Eksport harmonogramu rotacji do pliku CSV
+- Eksport wymiany sezonowej do pliku CSV
+- Eksport analityki opon do pliku PDF
+
+#### Wydajność:
+- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
+- Paginacja danych zmniejsza obciążenie przeglądarki
+- Lazy loading komponentów szczegółów
+- Opóźnione ładowanie danych wykresów i statystyk
+
+#### Bezpieczeństwo:
+- Walidacja danych wejściowych
+- Sanityzacja danych przed wyświetleniem
+- Obsługa błędów API
+- Zabezpieczenie przed atakami XSS
+
+#### Integracja z innymi modułami:
+- Połączenie z modułem Vehicles (Pojazdy) dla danych o pojazdach
+- Połączenie z modułem Maintenance (Konserwacja) dla danych o przeglądach
+- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach
+
+### tiresService
+Serwis do pobierania danych dla komponentu Tires (Opony) z rzeczywistego API.
+
+### mockTiresService
+Serwis dostarczający dane testowe dla komponentu Tires (Opony), gdy backend nie jest dostępny. Zawiera:
+- Dane inwentarza opon z informacjami o ID, marce, modelu, rozmiarze, typie, głębokości bieżnika, dacie produkcji, przebiegu, statusie
+- Dane stanu opon z informacjami o głębokości bieżnika, ciśnieniu, wzorze zużycia, stanie, rekomendowanych działaniach
+- Dane harmonogramu rotacji z informacjami o dacie ostatniej rotacji, dacie następnej rotacji, statusie, przebiegu od ostatniej rotacji, historii
+- Dane wymiany sezonowej z informacjami o aktualnym typie opon, dacie ostatniej wymiany, dacie następnej wymiany, statusie, lokalizacji przechowywania, historii
+- Dane analityki opon z informacjami o żywotności według marki, analizie kosztów, wpływie na zużycie paliwa, rekomendacjach
