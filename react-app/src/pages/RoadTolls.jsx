@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
@@ -27,6 +27,16 @@ const RoadTolls = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [useMockData, setUseMockData] = useState(true);
+  
+  // State to track which data has been loaded
+  const [dataLoaded, setDataLoaded] = useState({
+    dashboard: false,
+    transponders: false,
+    violations: false,
+    reports: false,
+    operators: false,
+    optimization: false
+  });
   
   // State for filters
   const [transponderFilters, setTransponderFilters] = useState({
@@ -57,37 +67,45 @@ const RoadTolls = () => {
   const service = useMockData ? mockRoadTollsService : roadTollsService;
 
   // Load dashboard data
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
+    if (isLoading || dataLoaded.dashboard) return;
+    
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getRoadTollsDashboard();
       setDashboardData(data);
+      setDataLoaded(prev => ({ ...prev, dashboard: true }));
     } catch (err) {
       console.error('Error loading dashboard data:', err);
       setError('Failed to load dashboard data. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading, dataLoaded.dashboard]);
 
   // Load transponders data
-  const loadTransponders = async (filters = transponderFilters) => {
+  const loadTransponders = useCallback(async (filters = transponderFilters) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getTransponders(filters);
       setTransponders(data);
+      setDataLoaded(prev => ({ ...prev, transponders: true }));
     } catch (err) {
       console.error('Error loading transponders data:', err);
       setError('Failed to load transponders data. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading, transponderFilters]);
 
   // Load transponder details
-  const loadTransponderDetails = async (id) => {
+  const loadTransponderDetails = useCallback(async (id) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(null);
     try {
@@ -99,25 +117,30 @@ const RoadTolls = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading]);
 
   // Load violations data
-  const loadViolations = async (filters = violationFilters) => {
+  const loadViolations = useCallback(async (filters = violationFilters) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getViolations(filters);
       setViolations(data);
+      setDataLoaded(prev => ({ ...prev, violations: true }));
     } catch (err) {
       console.error('Error loading violations data:', err);
       setError('Failed to load violations data. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading, violationFilters]);
 
   // Load violation details
-  const loadViolationDetails = async (id) => {
+  const loadViolationDetails = useCallback(async (id) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(null);
     try {
@@ -129,121 +152,156 @@ const RoadTolls = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading]);
 
   // Load expense reports
-  const loadExpenseReports = async (filters = reportFilters) => {
+  const loadExpenseReports = useCallback(async (filters = reportFilters) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getExpenseReports(filters);
       setExpenseReports(data);
+      setDataLoaded(prev => ({ ...prev, reports: true }));
     } catch (err) {
       console.error('Error loading expense reports:', err);
       setError('Failed to load expense reports. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading, reportFilters]);
 
   // Load toll operators
-  const loadTollOperators = async () => {
+  const loadTollOperators = useCallback(async () => {
+    if (isLoading || dataLoaded.operators) return;
+    
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getTollOperators();
       setTollOperators(data);
+      setDataLoaded(prev => ({ ...prev, operators: true }));
     } catch (err) {
       console.error('Error loading toll operators:', err);
       setError('Failed to load toll operators. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading, dataLoaded.operators]);
 
   // Load route optimization
-  const loadRouteOptimization = async (filters = routeFilters) => {
+  const loadRouteOptimization = useCallback(async (filters = routeFilters) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getRouteOptimization(filters);
       setRouteOptimization(data);
+      setDataLoaded(prev => ({ ...prev, optimization: true }));
     } catch (err) {
       console.error('Error loading route optimization:', err);
       setError('Failed to load route optimization. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [service, isLoading, routeFilters]);
 
   // Handle tab change
-  const handleTabChange = (tab) => {
+  const handleTabChange = useCallback((tab) => {
     setActiveTab(tab);
     setSelectedTransponder(null);
     setSelectedViolation(null);
     
-    // Load data based on selected tab
+    // Load data based on selected tab only if not already loaded
     switch (tab) {
       case 'dashboard':
-        loadDashboardData();
+        if (!dataLoaded.dashboard) loadDashboardData();
         break;
       case 'transponders':
-        loadTransponders();
+        if (!dataLoaded.transponders) loadTransponders();
         break;
       case 'violations':
-        loadViolations();
+        if (!dataLoaded.violations) loadViolations();
         break;
       case 'reports':
-        loadExpenseReports();
+        if (!dataLoaded.reports) loadExpenseReports();
         break;
       case 'operators':
-        loadTollOperators();
+        if (!dataLoaded.operators) loadTollOperators();
         break;
       case 'optimization':
-        loadRouteOptimization();
+        if (!dataLoaded.optimization) loadRouteOptimization();
         break;
       default:
         break;
     }
-  };
+  }, [
+    dataLoaded, 
+    loadDashboardData, 
+    loadTransponders, 
+    loadViolations, 
+    loadExpenseReports, 
+    loadTollOperators, 
+    loadRouteOptimization
+  ]);
 
   // Handle transponder filters change
-  const handleTransponderFilterChange = (name, value) => {
+  const handleTransponderFilterChange = useCallback((name, value) => {
     const newFilters = { ...transponderFilters, [name]: value };
     if (name !== 'page') {
       newFilters.page = 1; // Reset to first page when filters change
     }
     setTransponderFilters(newFilters);
-    loadTransponders(newFilters);
-  };
+    
+    // Debounce filter changes to prevent excessive API calls
+    if (name === 'search') {
+      const timer = setTimeout(() => {
+        loadTransponders(newFilters);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      loadTransponders(newFilters);
+    }
+  }, [transponderFilters, loadTransponders]);
 
   // Handle violation filters change
-  const handleViolationFilterChange = (name, value) => {
+  const handleViolationFilterChange = useCallback((name, value) => {
     const newFilters = { ...violationFilters, [name]: value };
     if (name !== 'page') {
       newFilters.page = 1; // Reset to first page when filters change
     }
     setViolationFilters(newFilters);
-    loadViolations(newFilters);
-  };
+    
+    // Debounce filter changes to prevent excessive API calls
+    if (name === 'search') {
+      const timer = setTimeout(() => {
+        loadViolations(newFilters);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      loadViolations(newFilters);
+    }
+  }, [violationFilters, loadViolations]);
 
   // Handle report filters change
-  const handleReportFilterChange = (name, value) => {
+  const handleReportFilterChange = useCallback((name, value) => {
     const newFilters = { ...reportFilters, [name]: value };
     setReportFilters(newFilters);
     loadExpenseReports(newFilters);
-  };
+  }, [reportFilters, loadExpenseReports]);
 
   // Handle route optimization search
-  const handleRouteSearch = (e) => {
+  const handleRouteSearch = useCallback((e) => {
     e.preventDefault();
     loadRouteOptimization(routeFilters);
-  };
+  }, [routeFilters, loadRouteOptimization]);
 
   // Handle route filter change
-  const handleRouteFilterChange = (name, value) => {
-    setRouteFilters({ ...routeFilters, [name]: value });
-  };
+  const handleRouteFilterChange = useCallback((name, value) => {
+    setRouteFilters(prev => ({ ...prev, [name]: value }));
+  }, []);
 
   // Format currency
   const formatCurrency = (value) => {
@@ -285,6 +343,21 @@ const RoadTolls = () => {
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData]);
+
+  // Reset data loaded state when mock data toggle changes
+  useEffect(() => {
+    setDataLoaded({
+      dashboard: false,
+      transponders: false,
+      violations: false,
+      reports: false,
+      operators: false,
+      optimization: false
+    });
+    
+    // Load data for current tab after reset
+    handleTabChange(activeTab);
+  }, [useMockData, handleTabChange, activeTab]);
 
   // Toggle between real and mock data
   const handleToggleDataSource = () => {
