@@ -732,14 +732,12 @@ const VehicleTires = () => {
         </FilterContainer>
         
         <Table 
-          columns={columns} 
-          data={tires.data} 
-          onRowClick={handleTireSelect}
-          pagination={{
-            currentPage: filters.page,
-            totalPages: Math.ceil(tires.total / filters.limit),
-            onPageChange: (page) => setFilters({ ...filters, page })
-          }}
+          headers={columns.map(col => col.label)}
+          data={tires.data.map(tire => columns.map(col => {
+            const value = tire[col.id];
+            return col.format && typeof col.format === 'function' ? col.format(value) : value;
+          }))}
+          onRowClick={(rowIndex) => handleTireSelect(tires.data[rowIndex])}
         />
         
         {selectedTire && (
@@ -933,14 +931,12 @@ const VehicleTires = () => {
         </FilterContainer>
         
         <Table 
-          columns={columns} 
-          data={tireConditions.data} 
-          onRowClick={handleConditionSelect}
-          pagination={{
-            currentPage: filters.page,
-            totalPages: Math.ceil(tireConditions.total / filters.limit),
-            onPageChange: (page) => setFilters({ ...filters, page })
-          }}
+          headers={columns.map(col => col.label)}
+          data={tireConditions.data.map(condition => columns.map(col => {
+            const value = condition[col.id];
+            return col.format && typeof col.format === 'function' ? col.format(value) : value;
+          }))}
+          onRowClick={(rowIndex) => handleConditionSelect(tireConditions.data[rowIndex])}
         />
         
         {selectedCondition && (
@@ -1103,14 +1099,12 @@ const VehicleTires = () => {
         </FilterContainer>
         
         <Table 
-          columns={columns} 
-          data={rotationSchedules.data} 
-          onRowClick={handleRotationSelect}
-          pagination={{
-            currentPage: filters.page,
-            totalPages: Math.ceil(rotationSchedules.total / filters.limit),
-            onPageChange: (page) => setFilters({ ...filters, page })
-          }}
+          headers={columns.map(col => col.label)}
+          data={rotationSchedules.data.map(schedule => columns.map(col => {
+            const value = schedule[col.id];
+            return col.format && typeof col.format === 'function' ? col.format(value) : value;
+          }))}
+          onRowClick={(rowIndex) => handleRotationSelect(rotationSchedules.data[rowIndex])}
         />
         
         {selectedRotation && (
@@ -1269,14 +1263,12 @@ const VehicleTires = () => {
         </FilterContainer>
         
         <Table 
-          columns={columns} 
-          data={seasonalChanges.data} 
-          onRowClick={handleSeasonalSelect}
-          pagination={{
-            currentPage: filters.page,
-            totalPages: Math.ceil(seasonalChanges.total / filters.limit),
-            onPageChange: (page) => setFilters({ ...filters, page })
-          }}
+          headers={columns.map(col => col.label)}
+          data={seasonalChanges.data.map(change => columns.map(col => {
+            const value = change[col.id];
+            return col.format && typeof col.format === 'function' ? col.format(value) : value;
+          }))}
+          onRowClick={(rowIndex) => handleSeasonalSelect(seasonalChanges.data[rowIndex])}
         />
         
         {selectedChange && (

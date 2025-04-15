@@ -607,11 +607,12 @@ const VehicleParts = () => {
         </FilterContainer>
         
         <Table 
-          columns={columns} 
-          data={parts.data} 
-          pagination={parts.pagination}
-          onRowClick={handlePartSelect}
-          onPageChange={(page) => setFilters({ ...filters, page })}
+          headers={columns.map(col => col.label)}
+          data={parts.data.map(part => columns.map(col => {
+            const value = part[col.id];
+            return col.format && typeof col.format === 'function' ? col.format(value) : value;
+          }))}
+          onRowClick={(rowIndex) => handlePartSelect(parts.data[rowIndex])}
         />
         
         {selectedPart && (

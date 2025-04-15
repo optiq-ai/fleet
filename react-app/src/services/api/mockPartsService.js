@@ -1243,4 +1243,6 @@ class MockPartsService {
   }
 }
 
-export default new MockPartsService();
+// Create an instance and export it
+const mockPartsService = new MockPartsService();
+export default mockPartsService;
