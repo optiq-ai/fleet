@@ -318,6 +318,7 @@ const VehicleParts = () => {
               filters.page,
               filters.limit
             );
+            console.log('Parts response:', partsResponse); // Debug log
             setParts(partsResponse);
             break;
             
@@ -325,17 +326,20 @@ const VehicleParts = () => {
             const ordersResponse = await service.getOrders(
               undefined, undefined, undefined, filters.page, filters.limit
             );
+            console.log('Orders response:', ordersResponse); // Debug log
             setOrders(ordersResponse);
             break;
             
           case 'usage':
             const usageResponse = await service.getUsageAnalysis();
+            console.log('Usage response:', usageResponse); // Debug log
             setUsageAnalysis(usageResponse);
             break;
             
           case 'compatibility':
             if (vehicleModel) {
               const compatibilityResponse = await service.getCompatibleParts(vehicleModel);
+              console.log('Compatibility response:', compatibilityResponse); // Debug log
               setCompatibleParts(compatibilityResponse);
             }
             break;
@@ -344,6 +348,7 @@ const VehicleParts = () => {
             const suppliersResponse = await service.getSuppliers(
               undefined, filters.page, filters.limit
             );
+            console.log('Suppliers response:', suppliersResponse); // Debug log
             setSuppliers(suppliersResponse);
             break;
             
