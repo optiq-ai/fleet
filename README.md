@@ -288,51 +288,83 @@ Sekcja pojazdów umożliwia kompleksowe zarządzanie flotą pojazdów, ich stane
 - **Parts (Części)** - inwentaryzacja i zarządzanie częściami zamiennymi
 - **Tires (Opony)** - zarządzanie oponami, ich stanem, rotacją i wymianą sezonową
 
-### Vehicles Overview (Przegląd Pojazdów)
+### Road Tolls (Opłaty Drogowe)
 
-Podstrona Overview zapewnia kompleksowy widok całej floty pojazdów z kluczowymi wskaźnikami i statystykami. Jest to główny punkt wejścia do zarządzania pojazdami, umożliwiający szybki dostęp do najważniejszych informacji o flocie.
+Sekcja Road Tolls umożliwia kompleksowe zarządzanie opłatami drogowymi, transponderami, naruszeniami, raportami wydatków oraz optymalizacją tras w celu minimalizacji kosztów opłat drogowych.
 
 #### Funkcje i metody:
-- `fetchFleetData()` - pobiera dane pojazdów, KPI, lokalizacje pojazdów i statystyki floty
-- `fetchVehicleDetails()` - pobiera szczegółowe dane wybranego pojazdu
-- `handleFilterChange()` - obsługuje zmianę filtrów listy pojazdów (status, wyszukiwanie)
-- `handleSearch()` - obsługuje wyszukiwanie pojazdów
-- `handleSort()` - obsługuje sortowanie listy pojazdów według wybranej kolumny
-- `handlePageChange()` - obsługuje zmianę strony w paginacji listy pojazdów
-- `handleVehicleSelect()` - obsługuje wybór pojazdu z listy i wyświetla jego szczegóły
-- `handleTabChange()` - obsługuje przełączanie między zakładkami w widoku szczegółów pojazdu
+- `loadDashboardData()` - pobiera dane KPI, mapę aktywności opłat drogowych, trendy wydatków i alerty
+- `loadTransponders()` - pobiera listę transponderów z możliwością filtrowania
+- `loadTransponderDetails()` - pobiera szczegółowe informacje o wybranym transponderze
+- `loadViolations()` - pobiera rejestr naruszeń z możliwością filtrowania
+- `loadViolationDetails()` - pobiera szczegółowe informacje o wybranym naruszeniu
+- `loadExpenseReports()` - pobiera raporty wydatków na opłaty drogowe z różnymi opcjami grupowania
+- `loadTollOperators()` - pobiera informacje o operatorach opłat drogowych
+- `loadRouteOptimization()` - pobiera dane optymalizacji tras z porównaniem kosztów
+- `handleTabChange()` - obsługuje zmianę głównej zakładki
+- `handleTransponderFilterChange()` - obsługuje zmianę filtrów transponderów
+- `handleViolationFilterChange()` - obsługuje zmianę filtrów naruszeń
+- `handleReportFilterChange()` - obsługuje zmianę filtrów raportów
+- `handleRouteSearch()` - obsługuje wyszukiwanie tras do optymalizacji
 - `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
-- `handleExportCSV()` - eksportuje dane pojazdów do pliku CSV
-- `handleExportPDF()` - eksportuje dane pojazdów do pliku PDF
 
 #### Komponenty:
-- **Dashboard KPI** - wyświetla kluczowe wskaźniki floty (liczba pojazdów, średni wiek, średni przebieg, pojazdy w serwisie, pojazdy nieaktywne, pojazdy wymagające uwagi)
-- **Mapa floty** - wizualizuje lokalizacje pojazdów na mapie z kolorowym oznaczeniem statusu
-- **Lista pojazdów** - tabela z wszystkimi pojazdami, ich statusem, danymi technicznymi i podstawowymi statystykami
-- **Szczegóły pojazdu** - prezentuje szczegółowe informacje o wybranym pojeździe z zakładkami (dane techniczne, historia przeglądów, historia kierowców, zużycie paliwa, przebieg, dokumenty)
-- **Statystyki floty** - wykresy i trendy dotyczące struktury floty, wieku pojazdów, zużycia paliwa i kosztów utrzymania
+- **Dashboard** - główny ekran z KPI, mapą aktywności opłat drogowych, trendami wydatków i alertami
+- **Transpondery** - zarządzanie urządzeniami do automatycznego poboru opłat
+  - Lista transponderów z filtrowaniem i paginacją
+  - Szczegóły transpondera z historią użycia i konserwacji
+- **Naruszenia** - rejestr naruszeń związanych z opłatami drogowymi
+  - Lista naruszeń z filtrowaniem i paginacją
+  - Szczegóły naruszenia z historią kwestionowania i płatności
+- **Raporty wydatków** - analizy i raporty wydatków na opłaty drogowe
+  - Grupowanie według pojazdu, kierowcy, trasy lub operatora
+  - Różne zakresy czasowe (dzień, tydzień, miesiąc, kwartał, rok)
+- **Operatorzy opłat** - informacje o operatorach systemów opłat drogowych
+  - Lista operatorów z mapą zasięgu
+  - Szczegóły operatora z cennikiem i punktami poboru opłat
+- **Optymalizacja tras** - porównanie i optymalizacja tras pod kątem kosztów opłat
+  - Wyszukiwanie tras między punktem początkowym a docelowym
+  - Porównanie standardowych tras z alternatywnymi
+  - Wizualizacja tras na mapie z zaznaczeniem punktów poboru opłat
+  - Szczegółowe porównanie kosztów dla różnych opcji
 
 #### Stany (hooks):
-- `vehicles` - dane pojazdów
-- `selectedVehicle` - wybrany pojazd
-- `kpiData` - dane KPI floty
-- `vehicleLocations` - lokalizacje pojazdów
-- `fleetStats` - statystyki floty
-- `filters` - filtry dla listy pojazdów (status, wyszukiwanie, sortowanie, strona)
-- `activeTab` - aktywna zakładka w widoku szczegółów pojazdu
+- `dashboardData` - dane dashboardu (KPI, mapa, trendy, alerty)
+- `transponders` - dane transponderów z paginacją
+- `selectedTransponder` - szczegóły wybranego transpondera
+- `violations` - dane naruszeń z paginacją
+- `selectedViolation` - szczegóły wybranego naruszenia
+- `expenseReports` - dane raportów wydatków
+- `tollOperators` - dane operatorów opłat drogowych
+- `routeOptimization` - dane optymalizacji tras
+- `activeTab` - aktywna główna zakładka
+- `activeSubTab` - aktywna podzakładka
 - `isLoading` - stan ładowania danych
 - `error` - stan błędu
 - `useMockData` - przełącznik źródła danych (API vs Mock)
+- `dataLoadedRef` - referencja śledząca, które dane zostały już załadowane
+- `transponderFilters` - filtry dla transponderów (status, wyszukiwanie, strona)
+- `violationFilters` - filtry dla naruszeń (status, wyszukiwanie, strona)
+- `reportFilters` - filtry dla raportów (grupowanie, zakres czasowy)
+- `routeFilters` - filtry dla optymalizacji tras (początek, cel)
 
 #### Integracja z API:
-- Komponent korzysta z `vehiclesService` lub `mockVehiclesService` w zależności od stanu przełącznika `useMockData`
+- Komponent korzysta z `roadTollsService` lub `mockRoadTollsService` w zależności od stanu przełącznika `useMockData`
 - Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
-- API udostępnia metody: `getVehicles()`, `getVehicleDetails()`, `getFleetKPIs()`, `getVehicleLocations()`, `getFleetStatistics()`
+- API udostępnia metody: `getRoadTollsDashboard()`, `getTransponders()`, `getTransponderDetails()`, `getViolations()`, `getViolationDetails()`, `getExpenseReports()`, `getTollOperators()`, `getRouteOptimization()`
 
 #### Obsługa błędów:
 - Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów
+- Osobna obsługa błędów dla różnych typów danych
 - Logowanie błędów do konsoli
+- Mechanizm debounce dla filtrów wyszukiwania, aby zapobiec zbyt częstym wywołaniom API
+
+#### Optymalizacja wydajności:
+- Wykorzystanie `useRef` do śledzenia załadowanych danych bez wywoływania ponownego renderowania
+- Implementacja `useCallback` dla funkcji ładujących dane
+- Mechanizm debounce dla filtrów wyszukiwania
+- Ładowanie danych tylko wtedy, gdy nie zostały jeszcze załadowane
+- Zapobieganie równoległym wywołaniom API podczas ładowania danych
 
 #### Responsywność:
 - Układ dostosowuje się do różnych rozmiarów ekranu
@@ -340,544 +372,80 @@ Podstrona Overview zapewnia kompleksowy widok całej floty pojazdów z kluczowym
 - Tabele i wykresy dostosowują się do dostępnej przestrzeni
 - Specjalne widoki dla urządzeń mobilnych
 
-#### Eksport danych:
-- Możliwość eksportu listy pojazdów do pliku CSV
-- Możliwość eksportu listy pojazdów do pliku PDF
-- Możliwość eksportu szczegółów pojazdu do pliku PDF
+### Route Optimization (Optymalizacja Tras)
 
-#### Wydajność:
-- Paginacja listy pojazdów dla szybszego ładowania
-- Lazy loading dla szczegółów pojazdu
-- Optymalizacja renderowania komponentów
+Sekcja Route Optimization, będąca częścią komponentu Road Tolls, umożliwia zaawansowaną optymalizację tras pod kątem minimalizacji kosztów opłat drogowych, czasu przejazdu i zużycia paliwa. Komponent ten pozwala na porównanie różnych wariantów tras i wybór najbardziej optymalnego rozwiązania.
 
-#### Bezpieczeństwo:
-- Walidacja danych wejściowych
-- Sanityzacja danych wyjściowych
-- Obsługa błędów API
+#### Obecna funkcjonalność:
+- Wyszukiwanie tras między punktem początkowym a docelowym
+- Porównanie standardowych tras z alternatywnymi
+- Wyświetlanie potencjalnych oszczędności na opłatach drogowych
+- Podstawowa wizualizacja tras na mapie
 
-#### Integracja z innymi modułami:
-- Powiązanie z modułem Maintenance (Konserwacja)
-- Powiązanie z modułem Drivers (Kierowcy)
-- Powiązanie z modułem Fleet Management (Zarządzanie Flotą)
+#### Planowane rozszerzenia funkcjonalności:
 
-### Maintenance (Konserwacja)
+##### Faza 1 (krótkoterminowa)
+1. **Zaawansowana wizualizacja**
+   - Interaktywna mapa z możliwością modyfikacji trasy
+   - Wizualizacja punktów poboru opłat z informacją o stawkach
+   - Kolorowanie odcinków trasy według kosztów opłat (heat map)
 
-Podstrona Maintenance (Konserwacja) umożliwia zarządzanie konserwacją predykcyjną pojazdów, monitorowanie stanu technicznego, planowanie przeglądów i napraw oraz analizę kosztów utrzymania floty.
+2. **Optymalizacja wielokryterialna**
+   - Minimalizacja kosztów opłat drogowych
+   - Minimalizacja zużycia paliwa
+   - Minimalizacja czasu przejazdu
+   - Minimalizacja emisji CO2
+
+3. **Integracja z modułem transponderów**
+   - Automatyczne przypisywanie transponderów do zaplanowanych tras
+   - Monitorowanie stanu konta transponderów przed planowanymi przejazdami
+   - Alerty o konieczności doładowania transponderów
+
+##### Faza 2 (średnioterminowa)
+1. **Zaawansowana analityka i raportowanie**
+   - Szczegółowe raporty oszczędności dzięki optymalizacji tras
+   - Analiza porównawcza planowanych vs. rzeczywistych kosztów opłat
+   - Identyfikacja kierowców/pojazdów generujących najwyższe koszty opłat
+
+2. **Predykcja ruchu i kosztów**
+   - Analiza historycznych danych o ruchu drogowym
+   - Predykcja natężenia ruchu w różnych porach dnia/tygodnia
+   - Uwzględnianie sezonowych zmian opłat drogowych
+
+3. **Optymalizacja dla floty pojazdów**
+   - Planowanie tras dla wielu pojazdów jednocześnie
+   - Optymalizacja przydziału pojazdów do tras
+   - Koordynacja przejazdów w celu minimalizacji łącznych kosztów opłat
+
+##### Faza 3 (długoterminowa)
+1. **Integracja z systemami nawigacyjnymi**
+   - Eksport zoptymalizowanych tras do systemów nawigacyjnych
+   - Integracja z popularnymi aplikacjami nawigacyjnymi
+   - Aktualizacja trasy w czasie rzeczywistym
+
+2. **Automatyzacja i inteligentne rekomendacje**
+   - Automatyczne sugerowanie alternatywnych tras przy planowaniu przejazdów
+   - Powiadomienia o zmianach w opłatach drogowych na często używanych trasach
+   - Rekomendacje dotyczące zakupu abonamentów/voucherów na opłaty drogowe
+
+3. **Pełna integracja z modułem zarządzania kosztami**
+   - Automatyczne księgowanie kosztów opłat drogowych
+   - Przypisywanie kosztów do odpowiednich centrów kosztowych
+   - Analiza rentowności tras z uwzględnieniem wszystkich kosztów
 
 #### Funkcje i metody:
-- `fetchMaintenanceData()` - pobiera dane alertów, stanu technicznego pojazdów, historii konserwacji, harmonogramu i analizy kosztów
-- `handleAlertClick()` - obsługuje kliknięcie wiersza alertu i pobiera szczegóły
-- `handleStatusUpdate()` - obsługuje aktualizację statusu alertu konserwacji
-- `handleFilterChange()` - obsługuje zmianę filtrów alertów (priorytet, pojazd, komponent, status)
-- `handleSearch()` - obsługuje wyszukiwanie alertów
-- `handlePageChange()` - obsługuje zmianę strony w paginacji alertów
-- `handleTabChange()` - obsługuje przełączanie między zakładkami tematycznymi
-- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+- `loadRouteOptimization()` - pobiera dane optymalizacji tras z porównaniem kosztów
+- `handleRouteSearch()` - obsługuje wyszukiwanie tras do optymalizacji
+- `handleRouteFilterChange()` - obsługuje zmianę filtrów tras
+- `calculateSavings()` - oblicza potencjalne oszczędności między różnymi wariantami tras
+- `visualizeRoute()` - wizualizuje trasę na mapie z zaznaczeniem punktów poboru opłat
 
 #### Komponenty:
-- **Zakładki tematyczne** - umożliwiają przełączanie między różnymi aspektami konserwacji pojazdów
-- **Alerty konserwacji** - przewidywanie potencjalnych awarii z priorytetyzacją i szczegółami
-- **Stan techniczny pojazdów** - wskaźniki zdrowia komponentów z wizualizacją stanu technicznego
-- **Historia konserwacji** - rejestr wykonanych prac serwisowych i napraw
-- **Harmonogram konserwacji** - planowane przeglądy i naprawy z priorytetyzacją
-- **Analiza kosztów** - koszty konserwacji z podziałem na kategorie i trendy miesięczne
-
-#### Stany (hooks):
-- `alerts` - dane alertów konserwacji
-- `selectedAlert` - wybrany alert do szczegółowego widoku
-- `vehicleHealth` - dane stanu technicznego pojazdów
-- `maintenanceHistory` - historia konserwacji
-- `maintenanceSchedule` - harmonogram konserwacji
-- `costAnalysis` - analiza kosztów konserwacji
-- `filters` - filtry dla alertów (priorytet, pojazd, komponent, status, strona)
-- `activeTab` - aktywna zakładka tematyczna
-- `isLoading` - stan ładowania danych
-- `isDetailLoading` - stan ładowania szczegółów
-- `error` - stan błędu
-- `useMockData` - przełącznik źródła danych (API vs Mock)
+- **Formularz wyszukiwania tras** - umożliwia wprowadzenie punktu początkowego i docelowego
+- **Mapa tras** - wizualizuje różne warianty tras na mapie
+- **Tabela porównawcza** - porównuje koszty, czas i dystans dla różnych wariantów tras
+- **Szczegóły trasy** - prezentuje szczegółowe informacje o wybranej trasie, w tym punkty poboru opłat
 
 #### Integracja z API:
-- Komponent korzysta z `predictiveMaintenanceService` lub `mockPredictiveMaintenanceService` w zależności od stanu przełącznika `useMockData`
-- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
-- API udostępnia metody: `getAlerts()`, `getAlertDetails()`, `updateAlertStatus()`, `getVehicleHealth()`, `getMaintenanceHistory()`, `getMaintenanceSchedule()`, `getCostAnalysis()`
-
-#### Obsługa błędów:
-- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów
-- Logowanie błędów do konsoli
-
-#### Responsywność:
-- Układ dostosowuje się do różnych rozmiarów ekranu
-- Zastosowano media queries dla różnych breakpointów
-- Tabele i wykresy dostosowują się do dostępnej przestrzeni
-- Specjalne widoki dla urządzeń mobilnych
-
-#### Eksport danych:
-- Możliwość eksportu alertów konserwacji do pliku CSV
-- Możliwość eksportu historii konserwacji do pliku PDF
-- Możliwość eksportu harmonogramu konserwacji do pliku PDF
-- Możliwość eksportu analizy kosztów do pliku PDF
-
-#### Wydajność:
-- Paginacja alertów dla szybszego ładowania
-- Lazy loading dla szczegółów alertu
-- Optymalizacja renderowania komponentów
-
-#### Bezpieczeństwo:
-- Walidacja danych wejściowych
-- Sanityzacja danych wyjściowych
-- Obsługa błędów API
-
-#### Integracja z innymi modułami:
-- Powiązanie z modułem Vehicles Overview (Przegląd Pojazdów)
-- Powiązanie z modułem Parts (Części)
-- Powiązanie z modułem Fleet Management (Zarządzanie Flotą)PDF()` - eksportuje dane pojazdów do pliku PDF
-
-#### Komponenty:
-- **Dashboard KPI** - wyświetla kluczowe wskaźniki floty:
-  - Liczba pojazdów aktywnych
-  - Liczba pojazdów w serwisie
-  - Średni wiek floty
-  - Średni przebieg
-  - Wskaźnik wykorzystania pojazdów
-  - Wskaźnik zgodności z harmonogramem przeglądów
-  - Każdy wskaźnik zawiera trend procentowy w porównaniu do poprzedniego okresu
-
-- **Mapa floty** - interaktywna mapa pokazująca lokalizacje wszystkich pojazdów:
-  - Kolorowe oznaczenia statusu pojazdów (aktywny, w serwisie, nieaktywny)
-  - Tooltip z podstawowymi informacjami po najechaniu na punkt
-  - Możliwość wyboru pojazdu bezpośrednio z mapy
-  - Legenda statusów pojazdów
-
-- **Lista pojazdów** - tabela z zaawansowanym filtrowaniem i sortowaniem:
-  - ID/numer rejestracyjny pojazdu
-  - Marka i model
-  - Rok produkcji
-  - Przebieg
-  - Status (aktywny, w serwisie, nieaktywny)
-  - Stan techniczny (wskaźnik procentowy)
-  - Przypisany kierowca
-  - Data ostatniego przeglądu
-  - Data następnego przeglądu
-  - Filtrowanie według statusu
-  - Wyszukiwanie według ID, marki, modelu
-  - Sortowanie według dowolnej kolumny
-  - Paginacja z wyborem liczby wyników na stronę
-
-- **Szczegóły pojazdu** - panel z zakładkami wyświetlający szczegółowe informacje o wybranym pojeździe:
-  - **Dane techniczne** - pełne dane techniczne pojazdu (marka, model, rok, VIN, numer rejestracyjny, typ nadwozia, rodzaj paliwa, pojemność silnika, moc, skrzynia biegów, napęd, masa, ładowność)
-  - **Historia przeglądów** - lista wszystkich przeglądów i napraw z datami, opisami, kosztami i wykonawcami
-  - **Historia kierowców** - lista kierowców przypisanych do pojazdu w przeszłości z datami rozpoczęcia i zakończenia, przebiegiem i liczbą incydentów
-  - **Zużycie paliwa** - wykres i tabela zużycia paliwa w czasie, z kosztami i przebiegiem
-  - **Przebieg** - wykres przebiegu w czasie z miesięcznymi przyrostami
-  - **Dokumenty** - lista dokumentów pojazdu (dowód rejestracyjny, ubezpieczenie, przegląd techniczny) z datami ważności i linkami do plików
-
-- **Statystyki floty** - wykresy i trendy:
-  - Struktura floty według marek/modeli
-  - Struktura wiekowa pojazdów
-  - Trendy zużycia paliwa w czasie
-  - Trendy kosztów utrzymania w czasie
-
-#### Stany (hooks):
-- `vehicles` - dane pojazdów (lista, paginacja, filtry)
-- `selectedVehicle` - wybrany pojazd do wyświetlenia szczegółów
-- `kpiData` - dane KPI floty
-- `mapData` - dane lokalizacji pojazdów dla mapy
-- `fleetStats` - statystyki floty (struktura, trendy)
-- `activeTab` - aktywna zakładka w widoku szczegółów pojazdu
-- `isLoading` - stan ładowania głównych danych
-- `isDetailLoading` - stan ładowania szczegółów pojazdu
-- `error` - stan błędu
-- `useMockData` - przełącznik źródła danych (API vs Mock)
-- `filters` - filtry dla listy pojazdów (status, wyszukiwanie, sortowanie, paginacja)
-
-#### Integracja z API:
-- Komponent korzysta z `vehiclesService` lub `mockVehiclesService` w zależności od stanu przełącznika `useMockData`
-- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
-- API udostępnia metody:
-  - `getVehicles()` - pobiera listę pojazdów z filtrowaniem, sortowaniem i paginacją
-  - `getVehicleDetails()` - pobiera szczegółowe dane pojazdu
-  - `getFleetKPIs()` - pobiera kluczowe wskaźniki floty
-  - `getVehicleLocations()` - pobiera dane lokalizacji pojazdów dla mapy
-  - `getFleetStatistics()` - pobiera statystyki floty
-
-#### Obsługa błędów:
-- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów pojazdu
-- Logowanie błędów do konsoli
-- Automatyczne ponowienie próby pobierania danych w przypadku błędu
-
-#### Responsywność:
-- Układ dostosowuje się do różnych rozmiarów ekranu
-- Zastosowano media queries dla różnych breakpointów
-- Tabele i wykresy dostosowują się do dostępnej przestrzeni
-- Specjalne widoki dla urządzeń mobilnych
-- Mapa floty zmienia rozmiar w zależności od dostępnej przestrzeni
-- Karty KPI układają się w stos na mniejszych ekranach
-
-#### Eksport danych:
-- Eksport listy pojazdów do pliku CSV
-- Eksport listy pojazdów do pliku PDF (planowana funkcjonalność)
-- Eksport szczegółów pojazdu do pliku PDF (planowana funkcjonalność)
-
-#### Wydajność:
-- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
-- Paginacja danych zmniejsza obciążenie przeglądarki
-- Lazy loading komponentów szczegółów pojazdu
-- Opóźnione ładowanie danych mapy i statystyk
-
-#### Bezpieczeństwo:
-- Walidacja danych wejściowych
-- Sanityzacja danych przed wyświetleniem
-- Obsługa błędów API
-- Zabezpieczenie przed atakami XSS
-
-#### Integracja z innymi modułami:
-- Połączenie z modułem Maintenance (Konserwacja) dla danych o przeglądach
-- Połączenie z modułem Drivers (Kierowcy) dla danych o przypisanych kierowcach
-- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach i wydajnościor` - stan błędu
-- `useMockData` - przełącznik źródła danych (API vs Mock)
-
-#### Integracja z API:
-- Komponent korzysta z `vehiclesService` lub `mockVehiclesService` w zależności od stanu przełącznika `useMockData`
-- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
-- API udostępnia metody: `getVehicles()`, `getVehicleDetails()`, `getFleetKPIs()`, `getVehicleLocations()`, `getFleetStatistics()`
-
-#### Obsługa błędów:
-- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów
-- Logowanie błędów do konsoli
-
-#### Responsywność:
-- Układ dostosowuje się do różnych rozmiarów ekranu
-- Zastosowano media queries dla różnych breakpointów
-- Tabele i wykresy dostosowują się do dostępnej przestrzeni
-- Specjalne widoki dla urządzeń mobilnych
-
-## Serwisy danych
-
-### dashboardService
-Serwis do pobierania danych dla komponentu Dashboard z rzeczywistego API.
-
-### mockDashboardService
-Serwis dostarczający dane testowe dla komponentu Dashboard, gdy backend nie jest dostępny.
-
-### monitoringService
-Serwis do pobierania danych dla komponentu Monitoring z rzeczywistego API.
-
-### mockMonitoringService
-Serwis dostarczający dane testowe dla komponentu Monitoring, gdy backend nie jest dostępny. Zawiera:
-- Dane pojazdów z informacjami o statusie, lokalizacji, kierowcy, zużyciu paliwa i wydajności
-- Dane alertów różnych typów i priorytetów
-- Dane zużycia paliwa z historią i statystykami
-- Dane KPI z kluczowymi wskaźnikami floty
-- Dane trendów dla różnych metryk
-
-### driverSafetyService
-Serwis do pobierania danych dla komponentu Bezpieczeństwo Kierowcy z rzeczywistego API.
-
-### mockDriverSafetyService
-Serwis dostarczający dane testowe dla komponentu Bezpieczeństwo Kierowcy, gdy backend nie jest dostępny. Zawiera:
-- Dane alertów bezpieczeństwa różnych typów (zmęczenie, rozproszenie uwagi, styl jazdy, kolizje)
-- Szczegóły alertów z osią czasu zdarzeń i rekomendacjami
-- Dane rankingu kierowców z oceną bezpieczeństwa
-- Dane analizy stylu jazdy z wykresem radarowym i rekomendacjami
-- Dane monitorowania zmęczenia kierowcy z symptomami i porami dnia
-- Dane wykrywania rozproszenia uwagi z typami rozproszenia
-- Dane sesji coachingowych z tematami i statusami
-- Dane telematyki wideo z nagraniami incydentów i statystykami
-
-### vehiclesService
-Serwis do pobierania danych dla komponentu Pojazdy z rzeczywistego API.
-
-### mockVehiclesService
-Serwis dostarczający dane testowe dla komponentu Pojazdy, gdy backend nie jest dostępny. Zawiera:
-- Dane pojazdów z informacjami o statusie, modelu, roku produkcji, przebiegu, stanie technicznym
-- Szczegóły pojazdów z pełnymi danymi technicznymi, historią przeglądów, przypisanymi kierowcami
-- Dane KPI floty z kluczowymi wskaźnikami (liczba pojazdów, średni wiek, przebieg, wykorzystanie)
-- Dane lokalizacji pojazdów dla mapy z kolorowym oznaczeniem statusu
-- Dane statystyk floty z wykresami struktury, wieku, zużycia paliwa, kosztów utrzymania
-
-## Uruchomienie aplikacji
-
-### Z użyciem Docker Compose
-```bash
-docker-compose up
-```
-
-### Ręczne uruchomienie
-1. Uruchom bazę danych PostgreSQL
-2. Zainicjalizuj bazę danych skryptem `db/init.sql`
-3. Uruchom backend:
-   ```bash
-   cd backend
-   npm install
-   npm start
-   ```
-4. Uruchom frontend:
-   ```bash
-   cd react-app
-   npm install
-   npm start
-   ```
-
-## Tryb testowy
-Aplikacja domyślnie działa w trybie testowym, korzystając z danych mockowych. Można przełączać się między danymi z API a danymi mockowymi za pomocą przełącznika w górnej części każdej sekcji.
-
-### partsService
-Serwis do pobierania danych dla komponentu Parts (Części) z rzeczywistego API.
-
-### mockPartsService
-Serwis dostarczający dane testowe dla komponentu Parts (Części), gdy backend nie jest dostępny. Zawiera:
-- Dane inwentarza części z informacjami o ID, nazwie, numerze katalogowym, kompatybilnych modelach, ilości, cenie
-- Dane zamówień części z informacjami o ID, dacie, dostawcy, statusie, pozycjach
-- Dane analizy zużycia części z wykresami najczęściej wymienianych części, kosztów według kategorii, trendów
-- Dane kompatybilności części z informacjami o modelach pojazdów, alternatywnych częściach
-- Dane dostawców z informacjami o ID, nazwie, osobie kontaktowej, ocenie, historii współpracy
-
-
-### Maintenance (Konserwacja)
-
-Podstrona Maintenance (Konserwacja) umożliwia zarządzanie harmonogramem przeglądów, napraw i serwisów pojazdów. Pozwala na przewidywanie potencjalnych awarii, monitorowanie stanu technicznego pojazdów oraz planowanie prac konserwacyjnych.
-
-#### Funkcje i metody:
-- `fetchMaintenanceData()` - pobiera dane alertów konserwacji, stanu technicznego, historii konserwacji i harmonogramu
-- `handleFilterChange()` - obsługuje zmianę filtrów danych (priorytet, status, komponent, pojazd)
-- `handleSearch()` - obsługuje wyszukiwanie danych
-- `handlePageChange()` - obsługuje zmianę strony w paginacji
-- `handleAlertClick()` - obsługuje wybór alertu konserwacji i wyświetla jego szczegóły
-- `handleVehicleSelect()` - obsługuje wybór pojazdu i wyświetla jego stan techniczny
-- `handleExportData()` - obsługuje eksport danych do CSV/PDF
-- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
-
-#### Komponenty:
-- **Alerty konserwacji** - tabela z alertami o potencjalnych awariach z priorytetami i rekomendacjami
-- **Stan techniczny pojazdów** - wskaźniki zdrowia komponentów pojazdów z wykresami i wartościami procentowymi
-- **Historia konserwacji** - rejestr wykonanych prac konserwacyjnych z datami, kosztami i wykonawcami
-- **Harmonogram konserwacji** - planowane przeglądy i naprawy z terminami i statusami
-- **Analiza kosztów** - koszty konserwacji z podziałem na kategorie (części, robocizna, materiały eksploatacyjne)
-
-#### Stany (hooks):
-- `maintenanceAlerts` - dane alertów konserwacji
-- `selectedAlert` - wybrany alert do szczegółowego widoku
-- `vehicleHealth` - dane stanu technicznego pojazdów
-- `maintenanceHistory` - historia konserwacji
-- `maintenanceSchedule` - harmonogram konserwacji
-- `costAnalysis` - dane analizy kosztów
-- `filters` - filtry dla danych (priorytet, status, komponent, pojazd, strona)
-- `activeTab` - aktywna zakładka tematyczna
-- `isLoading` - stan ładowania
-- `isDetailLoading` - stan ładowania szczegółów
-- `error` - stan błędu
-- `useMockData` - przełącznik źródła danych (API vs Mock)
-
-#### Integracja z API:
-- Komponent korzysta z `predictiveMaintenanceService` lub `mockPredictiveMaintenanceService` w zależności od stanu przełącznika `useMockData`
-- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
-- API udostępnia metody: `getMaintenanceAlerts()`, `getAlertDetails()`, `getVehicleHealth()`, `getMaintenanceHistory()`, `getMaintenanceSchedule()`, `getCostAnalysis()`
-
-#### Obsługa błędów:
-- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów
-- Logowanie błędów do konsoli
-- Automatyczne ponowienie próby pobierania danych w przypadku błędu
-
-#### Responsywność:
-- Układ dostosowuje się do różnych rozmiarów ekranu
-- Zastosowano media queries dla różnych breakpointów
-- Tabele i wykresy dostosowują się do dostępnej przestrzeni
-- Specjalne widoki dla urządzeń mobilnych
-
-#### Eksport danych:
-- Eksport alertów konserwacji do pliku CSV
-- Eksport historii konserwacji do pliku CSV
-- Eksport harmonogramu konserwacji do pliku CSV
-- Eksport analizy kosztów do pliku PDF
-
-#### Wydajność:
-- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
-- Paginacja danych zmniejsza obciążenie przeglądarki
-- Lazy loading komponentów szczegółów
-- Opóźnione ładowanie danych wykresów i statystyk
-
-#### Bezpieczeństwo:
-- Walidacja danych wejściowych
-- Sanityzacja danych przed wyświetleniem
-- Obsługa błędów API
-- Zabezpieczenie przed atakami XSS
-
-#### Integracja z innymi modułami:
-- Połączenie z modułem Vehicles (Pojazdy) dla danych o pojazdach
-- Połączenie z modułem Parts (Części) dla danych o częściach zamiennych
-- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach
-
-### Parts (Części)
-
-Podstrona Parts (Części) umożliwia zarządzanie inwentarzem części zamiennych i ich wykorzystaniem. Pozwala na śledzenie stanu magazynowego, zarządzanie zamówieniami, analizę zużycia części oraz sprawdzanie kompatybilności z różnymi modelami pojazdów.
-
-#### Funkcje i metody:
-- `fetchPartsData()` - pobiera dane inwentarza części, zamówień, analizy zużycia, kompatybilności i dostawców
-- `handleTabChange()` - obsługuje zmianę zakładki tematycznej
-- `handleFilterChange()` - obsługuje zmianę filtrów danych (kategoria, dostawca, status, kompatybilność)
-- `handleSearch()` - obsługuje wyszukiwanie danych
-- `handlePageChange()` - obsługuje zmianę strony w paginacji
-- `handlePartSelect()` - obsługuje wybór części z listy i wyświetla jej szczegóły
-- `handleOrderSelect()` - obsługuje wybór zamówienia i wyświetla jego szczegóły
-- `handleSupplierSelect()` - obsługuje wybór dostawcy i wyświetla jego szczegóły
-- `handleExportData()` - obsługuje eksport danych do CSV/PDF
-- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
-
-#### Komponenty:
-- **Inwentarz części** - tabela z częściami zamiennymi, ich ilością, ceną, statusem i kompatybilnością
-- **Zarządzanie zamówieniami** - system śledzenia zamówień części z historią i automatycznymi powiadomieniami
-- **Wykorzystanie części** - analiza zużycia części z wykresami najczęściej wymienianych części i kosztów
-- **Kompatybilność części** - wyszukiwarka kompatybilnych części z filtrowaniem według modelu pojazdu
-- **Zarządzanie dostawcami** - baza dostawców części z danymi kontaktowymi i historią współpracy
-
-#### Stany (hooks):
-- `parts` - dane inwentarza części
-- `selectedPart` - wybrana część do szczegółowego widoku
-- `orders` - dane zamówień części
-- `selectedOrder` - wybrane zamówienie do szczegółowego widoku
-- `usageAnalytics` - dane analizy zużycia części
-- `compatibility` - dane kompatybilności części
-- `suppliers` - dane dostawców
-- `selectedSupplier` - wybrany dostawca do szczegółowego widoku
-- `filters` - filtry dla danych (kategoria, dostawca, status, kompatybilność, strona)
-- `activeTab` - aktywna zakładka tematyczna
-- `isLoading` - stan ładowania
-- `isDetailLoading` - stan ładowania szczegółów
-- `error` - stan błędu
-- `useMockData` - przełącznik źródła danych (API vs Mock)
-
-#### Integracja z API:
-- Komponent korzysta z `partsService` lub `mockPartsService` w zależności od stanu przełącznika `useMockData`
-- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
-- API udostępnia metody: `getParts()`, `getPartDetails()`, `getOrders()`, `getOrderDetails()`, `getUsageAnalytics()`, `getCompatibility()`, `getSuppliers()`, `getSupplierDetails()`
-
-#### Obsługa błędów:
-- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów
-- Logowanie błędów do konsoli
-- Automatyczne ponowienie próby pobierania danych w przypadku błędu
-
-#### Responsywność:
-- Układ dostosowuje się do różnych rozmiarów ekranu
-- Zastosowano media queries dla różnych breakpointów
-- Tabele i wykresy dostosowują się do dostępnej przestrzeni
-- Specjalne widoki dla urządzeń mobilnych
-
-#### Eksport danych:
-- Eksport inwentarza części do pliku CSV
-- Eksport zamówień do pliku CSV
-- Eksport analizy zużycia do pliku PDF
-- Eksport listy dostawców do pliku CSV
-
-#### Wydajność:
-- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
-- Paginacja danych zmniejsza obciążenie przeglądarki
-- Lazy loading komponentów szczegółów
-- Opóźnione ładowanie danych wykresów i statystyk
-
-#### Bezpieczeństwo:
-- Walidacja danych wejściowych
-- Sanityzacja danych przed wyświetleniem
-- Obsługa błędów API
-- Zabezpieczenie przed atakami XSS
-
-#### Integracja z innymi modułami:
-- Połączenie z modułem Vehicles (Pojazdy) dla danych o kompatybilności
-- Połączenie z modułem Maintenance (Konserwacja) dla danych o zużyciu części
-- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach
-
-### Tires (Opony)
-
-Podstrona Tires (Opony) umożliwia kompleksowe zarządzanie oponami floty pojazdów. Pozwala na śledzenie stanu opon, planowanie rotacji, zarządzanie wymianą sezonową oraz analizę wydajności i kosztów.
-
-#### Funkcje i metody:
-- `fetchTiresData()` - pobiera dane inwentarza opon, stanu opon, harmonogramu rotacji, wymiany sezonowej i analityki
-- `handleTabChange()` - obsługuje zmianę zakładki tematycznej
-- `handleFilterChange()` - obsługuje zmianę filtrów danych (marka, typ, status, pojazd)
-- `handleSearch()` - obsługuje wyszukiwanie danych
-- `handlePageChange()` - obsługuje zmianę strony w paginacji
-- `handleTireSelect()` - obsługuje wybór opony z listy i wyświetla jej szczegóły
-- `handleVehicleSelect()` - obsługuje wybór pojazdu i wyświetla stan jego opon
-- `handleRotationSelect()` - obsługuje wybór harmonogramu rotacji i wyświetla jego szczegóły
-- `handleSeasonalChangeSelect()` - obsługuje wybór wymiany sezonowej i wyświetla jej szczegóły
-- `handleExportData()` - obsługuje eksport danych do CSV/PDF
-- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
-
-#### Komponenty:
-- **Inwentarz opon** - tabela z oponami, ich marką, modelem, rozmiarem, typem, głębokością bieżnika, statusem
-- **Monitorowanie stanu opon** - wskaźniki stanu opon z pomiarami głębokości bieżnika, ciśnienia, wzoru zużycia
-- **Harmonogram rotacji** - planowanie i śledzenie rotacji opon z datami, przebiegami i wzorcami rotacji
-- **Zarządzanie wymianą sezonową** - planowanie i śledzenie wymiany opon sezonowych z lokalizacją przechowywania
-- **Analityka opon** - analiza wydajności opon różnych marek, kosztów, wpływu na zużycie paliwa i rekomendacje
-
-#### Stany (hooks):
-- `tires` - dane inwentarza opon
-- `selectedTire` - wybrana opona do szczegółowego widoku
-- `tireConditions` - dane stanu opon
-- `rotationSchedules` - dane harmonogramu rotacji
-- `selectedRotation` - wybrany harmonogram rotacji do szczegółowego widoku
-- `seasonalChanges` - dane wymiany sezonowej
-- `selectedSeasonalChange` - wybrana wymiana sezonowa do szczegółowego widoku
-- `tireAnalytics` - dane analityki opon
-- `filters` - filtry dla danych (marka, typ, status, pojazd, strona)
-- `activeTab` - aktywna zakładka tematyczna
-- `isLoading` - stan ładowania
-- `isDetailLoading` - stan ładowania szczegółów
-- `error` - stan błędu
-- `useMockData` - przełącznik źródła danych (API vs Mock)
-
-#### Integracja z API:
-- Komponent korzysta z `tiresService` lub `mockTiresService` w zależności od stanu przełącznika `useMockData`
-- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
-- API udostępnia metody: `getTires()`, `getTireDetails()`, `getTireConditions()`, `getRotationSchedules()`, `getRotationDetails()`, `getSeasonalChanges()`, `getSeasonalChangeDetails()`, `getTireAnalytics()`
-
-#### Obsługa błędów:
-- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów
-- Logowanie błędów do konsoli
-- Automatyczne ponowienie próby pobierania danych w przypadku błędu
-
-#### Responsywność:
-- Układ dostosowuje się do różnych rozmiarów ekranu
-- Zastosowano media queries dla różnych breakpointów
-- Tabele i wykresy dostosowują się do dostępnej przestrzeni
-- Specjalne widoki dla urządzeń mobilnych
-
-#### Eksport danych:
-- Eksport inwentarza opon do pliku CSV
-- Eksport stanu opon do pliku CSV
-- Eksport harmonogramu rotacji do pliku CSV
-- Eksport wymiany sezonowej do pliku CSV
-- Eksport analityki opon do pliku PDF
-
-#### Wydajność:
-- Zastosowano React hooks (useCallback, useMemo) do optymalizacji renderowania
-- Paginacja danych zmniejsza obciążenie przeglądarki
-- Lazy loading komponentów szczegółów
-- Opóźnione ładowanie danych wykresów i statystyk
-
-#### Bezpieczeństwo:
-- Walidacja danych wejściowych
-- Sanityzacja danych przed wyświetleniem
-- Obsługa błędów API
-- Zabezpieczenie przed atakami XSS
-
-#### Integracja z innymi modułami:
-- Połączenie z modułem Vehicles (Pojazdy) dla danych o pojazdach
-- Połączenie z modułem Maintenance (Konserwacja) dla danych o przeglądach
-- Połączenie z modułem Fleet Management (Zarządzanie Flotą) dla danych o kosztach
-
-### tiresService
-Serwis do pobierania danych dla komponentu Tires (Opony) z rzeczywistego API.
-
-### mockTiresService
-Serwis dostarczający dane testowe dla komponentu Tires (Opony), gdy backend nie jest dostępny. Zawiera:
-- Dane inwentarza opon z informacjami o ID, marce, modelu, rozmiarze, typie, głębokości bieżnika, dacie produkcji, przebiegu, statusie
-- Dane stanu opon z informacjami o głębokości bieżnika, ciśnieniu, wzorze zużycia, stanie, rekomendowanych działaniach
-- Dane harmonogramu rotacji z informacjami o dacie ostatniej rotacji, dacie następnej rotacji, statusie, przebiegu od ostatniej rotacji, historii
-- Dane wymiany sezonowej z informacjami o aktualnym typie opon, dacie ostatniej wymiany, dacie następnej wymiany, statusie, lokalizacji przechowywania, historii
-- Dane analityki opon z informacjami o żywotności według marki, analizie kosztów, wpływie na zużycie paliwa, rekomendacjach
+- Komponent korzysta z `roadTollsService.getRouteOptimization()` lub `mockRoadTollsService.getRouteOptimization()`
+- API zwraca dane o różnych wariantach tras, ich kosztach, czasie przejazdu i dystansie
