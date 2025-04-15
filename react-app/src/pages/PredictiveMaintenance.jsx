@@ -4,6 +4,7 @@ import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
 import predictiveMaintenanceService from '../services/api/predictiveMaintenanceService';
+import mockPredictiveMaintenanceService from '../services/api/mockPredictiveMaintenanceService';
 
 /**
  * @typedef {Object} MaintenanceAlert
@@ -462,6 +463,9 @@ const PredictiveMaintenance = () => {
   // Stan dla aktywnej zakładki
   const [activeTab, setActiveTab] = useState('alerts');
   
+  // Stan dla przełącznika danych (API vs Mock)
+  const [useMockData, setUseMockData] = useState(false);
+  
   // Stany ładowania i błędów
   const [isLoading, setIsLoading] = useState(true);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
@@ -474,8 +478,11 @@ const PredictiveMaintenance = () => {
       setError(null);
       
       try {
+        // Wybór serwisu danych w zależności od stanu przełącznika
+        const service = useMockData ? mockPredictiveMaintenanceService : predictiveMaintenanceService;
+        
         // Pobieranie alertów konserwacji
-        const alertsResponse = await predictiveMaintenanceService.getAlerts(
+        const alertsResponse = await service.getAlerts(
           filters.priority !== 'all' ? filters.priority : undefined,
           filters.vehicle || undefined,
           filters.component || undefined,
@@ -486,23 +493,23 @@ const PredictiveMaintenance = () => {
         setAlerts(alertsResponse);
         
         // Pobieranie stanu technicznego pojazdów
-        const healthResponse = await predictiveMaintenanceService.getVehicleHealth();
+        const healthResponse = await service.getVehicleHealth();
         setVehicleHealth(healthResponse);
         
         // Pobieranie historii konserwacji
-        const historyResponse = await predictiveMaintenanceService.getMaintenanceHistory(
+        const historyResponse = await service.getMaintenanceHistory(
           undefined, undefined, undefined, undefined, 1, 5
         );
         setMaintenanceHistory(historyResponse);
         
         // Pobieranie harmonogramu konserwacji
-        const scheduleResponse = await predictiveMaintenanceService.getMaintenanceSchedule(
+        const scheduleResponse = await service.getMaintenanceSchedule(
           undefined, undefined, undefined, undefined, 1, 5
         );
         setMaintenanceSchedule(scheduleResponse);
         
         // Pobieranie analizy kosztów
-        const costResponse = await predictiveMaintenanceService.getCostAnalysis();
+        const costResponse = await service.getCostAnalysis();
         setCostAnalysis(costResponse);
       } catch (err) {
         console.error('Error fetching maintenance data:', err);
@@ -513,7 +520,7 @@ const PredictiveMaintenance = () => {
     };
     
     fetchMaintenanceData();
-  }, [filters.priority, filters.status, filters.page, filters.limit]);
+  }, [filters.priority, filters.status, filters.page, filters.limit, useMockData]);
   
   // Obsługa zmiany filtrów
   const handleFilterChange = (e) => {
@@ -547,7 +554,9 @@ const PredictiveMaintenance = () => {
     setIsDetailLoading(true);
     
     try {
-      const alertDetails = await predictiveMaintenanceService.getAlertDetails(alert.id);
+      // Wybór serwisu danych w zależności od stanu przełącznika
+      const service = useMockData ? mockPredictiveMaintenanceService : predictiveMaintenanceService;
+      const alertDetails = await service.getAlertDetails(alert.id);
       setSelectedAlert(alertDetails);
     } catch (err) {
       console.error('Error fetching alert details:', err);
@@ -560,10 +569,12 @@ const PredictiveMaintenance = () => {
   // Obsługa aktualizacji statusu alertu
   const handleStatusUpdate = async (id, newStatus) => {
     try {
-      await predictiveMaintenanceService.updateAlertStatus(id, newStatus);
+      // Wybór serwisu danych w zależności od stanu przełącznika
+      const service = useMockData ? mockPredictiveMaintenanceService : predictiveMaintenanceService;
+      await service.updateAlertStatus(id, newStatus);
       
       // Odświeżenie listy alertów
-      const alertsResponse = await predictiveMaintenanceService.getAlerts(
+      const alertsResponse = await service.getAlerts(
         filters.priority !== 'all' ? filters.priority : undefined,
         filters.vehicle || undefined,
         filters.component || undefined,
@@ -587,6 +598,11 @@ const PredictiveMaintenance = () => {
     }
   };
   
+  // Obsługa przełączania źródła danych
+  const handleToggleDataSource = () => {
+    setUseMockData(prev => !prev);
+  };
+
   // Renderowanie sekcji filtrów
   const renderFilters = () => {
     return (
@@ -1063,32 +1079,56 @@ const PredictiveMaintenance = () => {
     <PageContainer>
       <SectionTitle>KONSERWACJA PREDYKCYJNA</SectionTitle>
       
-      <TabsContainer>
-        <Tab 
-          active={activeTab === 'alerts'} 
-          onClick={() => setActiveTab('alerts')}
-        >
-          Alerty konserwacji
-        </Tab>
-        <Tab 
-          active={activeTab === 'health'} 
-          onClick={() => setActiveTab('health')}
-        >
-          Stan techniczny
-        </Tab>
-        <Tab 
-          active={activeTab === 'history'} 
-          onClick={() => setActiveTab('history')}
-        >
-          Historia i harmonogram
-        </Tab>
-        <Tab 
-          active={activeTab === 'costs'} 
-          onClick={() => setActiveTab('costs')}
-        >
-          Analiza kosztów
-        </Tab>
-      </TabsContainer>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <TabsContainer>
+          <Tab 
+            active={activeTab === 'alerts'} 
+            onClick={() => setActiveTab('alerts')}
+          >
+            Alerty konserwacji
+          </Tab>
+          <Tab 
+            active={activeTab === 'health'} 
+            onClick={() => setActiveTab('health')}
+          >
+            Stan techniczny
+          </Tab>
+          <Tab 
+            active={activeTab === 'history'} 
+            onClick={() => setActiveTab('history')}
+          >
+            Historia i harmonogram
+          </Tab>
+          <Tab 
+            active={activeTab === 'costs'} 
+            onClick={() => setActiveTab('costs')}
+          >
+            Analiza kosztów
+          </Tab>
+        </TabsContainer>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '14px', color: '#666' }}>Źródło danych:</span>
+          <Button 
+            onClick={handleToggleDataSource}
+            style={{ 
+              backgroundColor: !useMockData ? '#3f51b5' : 'white',
+              color: !useMockData ? 'white' : '#3f51b5'
+            }}
+          >
+            API
+          </Button>
+          <Button 
+            onClick={handleToggleDataSource}
+            style={{ 
+              backgroundColor: useMockData ? '#3f51b5' : 'white',
+              color: useMockData ? 'white' : '#3f51b5'
+            }}
+          >
+            Mock
+          </Button>
+        </div>
+      </div>
       
       {activeTab === 'alerts' && (
         <>

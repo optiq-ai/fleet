@@ -306,6 +306,134 @@ Podstrona Overview zapewnia kompleksowy widok całej floty pojazdów z kluczowym
 - `handleExportPDF()` - eksportuje dane pojazdów do pliku PDF
 
 #### Komponenty:
+- **Dashboard KPI** - wyświetla kluczowe wskaźniki floty (liczba pojazdów, średni wiek, średni przebieg, pojazdy w serwisie, pojazdy nieaktywne, pojazdy wymagające uwagi)
+- **Mapa floty** - wizualizuje lokalizacje pojazdów na mapie z kolorowym oznaczeniem statusu
+- **Lista pojazdów** - tabela z wszystkimi pojazdami, ich statusem, danymi technicznymi i podstawowymi statystykami
+- **Szczegóły pojazdu** - prezentuje szczegółowe informacje o wybranym pojeździe z zakładkami (dane techniczne, historia przeglądów, historia kierowców, zużycie paliwa, przebieg, dokumenty)
+- **Statystyki floty** - wykresy i trendy dotyczące struktury floty, wieku pojazdów, zużycia paliwa i kosztów utrzymania
+
+#### Stany (hooks):
+- `vehicles` - dane pojazdów
+- `selectedVehicle` - wybrany pojazd
+- `kpiData` - dane KPI floty
+- `vehicleLocations` - lokalizacje pojazdów
+- `fleetStats` - statystyki floty
+- `filters` - filtry dla listy pojazdów (status, wyszukiwanie, sortowanie, strona)
+- `activeTab` - aktywna zakładka w widoku szczegółów pojazdu
+- `isLoading` - stan ładowania danych
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `vehiclesService` lub `mockVehiclesService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getVehicles()`, `getVehicleDetails()`, `getFleetKPIs()`, `getVehicleLocations()`, `getFleetStatistics()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
+#### Eksport danych:
+- Możliwość eksportu listy pojazdów do pliku CSV
+- Możliwość eksportu listy pojazdów do pliku PDF
+- Możliwość eksportu szczegółów pojazdu do pliku PDF
+
+#### Wydajność:
+- Paginacja listy pojazdów dla szybszego ładowania
+- Lazy loading dla szczegółów pojazdu
+- Optymalizacja renderowania komponentów
+
+#### Bezpieczeństwo:
+- Walidacja danych wejściowych
+- Sanityzacja danych wyjściowych
+- Obsługa błędów API
+
+#### Integracja z innymi modułami:
+- Powiązanie z modułem Maintenance (Konserwacja)
+- Powiązanie z modułem Drivers (Kierowcy)
+- Powiązanie z modułem Fleet Management (Zarządzanie Flotą)
+
+### Maintenance (Konserwacja)
+
+Podstrona Maintenance (Konserwacja) umożliwia zarządzanie konserwacją predykcyjną pojazdów, monitorowanie stanu technicznego, planowanie przeglądów i napraw oraz analizę kosztów utrzymania floty.
+
+#### Funkcje i metody:
+- `fetchMaintenanceData()` - pobiera dane alertów, stanu technicznego pojazdów, historii konserwacji, harmonogramu i analizy kosztów
+- `handleAlertClick()` - obsługuje kliknięcie wiersza alertu i pobiera szczegóły
+- `handleStatusUpdate()` - obsługuje aktualizację statusu alertu konserwacji
+- `handleFilterChange()` - obsługuje zmianę filtrów alertów (priorytet, pojazd, komponent, status)
+- `handleSearch()` - obsługuje wyszukiwanie alertów
+- `handlePageChange()` - obsługuje zmianę strony w paginacji alertów
+- `handleTabChange()` - obsługuje przełączanie między zakładkami tematycznymi
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Zakładki tematyczne** - umożliwiają przełączanie między różnymi aspektami konserwacji pojazdów
+- **Alerty konserwacji** - przewidywanie potencjalnych awarii z priorytetyzacją i szczegółami
+- **Stan techniczny pojazdów** - wskaźniki zdrowia komponentów z wizualizacją stanu technicznego
+- **Historia konserwacji** - rejestr wykonanych prac serwisowych i napraw
+- **Harmonogram konserwacji** - planowane przeglądy i naprawy z priorytetyzacją
+- **Analiza kosztów** - koszty konserwacji z podziałem na kategorie i trendy miesięczne
+
+#### Stany (hooks):
+- `alerts` - dane alertów konserwacji
+- `selectedAlert` - wybrany alert do szczegółowego widoku
+- `vehicleHealth` - dane stanu technicznego pojazdów
+- `maintenanceHistory` - historia konserwacji
+- `maintenanceSchedule` - harmonogram konserwacji
+- `costAnalysis` - analiza kosztów konserwacji
+- `filters` - filtry dla alertów (priorytet, pojazd, komponent, status, strona)
+- `activeTab` - aktywna zakładka tematyczna
+- `isLoading` - stan ładowania danych
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `predictiveMaintenanceService` lub `mockPredictiveMaintenanceService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getAlerts()`, `getAlertDetails()`, `updateAlertStatus()`, `getVehicleHealth()`, `getMaintenanceHistory()`, `getMaintenanceSchedule()`, `getCostAnalysis()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
+#### Eksport danych:
+- Możliwość eksportu alertów konserwacji do pliku CSV
+- Możliwość eksportu historii konserwacji do pliku PDF
+- Możliwość eksportu harmonogramu konserwacji do pliku PDF
+- Możliwość eksportu analizy kosztów do pliku PDF
+
+#### Wydajność:
+- Paginacja alertów dla szybszego ładowania
+- Lazy loading dla szczegółów alertu
+- Optymalizacja renderowania komponentów
+
+#### Bezpieczeństwo:
+- Walidacja danych wejściowych
+- Sanityzacja danych wyjściowych
+- Obsługa błędów API
+
+#### Integracja z innymi modułami:
+- Powiązanie z modułem Vehicles Overview (Przegląd Pojazdów)
+- Powiązanie z modułem Parts (Części)
+- Powiązanie z modułem Fleet Management (Zarządzanie Flotą)PDF()` - eksportuje dane pojazdów do pliku PDF
+
+#### Komponenty:
 - **Dashboard KPI** - wyświetla kluczowe wskaźniki floty:
   - Liczba pojazdów aktywnych
   - Liczba pojazdów w serwisie
