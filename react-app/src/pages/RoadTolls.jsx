@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
@@ -28,8 +28,8 @@ const RoadTolls = () => {
   const [error, setError] = useState(null);
   const [useMockData, setUseMockData] = useState(true);
   
-  // State to track which data has been loaded
-  const [dataLoaded, setDataLoaded] = useState({
+  // Use refs to track loaded data state to avoid re-renders
+  const dataLoadedRef = useRef({
     dashboard: false,
     transponders: false,
     violations: false,
@@ -65,24 +65,27 @@ const RoadTolls = () => {
 
   // Service selection based on mock data toggle
   const service = useMockData ? mockRoadTollsService : roadTollsService;
+  
+  // Refs for search debounce timers
+  const searchTimerRef = useRef(null);
 
   // Load dashboard data
   const loadDashboardData = useCallback(async () => {
-    if (isLoading || dataLoaded.dashboard) return;
+    if (isLoading || dataLoadedRef.current.dashboard) return;
     
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getRoadTollsDashboard();
       setDashboardData(data);
-      setDataLoaded(prev => ({ ...prev, dashboard: true }));
+      dataLoadedRef.current.dashboard = true;
     } catch (err) {
       console.error('Error loading dashboard data:', err);
       setError('Failed to load dashboard data. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  }, [service, isLoading, dataLoaded.dashboard]);
+  }, [service, isLoading]);
 
   // Load transponders data
   const loadTransponders = useCallback(async (filters = transponderFilters) => {
@@ -93,7 +96,7 @@ const RoadTolls = () => {
     try {
       const data = await service.getTransponders(filters);
       setTransponders(data);
-      setDataLoaded(prev => ({ ...prev, transponders: true }));
+      dataLoadedRef.current.transponders = true;
     } catch (err) {
       console.error('Error loading transponders data:', err);
       setError('Failed to load transponders data. Please try again later.');
@@ -128,7 +131,7 @@ const RoadTolls = () => {
     try {
       const data = await service.getViolations(filters);
       setViolations(data);
-      setDataLoaded(prev => ({ ...prev, violations: true }));
+      dataLoadedRef.current.violations = true;
     } catch (err) {
       console.error('Error loading violations data:', err);
       setError('Failed to load violations data. Please try again later.');
@@ -163,7 +166,7 @@ const RoadTolls = () => {
     try {
       const data = await service.getExpenseReports(filters);
       setExpenseReports(data);
-      setDataLoaded(prev => ({ ...prev, reports: true }));
+      dataLoadedRef.current.reports = true;
     } catch (err) {
       console.error('Error loading expense reports:', err);
       setError('Failed to load expense reports. Please try again later.');
@@ -174,21 +177,21 @@ const RoadTolls = () => {
 
   // Load toll operators
   const loadTollOperators = useCallback(async () => {
-    if (isLoading || dataLoaded.operators) return;
+    if (isLoading || dataLoadedRef.current.operators) return;
     
     setIsLoading(true);
     setError(null);
     try {
       const data = await service.getTollOperators();
       setTollOperators(data);
-      setDataLoaded(prev => ({ ...prev, operators: true }));
+      dataLoadedRef.current.operators = true;
     } catch (err) {
       console.error('Error loading toll operators:', err);
       setError('Failed to load toll operators. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  }, [service, isLoading, dataLoaded.operators]);
+  }, [service, isLoading]);
 
   // Load route optimization
   const loadRouteOptimization = useCallback(async (filters = routeFilters) => {
@@ -199,7 +202,7 @@ const RoadTolls = () => {
     try {
       const data = await service.getRouteOptimization(filters);
       setRouteOptimization(data);
-      setDataLoaded(prev => ({ ...prev, optimization: true }));
+      dataLoadedRef.current.optimization = true;
     } catch (err) {
       console.error('Error loading route optimization:', err);
       setError('Failed to load route optimization. Please try again later.');
@@ -210,6 +213,8 @@ const RoadTolls = () => {
 
   // Handle tab change
   const handleTabChange = useCallback((tab) => {
+    if (tab === activeTab) return; // Prevent unnecessary re-renders
+    
     setActiveTab(tab);
     setSelectedTransponder(null);
     setSelectedViolation(null);
@@ -217,28 +222,28 @@ const RoadTolls = () => {
     // Load data based on selected tab only if not already loaded
     switch (tab) {
       case 'dashboard':
-        if (!dataLoaded.dashboard) loadDashboardData();
+        if (!dataLoadedRef.current.dashboard) loadDashboardData();
         break;
       case 'transponders':
-        if (!dataLoaded.transponders) loadTransponders();
+        if (!dataLoadedRef.current.transponders) loadTransponders();
         break;
       case 'violations':
-        if (!dataLoaded.violations) loadViolations();
+        if (!dataLoadedRef.current.violations) loadViolations();
         break;
       case 'reports':
-        if (!dataLoaded.reports) loadExpenseReports();
+        if (!dataLoadedRef.current.reports) loadExpenseReports();
         break;
       case 'operators':
-        if (!dataLoaded.operators) loadTollOperators();
+        if (!dataLoadedRef.current.operators) loadTollOperators();
         break;
       case 'optimization':
-        if (!dataLoaded.optimization) loadRouteOptimization();
+        if (!dataLoadedRef.current.optimization) loadRouteOptimization();
         break;
       default:
         break;
     }
   }, [
-    dataLoaded, 
+    activeTab,
     loadDashboardData, 
     loadTransponders, 
     loadViolations, 
@@ -257,10 +262,13 @@ const RoadTolls = () => {
     
     // Debounce filter changes to prevent excessive API calls
     if (name === 'search') {
-      const timer = setTimeout(() => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+      searchTimerRef.current = setTimeout(() => {
         loadTransponders(newFilters);
+        searchTimerRef.current = null;
       }, 300);
-      return () => clearTimeout(timer);
     } else {
       loadTransponders(newFilters);
     }
@@ -276,10 +284,13 @@ const RoadTolls = () => {
     
     // Debounce filter changes to prevent excessive API calls
     if (name === 'search') {
-      const timer = setTimeout(() => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+      searchTimerRef.current = setTimeout(() => {
         loadViolations(newFilters);
+        searchTimerRef.current = null;
       }, 300);
-      return () => clearTimeout(timer);
     } else {
       loadViolations(newFilters);
     }
@@ -339,25 +350,50 @@ const RoadTolls = () => {
     }
   };
 
-  // Initial data load
+  // Initial data load - only once on component mount
   useEffect(() => {
     loadDashboardData();
-  }, [loadDashboardData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reset data loaded state when mock data toggle changes
   useEffect(() => {
-    setDataLoaded({
+    // Reset data loaded state
+    dataLoadedRef.current = {
       dashboard: false,
       transponders: false,
       violations: false,
       reports: false,
       operators: false,
       optimization: false
-    });
+    };
     
     // Load data for current tab after reset
-    handleTabChange(activeTab);
-  }, [useMockData, handleTabChange, activeTab]);
+    const currentTab = activeTab;
+    switch (currentTab) {
+      case 'dashboard':
+        loadDashboardData();
+        break;
+      case 'transponders':
+        loadTransponders();
+        break;
+      case 'violations':
+        loadViolations();
+        break;
+      case 'reports':
+        loadExpenseReports();
+        break;
+      case 'operators':
+        loadTollOperators();
+        break;
+      case 'optimization':
+        loadRouteOptimization();
+        break;
+      default:
+        break;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useMockData]);
 
   // Toggle between real and mock data
   const handleToggleDataSource = () => {
