@@ -239,12 +239,14 @@ const ErrorMessage = styled.div`
   margin-bottom: 20px;
 `;
 
+// eslint-disable-next-line no-unused-vars
 const CompatibilityList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
 `;
 
+// eslint-disable-next-line no-unused-vars
 const CompatibilityItem = styled.li`
   padding: 8px 0;
   border-bottom: 1px solid #e0e0e0;
@@ -607,56 +609,50 @@ const VehicleParts = () => {
         <Table 
           columns={columns} 
           data={parts.data} 
-          pagination={{
-            page: parts.page,
-            limit: parts.limit,
-            total: parts.total,
-            onPageChange: (newPage) => setFilters({...filters, page: newPage})
-          }}
+          pagination={parts.pagination}
           onRowClick={handlePartSelect}
+          onPageChange={(page) => setFilters({ ...filters, page })}
         />
         
         {selectedPart && (
           <DetailContainer>
-            <DetailTitle>Szczegóły części</DetailTitle>
+            <DetailTitle>Szczegóły części: {selectedPart.name}</DetailTitle>
+            
             <DetailRow>
               <DetailLabel>ID:</DetailLabel>
               <DetailValue>{selectedPart.id}</DetailValue>
             </DetailRow>
-            <DetailRow>
-              <DetailLabel>Nazwa:</DetailLabel>
-              <DetailValue>{selectedPart.name}</DetailValue>
-            </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Numer katalogowy:</DetailLabel>
               <DetailValue>{selectedPart.catalogNumber}</DetailValue>
             </DetailRow>
-            <DetailRow>
-              <DetailLabel>Kategoria:</DetailLabel>
-              <DetailValue>{selectedPart.category}</DetailValue>
-            </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Kompatybilne modele:</DetailLabel>
-              <DetailValue>
-                {selectedPart.compatibleModels.join(', ')}
-              </DetailValue>
+              <DetailValue>{selectedPart.compatibleModels.join(', ')}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Ilość w magazynie:</DetailLabel>
               <DetailValue>{selectedPart.quantity}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
-              <DetailLabel>Minimalny poziom:</DetailLabel>
+              <DetailLabel>Minimalny poziom zapasów:</DetailLabel>
               <DetailValue>{selectedPart.minLevel}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Cena jednostkowa:</DetailLabel>
               <DetailValue>{selectedPart.price.toFixed(2)} zł</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Dostawca:</DetailLabel>
               <DetailValue>{selectedPart.supplier}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Status:</DetailLabel>
               <DetailValue>
@@ -669,18 +665,89 @@ const VehicleParts = () => {
                 </Badge>
               </DetailValue>
             </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Kategoria:</DetailLabel>
+              <DetailValue>{selectedPart.category}</DetailValue>
+            </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Lokalizacja w magazynie:</DetailLabel>
               <DetailValue>{selectedPart.location}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Data ostatniego zamówienia:</DetailLabel>
               <DetailValue>{selectedPart.lastOrderDate}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Opis:</DetailLabel>
               <DetailValue>{selectedPart.description}</DetailValue>
             </DetailRow>
+            
+            {selectedPart.technicalSpecs && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Specyfikacja techniczna</DetailTitle>
+                
+                <DetailRow>
+                  <DetailLabel>Wymiary:</DetailLabel>
+                  <DetailValue>{selectedPart.technicalSpecs.dimensions}</DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Waga:</DetailLabel>
+                  <DetailValue>{selectedPart.technicalSpecs.weight}</DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Materiał:</DetailLabel>
+                  <DetailValue>{selectedPart.technicalSpecs.material}</DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Producent:</DetailLabel>
+                  <DetailValue>{selectedPart.technicalSpecs.manufacturer}</DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Kraj pochodzenia:</DetailLabel>
+                  <DetailValue>{selectedPart.technicalSpecs.countryOfOrigin}</DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Gwarancja:</DetailLabel>
+                  <DetailValue>{selectedPart.technicalSpecs.warranty}</DetailValue>
+                </DetailRow>
+              </>
+            )}
+            
+            {selectedPart.installationInstructions && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Instrukcja montażu</DetailTitle>
+                <DetailRow>
+                  <DetailValue>{selectedPart.installationInstructions}</DetailValue>
+                </DetailRow>
+              </>
+            )}
+            
+            {selectedPart.replacementInterval && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Zalecany interwał wymiany</DetailTitle>
+                <DetailRow>
+                  <DetailValue>{selectedPart.replacementInterval}</DetailValue>
+                </DetailRow>
+              </>
+            )}
+            
+            {selectedPart.additionalNotes && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Dodatkowe informacje</DetailTitle>
+                <DetailRow>
+                  <DetailValue>{selectedPart.additionalNotes}</DetailValue>
+                </DetailRow>
+              </>
+            )}
           </DetailContainer>
         )}
       </>
@@ -705,8 +772,16 @@ const VehicleParts = () => {
       { id: 'id', label: 'ID zamówienia' },
       { id: 'date', label: 'Data zamówienia' },
       { id: 'supplier', label: 'Dostawca' },
-      { id: 'itemCount', label: 'Liczba pozycji' },
-      { id: 'totalCost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` },
+      { 
+        id: 'items', 
+        label: 'Liczba pozycji',
+        format: (items) => items.length
+      },
+      { 
+        id: 'totalCost', 
+        label: 'Koszt całkowity',
+        format: (value) => `${value.toFixed(2)} zł`
+      },
       { 
         id: 'status', 
         label: 'Status',
@@ -721,7 +796,7 @@ const VehicleParts = () => {
               break;
             case 'processing':
               label = 'W realizacji';
-              status = 'low';
+              status = 'ordered';
               break;
             case 'shipped':
               label = 'Wysłane';
@@ -747,106 +822,45 @@ const VehicleParts = () => {
     
     return (
       <>
-        <FilterContainer>
-          <FilterGroup>
-            <FilterLabel htmlFor="orderStatus">Status</FilterLabel>
-            <FilterSelect 
-              id="orderStatus" 
-              name="status" 
-              value={filters.status} 
-              onChange={handleFilterChange}
-            >
-              <option value="all">Wszystkie</option>
-              <option value="pending">Oczekujące</option>
-              <option value="processing">W realizacji</option>
-              <option value="shipped">Wysłane</option>
-              <option value="delivered">Dostarczone</option>
-              <option value="cancelled">Anulowane</option>
-            </FilterSelect>
-          </FilterGroup>
-          
-          <FilterGroup>
-            <FilterLabel htmlFor="orderSupplier">Dostawca</FilterLabel>
-            <FilterSelect 
-              id="orderSupplier" 
-              name="supplier" 
-              value={filters.supplier} 
-              onChange={handleFilterChange}
-            >
-              <option value="all">Wszyscy</option>
-              <option value="bosch">Bosch</option>
-              <option value="continental">Continental</option>
-              <option value="delphi">Delphi</option>
-              <option value="valeo">Valeo</option>
-              <option value="denso">Denso</option>
-              <option value="other">Inni</option>
-            </FilterSelect>
-          </FilterGroup>
-          
-          <FilterGroup>
-            <FilterLabel htmlFor="orderSearch">Wyszukaj</FilterLabel>
-            <FilterInput 
-              type="text" 
-              id="orderSearch" 
-              name="search" 
-              value={filters.search} 
-              onChange={handleFilterChange}
-              placeholder="ID zamówienia"
-            />
-          </FilterGroup>
-          
-          <FilterGroup style={{ alignSelf: 'flex-end' }}>
-            <Button primary onClick={handleSearch}>
-              Szukaj
-            </Button>
-          </FilterGroup>
-          
-          <ButtonGroup>
-            <Button onClick={handleExportCSV}>
-              Eksport CSV
-            </Button>
-            <Button onClick={handleExportPDF}>
-              Eksport PDF
-            </Button>
-            <Button onClick={handleToggleDataSource}>
-              {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
-            </Button>
-          </ButtonGroup>
-        </FilterContainer>
+        <ButtonGroup style={{ marginBottom: '20px' }}>
+          <Button onClick={handleExportCSV}>
+            Eksport CSV
+          </Button>
+          <Button onClick={handleExportPDF}>
+            Eksport PDF
+          </Button>
+          <Button onClick={handleToggleDataSource}>
+            {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
+          </Button>
+        </ButtonGroup>
         
         <Table 
           columns={columns} 
           data={orders.data} 
-          pagination={{
-            page: orders.page,
-            limit: orders.limit,
-            total: orders.total,
-            onPageChange: (newPage) => setFilters({...filters, page: newPage})
-          }}
+          pagination={orders.pagination}
           onRowClick={handleOrderSelect}
+          onPageChange={(page) => setFilters({ ...filters, page })}
         />
         
         {selectedOrder && (
           <DetailContainer>
-            <DetailTitle>Szczegóły zamówienia</DetailTitle>
-            <DetailRow>
-              <DetailLabel>ID zamówienia:</DetailLabel>
-              <DetailValue>{selectedOrder.id}</DetailValue>
-            </DetailRow>
+            <DetailTitle>Szczegóły zamówienia: {selectedOrder.id}</DetailTitle>
+            
             <DetailRow>
               <DetailLabel>Data zamówienia:</DetailLabel>
               <DetailValue>{selectedOrder.date}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Dostawca:</DetailLabel>
               <DetailValue>{selectedOrder.supplier}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Status:</DetailLabel>
               <DetailValue>
                 <Badge status={
-                  selectedOrder.status === 'pending' ? 'ordered' :
-                  selectedOrder.status === 'processing' ? 'low' :
+                  selectedOrder.status === 'pending' || selectedOrder.status === 'processing' ? 'ordered' :
                   selectedOrder.status === 'shipped' || selectedOrder.status === 'delivered' ? 'available' :
                   selectedOrder.status === 'cancelled' ? 'out_of_stock' : 'default'
                 }>
@@ -859,31 +873,136 @@ const VehicleParts = () => {
                 </Badge>
               </DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Koszt całkowity:</DetailLabel>
               <DetailValue>{selectedOrder.totalCost.toFixed(2)} zł</DetailValue>
             </DetailRow>
-            <DetailRow>
-              <DetailLabel>Przewidywana data dostawy:</DetailLabel>
-              <DetailValue>{selectedOrder.estimatedDelivery}</DetailValue>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Uwagi:</DetailLabel>
-              <DetailValue>{selectedOrder.notes || 'Brak'}</DetailValue>
-            </DetailRow>
             
-            <DetailTitle style={{ marginTop: '20px' }}>Pozycje zamówienia</DetailTitle>
+            {selectedOrder.estimatedDelivery && (
+              <DetailRow>
+                <DetailLabel>Szacowana data dostawy:</DetailLabel>
+                <DetailValue>{selectedOrder.estimatedDelivery}</DetailValue>
+              </DetailRow>
+            )}
+            
+            {selectedOrder.deliveryDate && (
+              <DetailRow>
+                <DetailLabel>Data dostawy:</DetailLabel>
+                <DetailValue>{selectedOrder.deliveryDate}</DetailValue>
+              </DetailRow>
+            )}
+            
+            {selectedOrder.trackingNumber && (
+              <DetailRow>
+                <DetailLabel>Numer przesyłki:</DetailLabel>
+                <DetailValue>{selectedOrder.trackingNumber}</DetailValue>
+              </DetailRow>
+            )}
+            
+            {selectedOrder.cancellationReason && (
+              <DetailRow>
+                <DetailLabel>Powód anulowania:</DetailLabel>
+                <DetailValue>{selectedOrder.cancellationReason}</DetailValue>
+              </DetailRow>
+            )}
+            
+            {selectedOrder.notes && (
+              <DetailRow>
+                <DetailLabel>Uwagi:</DetailLabel>
+                <DetailValue>{selectedOrder.notes}</DetailValue>
+              </DetailRow>
+            )}
+            
+            <DetailTitle style={{ marginTop: '16px' }}>Pozycje zamówienia</DetailTitle>
+            
             <Table 
               columns={[
                 { id: 'partId', label: 'ID części' },
-                { id: 'name', label: 'Nazwa części' },
+                { id: 'name', label: 'Nazwa' },
                 { id: 'quantity', label: 'Ilość' },
-                { id: 'unitPrice', label: 'Cena jedn.', format: (value) => `${value.toFixed(2)} zł` },
-                { id: 'totalPrice', label: 'Cena całkowita', format: (value) => `${value.toFixed(2)} zł` }
+                { id: 'price', label: 'Cena jedn.', format: (value) => `${value.toFixed(2)} zł` },
+                { 
+                  id: 'total', 
+                  label: 'Wartość',
+                  format: (_, item) => `${(item.quantity * item.price).toFixed(2)} zł`
+                }
               ]} 
               data={selectedOrder.items} 
               pagination={null}
             />
+            
+            {selectedOrder.contact && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Kontakt</DetailTitle>
+                
+                <DetailRow>
+                  <DetailLabel>Osoba kontaktowa:</DetailLabel>
+                  <DetailValue>{selectedOrder.contact.name}</DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Email:</DetailLabel>
+                  <DetailValue>{selectedOrder.contact.email}</DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Telefon:</DetailLabel>
+                  <DetailValue>{selectedOrder.contact.phone}</DetailValue>
+                </DetailRow>
+              </>
+            )}
+            
+            {selectedOrder.history && selectedOrder.history.length > 0 && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Historia zamówienia</DetailTitle>
+                
+                <Table 
+                  columns={[
+                    { id: 'date', label: 'Data' },
+                    { 
+                      id: 'status', 
+                      label: 'Status',
+                      format: (value) => {
+                        let label = '';
+                        let status = '';
+                        
+                        switch(value) {
+                          case 'created':
+                            label = 'Utworzone';
+                            status = 'default';
+                            break;
+                          case 'processing':
+                            label = 'W realizacji';
+                            status = 'ordered';
+                            break;
+                          case 'shipped':
+                            label = 'Wysłane';
+                            status = 'available';
+                            break;
+                          case 'delivered':
+                            label = 'Dostarczone';
+                            status = 'available';
+                            break;
+                          case 'cancelled':
+                            label = 'Anulowane';
+                            status = 'out_of_stock';
+                            break;
+                          default:
+                            label = value;
+                            status = 'default';
+                        }
+                        
+                        return <Badge status={status}>{label}</Badge>;
+                      }
+                    },
+                    { id: 'note', label: 'Notatka' }
+                  ]} 
+                  data={selectedOrder.history} 
+                  pagination={null}
+                />
+              </>
+            )}
           </DetailContainer>
         )}
       </>
@@ -924,7 +1043,7 @@ const VehicleParts = () => {
               columns={[
                 { id: 'name', label: 'Nazwa części' },
                 { id: 'count', label: 'Liczba wymian' },
-                { id: 'percentage', label: 'Procent wszystkich wymian', format: (value) => `${value}%` }
+                { id: 'cost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` }
               ]} 
               data={usageAnalysis.mostUsedParts} 
               pagination={null}
@@ -951,26 +1070,35 @@ const VehicleParts = () => {
         </GridSection>
         
         <GridSection>
-          <Card title="Trendy zużycia części">
+          <Card title="Trendy zużycia części w czasie">
             <ChartContainer>
               {/* Placeholder for chart - would be implemented with a charting library */}
               <div style={{ textAlign: 'center', paddingTop: '120px' }}>
                 Wykres trendów zużycia części w czasie
               </div>
             </ChartContainer>
+            <Table 
+              columns={[
+                { id: 'month', label: 'Miesiąc' },
+                { id: 'count', label: 'Liczba wymian' },
+                { id: 'cost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` }
+              ]} 
+              data={usageAnalysis.usageTrends} 
+              pagination={null}
+            />
           </Card>
           
           <Card title="Części według dostawców">
             <ChartContainer>
               {/* Placeholder for chart - would be implemented with a charting library */}
               <div style={{ textAlign: 'center', paddingTop: '120px' }}>
-                Wykres podziału części według dostawców
+                Wykres części według dostawców
               </div>
             </ChartContainer>
             <Table 
               columns={[
                 { id: 'supplier', label: 'Dostawca' },
-                { id: 'partCount', label: 'Liczba części' },
+                { id: 'count', label: 'Liczba części' },
                 { id: 'percentage', label: 'Procent całości', format: (value) => `${value}%` }
               ]} 
               data={usageAnalysis.partsBySupplier} 
@@ -982,20 +1110,28 @@ const VehicleParts = () => {
     );
   };
   
-  // Render compatibility search tab content
+  // Render compatibility tab content
   const renderCompatibilityTab = () => {
     return (
       <>
         <FilterContainer>
           <FilterGroup>
             <FilterLabel htmlFor="vehicleModel">Model pojazdu</FilterLabel>
-            <FilterInput 
-              type="text" 
+            <FilterSelect 
               id="vehicleModel" 
+              name="vehicleModel" 
               value={vehicleModel} 
               onChange={(e) => setVehicleModel(e.target.value)}
-              placeholder="Wprowadź model pojazdu"
-            />
+            >
+              <option value="">Wybierz model</option>
+              <option value="Mercedes Actros">Mercedes Actros</option>
+              <option value="Mercedes Arocs">Mercedes Arocs</option>
+              <option value="Mercedes Atego">Mercedes Atego</option>
+              <option value="Volvo FH">Volvo FH</option>
+              <option value="Volvo FM">Volvo FM</option>
+              <option value="Scania R">Scania R</option>
+              <option value="Scania S">Scania S</option>
+            </FilterSelect>
           </FilterGroup>
           
           <FilterGroup style={{ alignSelf: 'flex-end' }}>
@@ -1063,108 +1199,38 @@ const VehicleParts = () => {
                   }
                 }
               ]} 
-              data={compatibleParts.parts} 
+              data={compatibleParts.compatibleParts} 
               pagination={null}
               onRowClick={handlePartSelect}
             />
             
-            {compatibleParts.alternativeParts && compatibleParts.alternativeParts.length > 0 && (
-              <>
-                <SectionTitle style={{ marginTop: '20px' }}>Alternatywne części</SectionTitle>
+            {selectedPart && compatibleParts.alternativeParts && compatibleParts.alternativeParts[selectedPart.id] && (
+              <DetailContainer>
+                <DetailTitle>Alternatywne części dla: {selectedPart.name}</DetailTitle>
+                
                 <Table 
                   columns={[
                     { id: 'id', label: 'ID' },
                     { id: 'name', label: 'Nazwa' },
-                    { id: 'catalogNumber', label: 'Numer katalogowy' },
-                    { id: 'category', label: 'Kategoria' },
-                    { id: 'compatibility', label: 'Stopień kompatybilności', format: (value) => `${value}%` },
+                    { id: 'manufacturer', label: 'Producent' },
                     { id: 'price', label: 'Cena', format: (value) => `${value.toFixed(2)} zł` },
                     { 
-                      id: 'status', 
-                      label: 'Status',
+                      id: 'compatibilityRating', 
+                      label: 'Ocena kompatybilności',
                       format: (value) => {
-                        let label = '';
-                        let status = '';
-                        
-                        switch(value) {
-                          case 'available':
-                            label = 'Dostępna';
-                            status = 'available';
-                            break;
-                          case 'low':
-                            label = 'Niski stan';
-                            status = 'low';
-                            break;
-                          case 'ordered':
-                            label = 'Zamówiona';
-                            status = 'ordered';
-                            break;
-                          case 'out_of_stock':
-                            label = 'Brak w magazynie';
-                            status = 'out_of_stock';
-                            break;
-                          default:
-                            label = value;
-                            status = 'default';
-                        }
-                        
-                        return <Badge status={status}>{label}</Badge>;
+                        const stars = '★'.repeat(Math.floor(value)) + '☆'.repeat(5 - Math.floor(value));
+                        return <span style={{ color: '#f39c12' }}>{stars} ({value.toFixed(1)})</span>;
                       }
                     }
                   ]} 
-                  data={compatibleParts.alternativeParts} 
+                  data={compatibleParts.alternativeParts[selectedPart.id]} 
                   pagination={null}
-                  onRowClick={handlePartSelect}
                 />
-              </>
-            )}
-            
-            {selectedPart && (
-              <DetailContainer>
-                <DetailTitle>Szczegóły części</DetailTitle>
-                <DetailRow>
-                  <DetailLabel>ID:</DetailLabel>
-                  <DetailValue>{selectedPart.id}</DetailValue>
-                </DetailRow>
-                <DetailRow>
-                  <DetailLabel>Nazwa:</DetailLabel>
-                  <DetailValue>{selectedPart.name}</DetailValue>
-                </DetailRow>
-                <DetailRow>
-                  <DetailLabel>Numer katalogowy:</DetailLabel>
-                  <DetailValue>{selectedPart.catalogNumber}</DetailValue>
-                </DetailRow>
-                <DetailRow>
-                  <DetailLabel>Kategoria:</DetailLabel>
-                  <DetailValue>{selectedPart.category}</DetailValue>
-                </DetailRow>
-                <DetailRow>
-                  <DetailLabel>Kompatybilne modele:</DetailLabel>
-                  <DetailValue>
-                    {selectedPart.compatibleModels.join(', ')}
-                  </DetailValue>
-                </DetailRow>
-                <DetailRow>
-                  <DetailLabel>Specyfikacja techniczna:</DetailLabel>
-                  <DetailValue>{selectedPart.technicalSpecs || 'Brak danych'}</DetailValue>
-                </DetailRow>
-                <DetailRow>
-                  <DetailLabel>Instrukcja montażu:</DetailLabel>
-                  <DetailValue>
-                    {selectedPart.installationInstructions ? (
-                      <Button onClick={() => alert('Pobieranie instrukcji montażu...')}>
-                        Pobierz instrukcję
-                      </Button>
-                    ) : (
-                      'Brak instrukcji'
-                    )}
-                  </DetailValue>
-                </DetailRow>
               </DetailContainer>
             )}
           </>
         ) : (
-          <div>Wprowadź model pojazdu, aby wyszukać kompatybilne części.</div>
+          <div>Wybierz model pojazdu, aby wyświetlić kompatybilne części.</div>
         )}
       </>
     );
@@ -1190,185 +1256,218 @@ const VehicleParts = () => {
       { id: 'contactPerson', label: 'Osoba kontaktowa' },
       { id: 'email', label: 'Email' },
       { id: 'phone', label: 'Telefon' },
-      { id: 'categoryCount', label: 'Liczba kategorii' },
+      { 
+        id: 'categories', 
+        label: 'Kategorie',
+        format: (categories) => categories.join(', ')
+      },
       { 
         id: 'rating', 
         label: 'Ocena',
         format: (value) => {
           const stars = '★'.repeat(Math.floor(value)) + '☆'.repeat(5 - Math.floor(value));
-          return <span style={{ color: '#ff9800' }}>{stars} ({value.toFixed(1)})</span>;
+          return <span style={{ color: '#f39c12' }}>{stars} ({value.toFixed(1)})</span>;
         }
       }
     ];
     
     return (
       <>
-        <FilterContainer>
-          <FilterGroup>
-            <FilterLabel htmlFor="supplierSearch">Wyszukaj</FilterLabel>
-            <FilterInput 
-              type="text" 
-              id="supplierSearch" 
-              name="search" 
-              value={filters.search} 
-              onChange={handleFilterChange}
-              placeholder="Nazwa dostawcy"
-            />
-          </FilterGroup>
-          
-          <FilterGroup style={{ alignSelf: 'flex-end' }}>
-            <Button primary onClick={handleSearch}>
-              Szukaj
-            </Button>
-          </FilterGroup>
-          
-          <ButtonGroup>
-            <Button onClick={handleExportCSV}>
-              Eksport CSV
-            </Button>
-            <Button onClick={handleExportPDF}>
-              Eksport PDF
-            </Button>
-            <Button onClick={handleToggleDataSource}>
-              {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
-            </Button>
-          </ButtonGroup>
-        </FilterContainer>
+        <ButtonGroup style={{ marginBottom: '20px' }}>
+          <Button onClick={handleExportCSV}>
+            Eksport CSV
+          </Button>
+          <Button onClick={handleExportPDF}>
+            Eksport PDF
+          </Button>
+          <Button onClick={handleToggleDataSource}>
+            {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
+          </Button>
+        </ButtonGroup>
         
         <Table 
           columns={columns} 
           data={suppliers.data} 
-          pagination={{
-            page: suppliers.page,
-            limit: suppliers.limit,
-            total: suppliers.total,
-            onPageChange: (newPage) => setFilters({...filters, page: newPage})
-          }}
+          pagination={suppliers.pagination}
           onRowClick={handleSupplierSelect}
+          onPageChange={(page) => setFilters({ ...filters, page })}
         />
         
         {selectedSupplier && (
           <DetailContainer>
-            <DetailTitle>Szczegóły dostawcy</DetailTitle>
+            <DetailTitle>Szczegóły dostawcy: {selectedSupplier.name}</DetailTitle>
+            
             <DetailRow>
               <DetailLabel>ID:</DetailLabel>
               <DetailValue>{selectedSupplier.id}</DetailValue>
             </DetailRow>
-            <DetailRow>
-              <DetailLabel>Nazwa:</DetailLabel>
-              <DetailValue>{selectedSupplier.name}</DetailValue>
-            </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Osoba kontaktowa:</DetailLabel>
               <DetailValue>{selectedSupplier.contactPerson}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Email:</DetailLabel>
               <DetailValue>{selectedSupplier.email}</DetailValue>
             </DetailRow>
+            
             <DetailRow>
               <DetailLabel>Telefon:</DetailLabel>
               <DetailValue>{selectedSupplier.phone}</DetailValue>
             </DetailRow>
-            <DetailRow>
-              <DetailLabel>Adres:</DetailLabel>
-              <DetailValue>{selectedSupplier.address}</DetailValue>
-            </DetailRow>
+            
+            {selectedSupplier.address && (
+              <DetailRow>
+                <DetailLabel>Adres:</DetailLabel>
+                <DetailValue>{selectedSupplier.address}</DetailValue>
+              </DetailRow>
+            )}
+            
             <DetailRow>
               <DetailLabel>Kategorie części:</DetailLabel>
-              <DetailValue>
-                {selectedSupplier.categories.join(', ')}
-              </DetailValue>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Ocena:</DetailLabel>
-              <DetailValue>
-                <span style={{ color: '#ff9800' }}>
-                  {'★'.repeat(Math.floor(selectedSupplier.rating)) + '☆'.repeat(5 - Math.floor(selectedSupplier.rating))} ({selectedSupplier.rating.toFixed(1)})
-                </span>
-              </DetailValue>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Terminowość dostaw:</DetailLabel>
-              <DetailValue>
-                <span style={{ color: '#ff9800' }}>
-                  {'★'.repeat(Math.floor(selectedSupplier.performance.timeliness)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.timeliness))} ({selectedSupplier.performance.timeliness.toFixed(1)})
-                </span>
-              </DetailValue>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Jakość części:</DetailLabel>
-              <DetailValue>
-                <span style={{ color: '#ff9800' }}>
-                  {'★'.repeat(Math.floor(selectedSupplier.performance.quality)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.quality))} ({selectedSupplier.performance.quality.toFixed(1)})
-                </span>
-              </DetailValue>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Ceny:</DetailLabel>
-              <DetailValue>
-                <span style={{ color: '#ff9800' }}>
-                  {'★'.repeat(Math.floor(selectedSupplier.performance.pricing)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.pricing))} ({selectedSupplier.performance.pricing.toFixed(1)})
-                </span>
-              </DetailValue>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Uwagi:</DetailLabel>
-              <DetailValue>{selectedSupplier.notes || 'Brak'}</DetailValue>
+              <DetailValue>{selectedSupplier.categories.join(', ')}</DetailValue>
             </DetailRow>
             
-            <DetailTitle style={{ marginTop: '20px' }}>Historia współpracy</DetailTitle>
-            <Table 
-              columns={[
-                { id: 'date', label: 'Data' },
-                { id: 'orderId', label: 'ID zamówienia' },
-                { id: 'itemCount', label: 'Liczba pozycji' },
-                { id: 'totalCost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` },
-                { 
-                  id: 'status', 
-                  label: 'Status',
-                  format: (value) => {
-                    let label = '';
-                    let status = '';
-                    
-                    switch(value) {
-                      case 'pending':
-                        label = 'Oczekujące';
-                        status = 'ordered';
-                        break;
-                      case 'processing':
-                        label = 'W realizacji';
-                        status = 'low';
-                        break;
-                      case 'shipped':
-                        label = 'Wysłane';
-                        status = 'available';
-                        break;
-                      case 'delivered':
-                        label = 'Dostarczone';
-                        status = 'available';
-                        break;
-                      case 'cancelled':
-                        label = 'Anulowane';
-                        status = 'out_of_stock';
-                        break;
-                      default:
-                        label = value;
-                        status = 'default';
+            <DetailRow>
+              <DetailLabel>Ocena ogólna:</DetailLabel>
+              <DetailValue>
+                {(() => {
+                  const stars = '★'.repeat(Math.floor(selectedSupplier.rating)) + '☆'.repeat(5 - Math.floor(selectedSupplier.rating));
+                  return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.rating.toFixed(1)})</span>;
+                })()}
+              </DetailValue>
+            </DetailRow>
+            
+            {selectedSupplier.performance && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Ocena wydajności</DetailTitle>
+                
+                <DetailRow>
+                  <DetailLabel>Terminowość:</DetailLabel>
+                  <DetailValue>
+                    {(() => {
+                      const stars = '★'.repeat(Math.floor(selectedSupplier.performance.timeliness)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.timeliness));
+                      return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.performance.timeliness.toFixed(1)})</span>;
+                    })()}
+                  </DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Jakość:</DetailLabel>
+                  <DetailValue>
+                    {(() => {
+                      const stars = '★'.repeat(Math.floor(selectedSupplier.performance.quality)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.quality));
+                      return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.performance.quality.toFixed(1)})</span>;
+                    })()}
+                  </DetailValue>
+                </DetailRow>
+                
+                <DetailRow>
+                  <DetailLabel>Ceny:</DetailLabel>
+                  <DetailValue>
+                    {(() => {
+                      const stars = '★'.repeat(Math.floor(selectedSupplier.performance.pricing)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.pricing));
+                      return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.performance.pricing.toFixed(1)})</span>;
+                    })()}
+                  </DetailValue>
+                </DetailRow>
+              </>
+            )}
+            
+            {selectedSupplier.notes && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Notatki</DetailTitle>
+                <DetailRow>
+                  <DetailValue>{selectedSupplier.notes}</DetailValue>
+                </DetailRow>
+              </>
+            )}
+            
+            {selectedSupplier.orderHistory && selectedSupplier.orderHistory.length > 0 && (
+              <>
+                <DetailTitle style={{ marginTop: '16px' }}>Historia zamówień</DetailTitle>
+                
+                <Table 
+                  columns={[
+                    { id: 'date', label: 'Data' },
+                    { id: 'orderId', label: 'ID zamówienia' },
+                    { id: 'itemCount', label: 'Liczba pozycji' },
+                    { id: 'totalCost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` },
+                    { 
+                      id: 'status', 
+                      label: 'Status',
+                      format: (value) => {
+                        let label = '';
+                        let status = '';
+                        
+                        switch(value) {
+                          case 'pending':
+                            label = 'Oczekujące';
+                            status = 'ordered';
+                            break;
+                          case 'processing':
+                            label = 'W realizacji';
+                            status = 'ordered';
+                            break;
+                          case 'shipped':
+                            label = 'Wysłane';
+                            status = 'available';
+                            break;
+                          case 'delivered':
+                            label = 'Dostarczone';
+                            status = 'available';
+                            break;
+                          case 'cancelled':
+                            label = 'Anulowane';
+                            status = 'out_of_stock';
+                            break;
+                          default:
+                            label = value;
+                            status = 'default';
+                        }
+                        
+                        return <Badge status={status}>{label}</Badge>;
+                      }
                     }
-                    
-                    return <Badge status={status}>{label}</Badge>;
-                  }
-                }
-              ]} 
-              data={selectedSupplier.orderHistory} 
-              pagination={null}
-            />
+                  ]} 
+                  data={selectedSupplier.orderHistory} 
+                  pagination={null}
+                />
+              </>
+            )}
           </DetailContainer>
         )}
       </>
     );
   };
+  
+  // Render main content
+  const renderContent = () => {
+    switch(activeTab) {
+      case 'inventory':
+        return renderInventoryTab();
+      case 'orders':
+        return renderOrdersTab();
+      case 'usage':
+        return renderUsageTab();
+      case 'compatibility':
+        return renderCompatibilityTab();
+      case 'suppliers':
+        return renderSuppliersTab();
+      default:
+        return renderInventoryTab();
+    }
+  };
+  
+  // Debug output
+  console.log('Current tab:', activeTab);
+  console.log('Using mock data:', useMockData);
+  console.log('Parts data:', parts);
+  console.log('Orders data:', orders);
+  console.log('Usage data:', usageAnalysis);
+  console.log('Compatible parts data:', compatibleParts);
+  console.log('Suppliers data:', suppliers);
   
   return (
     <PageContainer>
@@ -1403,15 +1502,11 @@ const VehicleParts = () => {
           active={activeTab === 'suppliers'} 
           onClick={() => setActiveTab('suppliers')}
         >
-          Zarządzanie dostawcami
+          Dostawcy
         </Tab>
       </TabsContainer>
       
-      {activeTab === 'inventory' && renderInventoryTab()}
-      {activeTab === 'orders' && renderOrdersTab()}
-      {activeTab === 'usage' && renderUsageTab()}
-      {activeTab === 'compatibility' && renderCompatibilityTab()}
-      {activeTab === 'suppliers' && renderSuppliersTab()}
+      {renderContent()}
     </PageContainer>
   );
 };
