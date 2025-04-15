@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import FraudDetection from './pages/FraudDetection';
@@ -13,6 +13,7 @@ import FleetManagement from './pages/FleetManagement';
 import VehiclesOverview from './pages/VehiclesOverview';
 import VehicleParts from './pages/VehicleParts';
 import VehicleTires from './pages/VehicleTires';
+import FuelAnalysis from './pages/FuelAnalysis';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -84,6 +85,13 @@ function App() {
               <ViewCustomizationAdmin />
             </Layout>
           } />
+          <Route path="/fuel-analysis" element={
+            <Layout>
+              <FuelAnalysis />
+            </Layout>
+          } />
+          {/* Fallback route for any unmatched paths */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </ViewCustomizationProvider>
