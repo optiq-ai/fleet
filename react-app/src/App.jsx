@@ -15,6 +15,7 @@ import VehicleParts from './pages/VehicleParts';
 import VehicleTires from './pages/VehicleTires';
 import FuelAnalysis from './pages/FuelAnalysis';
 import RoadTolls from './pages/RoadTolls';
+import RouteOptimization from './pages/RouteOptimization';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -94,6 +95,11 @@ function App() {
           <Route path="/road-tolls" element={
             <Layout>
               <RoadTolls />
+            </Layout>
+          } />
+          <Route path="/route-optimization" element={
+            <Layout>
+              <RouteOptimization />
             </Layout>
           } />
           {/* Fallback route for any unmatched paths */}
