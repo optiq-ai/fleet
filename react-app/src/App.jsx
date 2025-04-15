@@ -14,6 +14,7 @@ import VehiclesOverview from './pages/VehiclesOverview';
 import VehicleParts from './pages/VehicleParts';
 import VehicleTires from './pages/VehicleTires';
 import FuelAnalysis from './pages/FuelAnalysis';
+import RoadTolls from './pages/RoadTolls';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -88,6 +89,11 @@ function App() {
           <Route path="/fuel-analysis" element={
             <Layout>
               <FuelAnalysis />
+            </Layout>
+          } />
+          <Route path="/road-tolls" element={
+            <Layout>
+              <RoadTolls />
             </Layout>
           } />
           {/* Fallback route for any unmatched paths */}
