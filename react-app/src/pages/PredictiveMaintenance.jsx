@@ -295,6 +295,7 @@ const GaugeValue = styled.div`
   color: #333;
 `;
 
+// eslint-disable-next-line no-unused-vars
 const GaugeLabel = styled.div`
   position: absolute;
   bottom: -5px;
@@ -468,6 +469,7 @@ const PredictiveMaintenance = () => {
   
   // Stany ładowania i błędów
   const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [error, setError] = useState(null);
   
@@ -520,7 +522,7 @@ const PredictiveMaintenance = () => {
     };
     
     fetchMaintenanceData();
-  }, [filters.priority, filters.status, filters.page, filters.limit, useMockData]);
+  }, [filters.priority, filters.status, filters.page, filters.limit, filters.component, filters.vehicle, useMockData]);
   
   // Obsługa zmiany filtrów
   const handleFilterChange = (e) => {
