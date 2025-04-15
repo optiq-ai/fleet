@@ -206,6 +206,31 @@ const FuelAnalysis = () => {
     return <ErrorMessage>{error}</ErrorMessage>;
   }
   
+  // Fallback rendering for debugging
+  if (!kpiData || !fuelConsumption || !fuelComparison || !anomalies || !costOptimization || !co2Emission) {
+    return (
+      <Container>
+        <Header>
+          <Title>Analiza Paliwa - Debugowanie</Title>
+        </Header>
+        <ErrorMessage>
+          <div style={{ textAlign: 'left', color: '#333' }}>
+            <h3>Stan komponentów:</h3>
+            <ul>
+              <li>KPI Data: {kpiData ? 'Załadowane' : 'Brak danych'}</li>
+              <li>Fuel Consumption: {fuelConsumption ? 'Załadowane' : 'Brak danych'}</li>
+              <li>Fuel Comparison: {fuelComparison ? 'Załadowane' : 'Brak danych'}</li>
+              <li>Anomalies: {anomalies ? 'Załadowane' : 'Brak danych'}</li>
+              <li>Cost Optimization: {costOptimization ? 'Załadowane' : 'Brak danych'}</li>
+              <li>CO2 Emission: {co2Emission ? 'Załadowane' : 'Brak danych'}</li>
+            </ul>
+            <p>Sprawdź konsolę przeglądarki, aby zobaczyć szczegółowe informacje o błędach.</p>
+          </div>
+        </ErrorMessage>
+      </Container>
+    );
+  }
+  
   // Render the component
   return (
     <Container>
