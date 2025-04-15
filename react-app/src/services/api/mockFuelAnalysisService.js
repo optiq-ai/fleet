@@ -9,7 +9,7 @@ class MockFuelAnalysisService {
    * Get fuel analysis KPIs
    * @returns {Promise<Object>} Fuel analysis KPI data
    */
-  async getFuelKPIs() {
+  async getKpiData() {
     // Simulate API delay
     await delay(600);
     
@@ -18,31 +18,23 @@ class MockFuelAnalysisService {
       totalFuelCost: 125780,
       potentialSavings: 12450,
       co2Emission: 28750,
-      averageFuelConsumptionTrend: -2.3,
-      totalFuelCostTrend: 5.7,
-      potentialSavingsTrend: 8.2,
-      co2EmissionTrend: -3.1
+      fuelConsumptionChange: -2.3,
+      fuelCostChange: 5.7,
+      savingsChange: 8.2,
+      co2EmissionChange: -3.1
     };
   }
   
   /**
    * Get fuel consumption data
-   * @param {string} [period='month'] - Period for data aggregation (day, week, month, year)
-   * @param {string} [vehicleId] - Optional vehicle ID filter
-   * @param {string} [driverId] - Optional driver ID filter
-   * @param {string} [startDate] - Optional start date filter
-   * @param {string} [endDate] - Optional end date filter
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} Fuel consumption data
    */
-  async getFuelConsumption(
-    period = 'month',
-    vehicleId,
-    driverId,
-    startDate,
-    endDate
-  ) {
+  async getFuelConsumptionData(filters) {
     // Simulate API delay
     await delay(800);
+    
+    const { period = 'month', vehicleId, driverId, startDate, endDate } = filters;
     
     // Generate consumption data based on period
     let data;
@@ -98,16 +90,14 @@ class MockFuelAnalysisService {
   
   /**
    * Get fuel consumption comparison data
-   * @param {string} [compareBy='vehicle'] - Comparison type (vehicle, driver, route)
-   * @param {string} [period='month'] - Period for data aggregation
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} Fuel consumption comparison data
    */
-  async getFuelConsumptionComparison(
-    compareBy = 'vehicle',
-    period = 'month'
-  ) {
+  async getFuelComparisonData(filters) {
     // Simulate API delay
     await delay(700);
+    
+    const { compareBy = 'vehicle', period = 'month' } = filters;
     
     let data;
     
@@ -127,26 +117,21 @@ class MockFuelAnalysisService {
     return {
       compareBy,
       period,
-      data
+      data,
+      total: data.length
     };
   }
   
   /**
    * Get fuel anomalies data
-   * @param {string} [period='month'] - Period for data aggregation
-   * @param {string} [severity='all'] - Severity filter (all, high, medium, low)
-   * @param {number} [page=1] - Page number
-   * @param {number} [limit=10] - Results per page
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} Fuel anomalies data
    */
-  async getFuelAnomalies(
-    period = 'month',
-    severity = 'all',
-    page = 1,
-    limit = 10
-  ) {
+  async getAnomaliesData(filters) {
     // Simulate API delay
     await delay(900);
+    
+    const { period = 'month', severity = 'all', page = 1, limit = 10 } = filters;
     
     // Generate anomalies data
     let anomalies = this.generateAnomalies();
@@ -175,7 +160,7 @@ class MockFuelAnalysisService {
    * Get cost optimization data
    * @returns {Promise<Object>} Cost optimization data
    */
-  async getCostOptimization() {
+  async getCostOptimizationData() {
     // Simulate API delay
     await delay(750);
     
@@ -190,12 +175,14 @@ class MockFuelAnalysisService {
   
   /**
    * Get CO2 emission data
-   * @param {string} [period='month'] - Period for data aggregation
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} CO2 emission data
    */
-  async getCO2Emission(period = 'month') {
+  async getCo2EmissionData(filters) {
     // Simulate API delay
     await delay(650);
+    
+    const { period = 'month' } = filters;
     
     let data;
     
@@ -224,13 +211,45 @@ class MockFuelAnalysisService {
         emissionPerKm: data.reduce((sum, item) => sum + item.emissionPerKm, 0) / data.length,
         emissionTrend: -3.2
       },
-      complianceStatus: {
-        currentStandard: 'Euro 6',
-        fleetCompliance: 87,
-        targetEmission: 25000,
-        currentEmission: 28750,
-        reductionNeeded: 3750
-      }
+      standards: [
+        {
+          standard: 'Euro 6',
+          limit: 80,
+          current: 92,
+          status: 'Non-compliant',
+          compliance: 87
+        },
+        {
+          standard: 'Euro 5',
+          limit: 100,
+          current: 92,
+          status: 'Compliant',
+          compliance: 108
+        },
+        {
+          standard: 'Corporate Goal 2025',
+          limit: 70,
+          current: 92,
+          status: 'Non-compliant',
+          compliance: 76
+        }
+      ],
+      reductionGoals: [
+        {
+          name: 'Redukcja 2025',
+          target: 70,
+          current: 92,
+          deadline: '2025-12-31',
+          progress: 35
+        },
+        {
+          name: 'Redukcja 2030',
+          target: 50,
+          current: 92,
+          deadline: '2030-12-31',
+          progress: 15
+        }
+      ]
     };
   }
   
@@ -453,10 +472,10 @@ class MockFuelAnalysisService {
         date: date.toLocaleDateString('pl-PL'),
         type,
         description,
-        vehicle: vehicles[Math.floor(Math.random() * vehicles.length)],
-        driver: drivers[Math.floor(Math.random() * drivers.length)],
+        vehicleId: vehicles[Math.floor(Math.random() * vehicles.length)],
+        driverId: drivers[Math.floor(Math.random() * drivers.length)],
         severity,
-        impact: Math.floor(Math.random() * 1000) + 100,
+        potentialLoss: Math.floor(Math.random() * 1000) + 100,
         status: statuses[Math.floor(Math.random() * statuses.length)]
       });
     }
@@ -470,11 +489,11 @@ class MockFuelAnalysisService {
    */
   generateFuelPriceComparison() {
     const stations = [
-      { id: 'ST001', name: 'Orlen', price: 5.89, savings: 0 },
-      { id: 'ST002', name: 'BP', price: 5.99, savings: 1200 },
-      { id: 'ST003', name: 'Shell', price: 6.05, savings: 1920 },
-      { id: 'ST004', name: 'Circle K', price: 5.92, savings: 360 },
-      { id: 'ST005', name: 'Lotos', price: 5.85, savings: -480 }
+      { id: 'ST001', stationName: 'Orlen', price: 5.89, distance: 2.5, rating: 4.5, savings: 0 },
+      { id: 'ST002', stationName: 'BP', price: 5.99, distance: 1.8, rating: 4.2, savings: 1200 },
+      { id: 'ST003', stationName: 'Shell', price: 6.05, distance: 3.2, rating: 4.7, savings: 1920 },
+      { id: 'ST004', stationName: 'Circle K', price: 5.92, distance: 4.1, rating: 4.0, savings: 360 },
+      { id: 'ST005', stationName: 'Lotos', price: 5.85, distance: 5.3, rating: 4.3, savings: -480 }
     ];
     
     // Calculate savings compared to average price
@@ -532,6 +551,8 @@ class MockFuelAnalysisService {
     return {
       routes,
       totalSavings: routes.reduce((sum, route) => sum + route.savings, 0),
+      averageSavings: routes.reduce((sum, route) => sum + route.savings, 0) / routes.length,
+      totalDistanceReduction: routes.reduce((sum, route) => sum + (route.currentDistance - route.optimizedDistance), 0),
       averageFuelSaving: parseFloat((routes.reduce((sum, route) => sum + (route.currentFuelConsumption - route.optimizedFuelConsumption), 0) / routes.length).toFixed(1)),
       averageDistanceSaving: parseFloat((routes.reduce((sum, route) => sum + (route.currentDistance - route.optimizedDistance), 0) / routes.length).toFixed(1))
     };
@@ -544,36 +565,32 @@ class MockFuelAnalysisService {
   generateDrivingBehavior() {
     const behaviors = [
       {
-        type: 'Gwałtowne przyspieszanie',
-        impact: 12.5,
-        frequency: 'Wysoka',
-        potentialSavings: 1875
+        id: 'BEH001',
+        name: 'Gwałtowne przyspieszanie',
+        impact: 'Zwiększone zużycie paliwa o 15-20%',
+        recommendation: 'Szkolenie z eco-drivingu',
+        potentialSavings: 3200
       },
       {
-        type: 'Gwałtowne hamowanie',
-        impact: 8.3,
-        frequency: 'Średnia',
-        potentialSavings: 1245
+        id: 'BEH002',
+        name: 'Nadmierna prędkość',
+        impact: 'Zwiększone zużycie paliwa o 10-15%',
+        recommendation: 'Ograniczniki prędkości',
+        potentialSavings: 2800
       },
       {
-        type: 'Nadmierna prędkość',
-        impact: 15.2,
-        frequency: 'Średnia',
-        potentialSavings: 2280
-      },
-      {
-        type: 'Zbyt długi czas pracy silnika na biegu jałowym',
-        impact: 6.8,
-        frequency: 'Wysoka',
-        potentialSavings: 1020
+        id: 'BEH003',
+        name: 'Długi czas pracy na biegu jałowym',
+        impact: 'Marnowanie 0.5-1L paliwa na godzinę',
+        recommendation: 'Automatyczne wyłączanie silnika',
+        potentialSavings: 1900
       }
     ];
     
     return {
       behaviors,
-      totalImpact: parseFloat(behaviors.reduce((sum, behavior) => sum + behavior.impact, 0).toFixed(1)),
       totalPotentialSavings: behaviors.reduce((sum, behavior) => sum + behavior.potentialSavings, 0),
-      driverTrainingROI: 320
+      topIssue: behaviors.sort((a, b) => b.potentialSavings - a.potentialSavings)[0]
     };
   }
   
@@ -582,38 +599,34 @@ class MockFuelAnalysisService {
    * @returns {Object} Maintenance impact data
    */
   generateMaintenanceImpact() {
-    const factors = [
+    const issues = [
       {
-        factor: 'Ciśnienie w oponach',
-        impact: 3.5,
-        status: 'Wymaga uwagi',
-        potentialSavings: 525
+        id: 'MI001',
+        name: 'Nieprawidłowe ciśnienie w oponach',
+        impact: 'Zwiększone zużycie paliwa o 3-5%',
+        recommendation: 'Regularne kontrole ciśnienia',
+        potentialSavings: 1500
       },
       {
-        factor: 'Filtry powietrza',
-        impact: 2.8,
-        status: 'Dobry',
-        potentialSavings: 420
+        id: 'MI002',
+        name: 'Zanieczyszczone filtry powietrza',
+        impact: 'Zwiększone zużycie paliwa o 2-3%',
+        recommendation: 'Częstsza wymiana filtrów',
+        potentialSavings: 950
       },
       {
-        factor: 'Olej silnikowy',
-        impact: 4.2,
-        status: 'Wymaga uwagi',
-        potentialSavings: 630
-      },
-      {
-        factor: 'Geometria kół',
-        impact: 3.0,
-        status: 'Dobry',
-        potentialSavings: 450
+        id: 'MI003',
+        name: 'Niewyregulowany silnik',
+        impact: 'Zwiększone zużycie paliwa o 4-8%',
+        recommendation: 'Regularne przeglądy silnika',
+        potentialSavings: 2100
       }
     ];
     
     return {
-      factors,
-      totalImpact: parseFloat(factors.reduce((sum, factor) => sum + factor.impact, 0).toFixed(1)),
-      totalPotentialSavings: factors.reduce((sum, factor) => sum + factor.potentialSavings, 0),
-      maintenanceROI: 280
+      issues,
+      totalPotentialSavings: issues.reduce((sum, issue) => sum + issue.potentialSavings, 0),
+      topIssue: issues.sort((a, b) => b.potentialSavings - a.potentialSavings)[0]
     };
   }
   
@@ -626,52 +639,47 @@ class MockFuelAnalysisService {
       {
         id: 'REC001',
         title: 'Optymalizacja tras',
-        description: 'Wdrożenie optymalizacji tras może zmniejszyć zużycie paliwa o 5-7%.',
-        impact: 'Wysoki',
-        difficulty: 'Średnia',
-        estimatedSavings: 3750,
-        implementationCost: 1200,
-        roi: 312.5
+        description: 'Wdrożenie systemu optymalizacji tras w oparciu o dane historyczne i ruch drogowy w czasie rzeczywistym.',
+        estimatedSavings: 12500,
+        implementationCost: 8000,
+        roi: 156,
+        priority: 'High'
       },
       {
         id: 'REC002',
         title: 'Szkolenia z eco-drivingu',
-        description: 'Szkolenia kierowców z technik eco-drivingu mogą zmniejszyć zużycie paliwa o 10-15%.',
-        impact: 'Wysoki',
-        difficulty: 'Niska',
-        estimatedSavings: 4500,
-        implementationCost: 2000,
-        roi: 225
+        description: 'Program szkoleń dla kierowców z technik eco-drivingu i monitorowanie wyników.',
+        estimatedSavings: 8700,
+        implementationCost: 3500,
+        roi: 249,
+        priority: 'High'
       },
       {
         id: 'REC003',
-        title: 'Regularne kontrole ciśnienia w oponach',
-        description: 'Utrzymywanie prawidłowego ciśnienia w oponach może zmniejszyć zużycie paliwa o 3%.',
-        impact: 'Średni',
-        difficulty: 'Niska',
-        estimatedSavings: 1125,
-        implementationCost: 0,
-        roi: 'Nieskończony'
+        title: 'Modernizacja floty',
+        description: 'Wymiana najstarszych pojazdów na modele o niższym zużyciu paliwa.',
+        estimatedSavings: 35000,
+        implementationCost: 120000,
+        roi: 29,
+        priority: 'Medium'
       },
       {
         id: 'REC004',
-        title: 'Tankowanie na rekomendowanych stacjach',
-        description: 'Korzystanie z rekomendowanych stacji paliw może zmniejszyć koszty o 2-4%.',
-        impact: 'Średni',
-        difficulty: 'Niska',
-        estimatedSavings: 1500,
-        implementationCost: 0,
-        roi: 'Nieskończony'
+        title: 'System monitorowania ciśnienia w oponach',
+        description: 'Instalacja systemu TPMS we wszystkich pojazdach floty.',
+        estimatedSavings: 4500,
+        implementationCost: 6000,
+        roi: 75,
+        priority: 'Medium'
       },
       {
         id: 'REC005',
-        title: 'Modernizacja starszych pojazdów',
-        description: 'Modernizacja starszych pojazdów lub wymiana na nowsze modele może zmniejszyć zużycie paliwa o 10-20%.',
-        impact: 'Wysoki',
-        difficulty: 'Wysoka',
-        estimatedSavings: 7500,
-        implementationCost: 50000,
-        roi: 15
+        title: 'Karty paliwowe z rabatem',
+        description: 'Negocjacja umowy z siecią stacji paliw na karty z rabatem.',
+        estimatedSavings: 7800,
+        implementationCost: 1000,
+        roi: 780,
+        priority: 'High'
       }
     ];
   }
@@ -687,14 +695,14 @@ class MockFuelAnalysisService {
       const date = new Date();
       date.setDate(date.getDate() - 29 + i);
       
-      const emission = Math.floor(Math.random() * 300) + 700;
       const distance = Math.floor(Math.random() * 300) + 100;
+      const emissionPerKm = parseFloat((Math.random() * 0.1 + 0.7).toFixed(2));
       
       data.push({
         date: date.toLocaleDateString('pl-PL'),
-        emission,
+        emission: parseFloat((distance * emissionPerKm).toFixed(1)),
         distance,
-        emissionPerKm: parseFloat((emission / distance).toFixed(2))
+        emissionPerKm
       });
     }
     
@@ -715,14 +723,14 @@ class MockFuelAnalysisService {
       const endDate = new Date(date);
       endDate.setDate(endDate.getDate() + 6);
       
-      const emission = Math.floor(Math.random() * 1500) + 4000;
       const distance = Math.floor(Math.random() * 1500) + 500;
+      const emissionPerKm = parseFloat((Math.random() * 0.1 + 0.7).toFixed(2));
       
       data.push({
         date: `${date.toLocaleDateString('pl-PL')} - ${endDate.toLocaleDateString('pl-PL')}`,
-        emission,
+        emission: parseFloat((distance * emissionPerKm).toFixed(1)),
         distance,
-        emissionPerKm: parseFloat((emission / distance).toFixed(2))
+        emissionPerKm
       });
     }
     
@@ -740,14 +748,14 @@ class MockFuelAnalysisService {
       const date = new Date();
       date.setMonth(date.getMonth() - 11 + i);
       
-      const emission = Math.floor(Math.random() * 5000) + 15000;
       const distance = Math.floor(Math.random() * 6000) + 2000;
+      const emissionPerKm = parseFloat((Math.random() * 0.1 + 0.7).toFixed(2));
       
       data.push({
         date: date.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' }),
-        emission,
+        emission: parseFloat((distance * emissionPerKm).toFixed(1)),
         distance,
-        emissionPerKm: parseFloat((emission / distance).toFixed(2))
+        emissionPerKm
       });
     }
     
@@ -765,14 +773,14 @@ class MockFuelAnalysisService {
       const date = new Date();
       date.setFullYear(date.getFullYear() - 4 + i);
       
-      const emission = Math.floor(Math.random() * 50000) + 200000;
       const distance = Math.floor(Math.random() * 60000) + 20000;
+      const emissionPerKm = parseFloat((Math.random() * 0.1 + 0.7).toFixed(2));
       
       data.push({
         date: date.getFullYear().toString(),
-        emission,
+        emission: parseFloat((distance * emissionPerKm).toFixed(1)),
         distance,
-        emissionPerKm: parseFloat((emission / distance).toFixed(2))
+        emissionPerKm
       });
     }
     
@@ -780,6 +788,6 @@ class MockFuelAnalysisService {
   }
 }
 
-// Export service instance
-export const mockFuelAnalysisService = new MockFuelAnalysisService();
+// Create and export an instance of the service
+const mockFuelAnalysisService = new MockFuelAnalysisService();
 export default mockFuelAnalysisService;

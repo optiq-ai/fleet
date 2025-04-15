@@ -13,7 +13,7 @@ class FuelAnalysisService {
    * Get fuel analysis KPIs
    * @returns {Promise<Object>} Fuel analysis KPI data
    */
-  async getFuelKPIs() {
+  async getKpiData() {
     try {
       const response = await fetch(`${this.baseUrl}/kpis`);
       if (!response.ok) throw new Error('Failed to fetch fuel KPIs');
@@ -26,21 +26,13 @@ class FuelAnalysisService {
   
   /**
    * Get fuel consumption data
-   * @param {string} [period='month'] - Period for data aggregation (day, week, month, year)
-   * @param {string} [vehicleId] - Optional vehicle ID filter
-   * @param {string} [driverId] - Optional driver ID filter
-   * @param {string} [startDate] - Optional start date filter
-   * @param {string} [endDate] - Optional end date filter
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} Fuel consumption data
    */
-  async getFuelConsumption(
-    period = 'month',
-    vehicleId,
-    driverId,
-    startDate,
-    endDate
-  ) {
+  async getFuelConsumptionData(filters) {
     try {
+      const { period = 'month', vehicleId, driverId, startDate, endDate } = filters;
+      
       let url = `${this.baseUrl}/consumption?period=${period}`;
       
       if (vehicleId) url += `&vehicleId=${vehicleId}`;
@@ -59,15 +51,13 @@ class FuelAnalysisService {
   
   /**
    * Get fuel consumption comparison data
-   * @param {string} [compareBy='vehicle'] - Comparison type (vehicle, driver, route)
-   * @param {string} [period='month'] - Period for data aggregation
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} Fuel consumption comparison data
    */
-  async getFuelConsumptionComparison(
-    compareBy = 'vehicle',
-    period = 'month'
-  ) {
+  async getFuelComparisonData(filters) {
     try {
+      const { compareBy = 'vehicle', period = 'month' } = filters;
+      
       const url = `${this.baseUrl}/comparison?compareBy=${compareBy}&period=${period}`;
       
       const response = await fetch(url);
@@ -81,19 +71,13 @@ class FuelAnalysisService {
   
   /**
    * Get fuel anomalies data
-   * @param {string} [period='month'] - Period for data aggregation
-   * @param {string} [severity='all'] - Severity filter (all, high, medium, low)
-   * @param {number} [page=1] - Page number
-   * @param {number} [limit=10] - Results per page
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} Fuel anomalies data
    */
-  async getFuelAnomalies(
-    period = 'month',
-    severity = 'all',
-    page = 1,
-    limit = 10
-  ) {
+  async getAnomaliesData(filters) {
     try {
+      const { period = 'month', severity = 'all', page = 1, limit = 10 } = filters;
+      
       const url = `${this.baseUrl}/anomalies?period=${period}&severity=${severity}&page=${page}&limit=${limit}`;
       
       const response = await fetch(url);
@@ -109,7 +93,7 @@ class FuelAnalysisService {
    * Get cost optimization data
    * @returns {Promise<Object>} Cost optimization data
    */
-  async getCostOptimization() {
+  async getCostOptimizationData() {
     try {
       const response = await fetch(`${this.baseUrl}/optimization`);
       if (!response.ok) throw new Error('Failed to fetch cost optimization data');
@@ -122,11 +106,13 @@ class FuelAnalysisService {
   
   /**
    * Get CO2 emission data
-   * @param {string} [period='month'] - Period for data aggregation
+   * @param {Object} filters - Filters for data
    * @returns {Promise<Object>} CO2 emission data
    */
-  async getCO2Emission(period = 'month') {
+  async getCo2EmissionData(filters) {
     try {
+      const { period = 'month' } = filters;
+      
       const url = `${this.baseUrl}/co2-emission?period=${period}`;
       
       const response = await fetch(url);

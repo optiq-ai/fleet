@@ -387,7 +387,7 @@ const FuelAnalysis = () => {
           
           <TableContainer>
             <Table 
-              headers={[
+              columns={[
                 { key: 'id', label: 'ID' },
                 { key: 'name', label: 'Nazwa' },
                 { key: 'consumption', label: 'Zużycie (l/100km)' },
@@ -480,14 +480,15 @@ const FuelAnalysis = () => {
           
           <TableContainer>
             <Table 
-              headers={[
+              columns={[
                 { key: 'date', label: 'Data' },
+                { key: 'type', label: 'Typ anomalii' },
+                { key: 'description', label: 'Opis' },
                 { key: 'vehicleId', label: 'Pojazd' },
                 { key: 'driverId', label: 'Kierowca' },
-                { key: 'type', label: 'Typ anomalii' },
                 { key: 'severity', label: 'Ważność' },
-                { key: 'description', label: 'Opis' },
-                { key: 'potentialLoss', label: 'Potencjalna strata (zł)' }
+                { key: 'potentialLoss', label: 'Potencjalna strata (zł)' },
+                { key: 'status', label: 'Status' }
               ]}
               data={anomalies.data}
               isLoading={isLoading}
@@ -526,18 +527,9 @@ const FuelAnalysis = () => {
     return (
       <TabContent>
         <Card title="Porównanie cen paliwa">
-          {isLoading ? (
-            <LoadingIndicator>Ładowanie wykresu...</LoadingIndicator>
-          ) : (
-            <CostOptimizationChart 
-              data={costOptimization}
-              isLoading={isLoading}
-            />
-          )}
-          
           <TableContainer>
             <Table 
-              headers={[
+              columns={[
                 { key: 'stationName', label: 'Stacja paliw' },
                 { key: 'price', label: 'Cena (zł/l)' },
                 { key: 'distance', label: 'Odległość (km)' },
@@ -549,12 +541,123 @@ const FuelAnalysis = () => {
               emptyMessage="Brak danych o cenach paliwa"
             />
           </TableContainer>
+          
+          <InfoBox>
+            <InfoItem>
+              <InfoLabel>Rekomendowana stacja:</InfoLabel>
+              <InfoValue>{costOptimization.fuelPriceComparison.recommendedStation.stationName}</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>Średnia cena paliwa:</InfoLabel>
+              <InfoValue>{costOptimization.fuelPriceComparison.averagePrice.toFixed(2)} zł/l</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>Potencjalne roczne oszczędności:</InfoLabel>
+              <InfoValue>{costOptimization.fuelPriceComparison.potentialAnnualSavings} zł</InfoValue>
+            </InfoItem>
+          </InfoBox>
         </Card>
         
-        <Card title="Rekomendacje optymalizacji kosztów">
+        <Card title="Optymalizacja tras">
+          {isLoading ? (
+            <LoadingIndicator>Ładowanie wykresu...</LoadingIndicator>
+          ) : (
+            <CostOptimizationChart 
+              data={costOptimization}
+              isLoading={isLoading}
+            />
+          )}
+          
           <TableContainer>
             <Table 
-              headers={[
+              columns={[
+                { key: 'name', label: 'Trasa' },
+                { key: 'currentDistance', label: 'Obecna odległość (km)' },
+                { key: 'optimizedDistance', label: 'Zoptymalizowana odległość (km)' },
+                { key: 'currentFuelConsumption', label: 'Obecne zużycie paliwa (l)' },
+                { key: 'optimizedFuelConsumption', label: 'Zoptymalizowane zużycie paliwa (l)' },
+                { key: 'savings', label: 'Oszczędności (zł)' }
+              ]}
+              data={costOptimization.routeOptimization.routes}
+              isLoading={isLoading}
+              emptyMessage="Brak danych o trasach"
+            />
+          </TableContainer>
+          
+          <InfoBox>
+            <InfoItem>
+              <InfoLabel>Całkowite oszczędności:</InfoLabel>
+              <InfoValue>{costOptimization.routeOptimization.totalSavings} zł</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>Średnie oszczędności na trasę:</InfoLabel>
+              <InfoValue>{costOptimization.routeOptimization.averageSavings.toFixed(0)} zł</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>Całkowita redukcja dystansu:</InfoLabel>
+              <InfoValue>{costOptimization.routeOptimization.totalDistanceReduction} km</InfoValue>
+            </InfoItem>
+          </InfoBox>
+        </Card>
+        
+        <Card title="Wpływ stylu jazdy">
+          <TableContainer>
+            <Table 
+              columns={[
+                { key: 'name', label: 'Zachowanie' },
+                { key: 'impact', label: 'Wpływ' },
+                { key: 'recommendation', label: 'Rekomendacja' },
+                { key: 'potentialSavings', label: 'Potencjalne oszczędności (zł)' }
+              ]}
+              data={costOptimization.drivingBehavior.behaviors}
+              isLoading={isLoading}
+              emptyMessage="Brak danych o stylu jazdy"
+            />
+          </TableContainer>
+          
+          <InfoBox>
+            <InfoItem>
+              <InfoLabel>Całkowite potencjalne oszczędności:</InfoLabel>
+              <InfoValue>{costOptimization.drivingBehavior.totalPotentialSavings} zł</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>Najważniejszy problem:</InfoLabel>
+              <InfoValue>{costOptimization.drivingBehavior.topIssue.name}</InfoValue>
+            </InfoItem>
+          </InfoBox>
+        </Card>
+        
+        <Card title="Wpływ konserwacji">
+          <TableContainer>
+            <Table 
+              columns={[
+                { key: 'name', label: 'Problem' },
+                { key: 'impact', label: 'Wpływ' },
+                { key: 'recommendation', label: 'Rekomendacja' },
+                { key: 'potentialSavings', label: 'Potencjalne oszczędności (zł)' }
+              ]}
+              data={costOptimization.maintenanceImpact.issues}
+              isLoading={isLoading}
+              emptyMessage="Brak danych o konserwacji"
+            />
+          </TableContainer>
+          
+          <InfoBox>
+            <InfoItem>
+              <InfoLabel>Całkowite potencjalne oszczędności:</InfoLabel>
+              <InfoValue>{costOptimization.maintenanceImpact.totalPotentialSavings} zł</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>Najważniejszy problem:</InfoLabel>
+              <InfoValue>{costOptimization.maintenanceImpact.topIssue.name}</InfoValue>
+            </InfoItem>
+          </InfoBox>
+        </Card>
+        
+        <Card title="Rekomendacje">
+          <TableContainer>
+            <Table 
+              columns={[
                 { key: 'title', label: 'Rekomendacja' },
                 { key: 'description', label: 'Opis' },
                 { key: 'estimatedSavings', label: 'Szacowane oszczędności (zł)' },
@@ -564,7 +667,7 @@ const FuelAnalysis = () => {
               ]}
               data={costOptimization.recommendations}
               isLoading={isLoading}
-              emptyMessage="Brak rekomendacji optymalizacji kosztów"
+              emptyMessage="Brak rekomendacji"
             />
           </TableContainer>
         </Card>
@@ -580,6 +683,31 @@ const FuelAnalysis = () => {
     
     return (
       <TabContent>
+        <KpiSection>
+          {co2Emission && (
+            <>
+              <KPICard 
+                title="Całkowita emisja CO2"
+                value={`${co2Emission.summary.totalEmission.toFixed(0)} kg`}
+                change={co2Emission.summary.emissionTrend}
+                icon="co2"
+              />
+              <KPICard 
+                title="Średnia emisja CO2"
+                value={`${co2Emission.summary.averageEmission.toFixed(1)} kg`}
+                change={co2Emission.summary.emissionTrend}
+                icon="co2"
+              />
+              <KPICard 
+                title="Emisja CO2 na km"
+                value={`${co2Emission.summary.emissionPerKm.toFixed(2)} kg/km`}
+                change={co2Emission.summary.emissionTrend}
+                icon="co2"
+              />
+            </>
+          )}
+        </KpiSection>
+        
         <Card title="Emisja CO2 w czasie">
           <FilterContainer>
             <FilterGroup>
@@ -610,7 +738,7 @@ const FuelAnalysis = () => {
         <Card title="Zgodność z normami emisji">
           <TableContainer>
             <Table 
-              headers={[
+              columns={[
                 { key: 'standard', label: 'Standard' },
                 { key: 'limit', label: 'Limit (g/km)' },
                 { key: 'current', label: 'Aktualna emisja (g/km)' },
@@ -627,7 +755,7 @@ const FuelAnalysis = () => {
         <Card title="Cele redukcji emisji">
           <TableContainer>
             <Table 
-              headers={[
+              columns={[
                 { key: 'name', label: 'Cel' },
                 { key: 'target', label: 'Wartość docelowa (g/km)' },
                 { key: 'current', label: 'Aktualna wartość (g/km)' },
@@ -698,28 +826,28 @@ const ToggleSwitch = styled.input`
     left: 2px;
     width: 16px;
     height: 16px;
-    border-radius: 50%;
     background-color: white;
-    transition: left 0.3s;
+    border-radius: 50%;
+    transition: transform 0.3s;
   }
   
   &:checked:before {
-    left: 22px;
+    transform: translateX(20px);
   }
 `;
 
 const TabsContainer = styled.div`
   display: flex;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e0e0e0;
   margin-bottom: 20px;
 `;
 
 const Tab = styled.div`
-  padding: 10px 20px;
+  padding: 12px 16px;
   cursor: pointer;
-  border-bottom: 2px solid ${props => props.active ? '#1976d2' : 'transparent'};
-  color: ${props => props.active ? '#1976d2' : '#666'};
   font-weight: ${props => props.active ? '600' : '400'};
+  color: ${props => props.active ? '#1976d2' : '#333'};
+  border-bottom: 2px solid ${props => props.active ? '#1976d2' : 'transparent'};
   transition: all 0.3s;
   
   &:hover {
@@ -743,70 +871,46 @@ const KpiSection = styled.div`
 const FilterContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 16px;
   margin-bottom: 20px;
 `;
 
 const FilterGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 `;
 
 const FilterLabel = styled.label`
   font-size: 14px;
-  font-weight: 500;
+  color: #666;
 `;
 
 const FilterSelect = styled.select`
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #e0e0e0;
   border-radius: 4px;
+  background-color: white;
   min-width: 150px;
-`;
-
-const FilterInput = styled.input`
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  min-width: 150px;
-`;
-
-const SearchContainer = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const SearchButton = styled.button`
-  padding: 8px 12px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #1565c0;
-  }
 `;
 
 const TableContainer = styled.div`
   margin-top: 20px;
-  overflow-x: auto;
+  margin-bottom: 20px;
 `;
 
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
   margin-top: 20px;
 `;
 
 const PaginationButton = styled.button`
-  padding: 8px 12px;
+  padding: 8px 16px;
   background-color: ${props => props.disabled ? '#f5f5f5' : '#1976d2'};
-  color: ${props => props.disabled ? '#aaa' : 'white'};
+  color: ${props => props.disabled ? '#999' : 'white'};
   border: none;
   border-radius: 4px;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
@@ -818,15 +922,16 @@ const PaginationButton = styled.button`
 
 const PaginationInfo = styled.div`
   font-size: 14px;
+  color: #666;
 `;
 
 const ActionsContainer = styled.div`
   display: flex;
-  gap: 10px;
+  gap: 8px;
 `;
 
 const Button = styled.button`
-  padding: 8px 12px;
+  padding: 8px 16px;
   background-color: #1976d2;
   color: white;
   border: none;
@@ -836,6 +941,33 @@ const Button = styled.button`
   &:hover {
     background-color: #1565c0;
   }
+`;
+
+const InfoBox = styled.div`
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 20px;
+`;
+
+const InfoItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const InfoLabel = styled.div`
+  font-weight: 500;
+  color: #333;
+`;
+
+const InfoValue = styled.div`
+  color: #1976d2;
+  font-weight: 600;
 `;
 
 const LoadingIndicator = styled.div`
@@ -856,14 +988,13 @@ const ErrorMessage = styled.div`
 `;
 
 const ChartPlaceholder = styled.div`
+  height: 300px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 400px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  padding: 20px;
   color: #666;
 `;
 
