@@ -102,7 +102,7 @@ const VehiclesOverview = () => {
     if (selectedVehicle && selectedVehicle.id) {
       fetchVehicleDetails(selectedVehicle.id);
     }
-  }, [selectedVehicle?.id, fetchVehicleDetails]);
+  }, [selectedVehicle, selectedVehicle?.id, fetchVehicleDetails]);
   
   // Handle filter change
   const handleFilterChange = (e) => {
@@ -123,7 +123,8 @@ const VehiclesOverview = () => {
     });
   };
   
-  // Handle sort
+  // eslint-disable-next-line no-unused-vars
+  // Handle sort - used in table column headers for future implementation
   const handleSort = (column) => {
     setFilters({
       ...filters,
@@ -285,7 +286,32 @@ const VehiclesOverview = () => {
   
   // Render vehicles table
   const renderVehiclesTable = () => {
-    if (!vehicles || !vehicles.data) return null;
+    if (!vehicles || !vehicles.data) {
+      // Return empty table with columns when no data is available
+      const columns = [
+        { key: 'id', label: 'ID pojazdu' },
+        { key: 'make', label: 'Marka' },
+        { key: 'model', label: 'Model' },
+        { key: 'year', label: 'Rok produkcji' },
+        { key: 'mileage', label: 'Przebieg (km)' },
+        { key: 'status', label: 'Status' },
+        { key: 'healthPercentage', label: 'Stan techniczny' },
+        { key: 'driver', label: 'Kierowca' },
+        { key: 'lastMaintenance', label: 'Ostatni przegląd' },
+        { key: 'nextMaintenance', label: 'Następny przegląd' }
+      ];
+      
+      return (
+        <Card title="Lista pojazdów">
+          <Table 
+            columns={columns}
+            data={[]}
+            isLoading={isLoading}
+            emptyMessage="Brak pojazdów spełniających kryteria"
+          />
+        </Card>
+      );
+    }
     
     const columns = [
       { key: 'id', label: 'ID pojazdu' },
