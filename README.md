@@ -623,3 +623,14 @@ docker-compose up
 
 ## Tryb testowy
 Aplikacja domyślnie działa w trybie testowym, korzystając z danych mockowych. Można przełączać się między danymi z API a danymi mockowymi za pomocą przełącznika w górnej części każdej sekcji.
+
+### partsService
+Serwis do pobierania danych dla komponentu Parts (Części) z rzeczywistego API.
+
+### mockPartsService
+Serwis dostarczający dane testowe dla komponentu Parts (Części), gdy backend nie jest dostępny. Zawiera:
+- Dane inwentarza części z informacjami o ID, nazwie, numerze katalogowym, kompatybilnych modelach, ilości, cenie
+- Dane zamówień części z informacjami o ID, dacie, dostawcy, statusie, pozycjach
+- Dane analizy zużycia części z wykresami najczęściej wymienianych części, kosztów według kategorii, trendów
+- Dane kompatybilności części z informacjami o modelach pojazdów, alternatywnych częściach
+- Dane dostawców z informacjami o ID, nazwie, osobie kontaktowej, ocenie, historii współpracy

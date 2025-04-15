@@ -11,6 +11,7 @@ import Monitoring from './pages/Monitoring';
 import Drivers from './pages/Drivers';
 import FleetManagement from './pages/FleetManagement';
 import VehiclesOverview from './pages/VehiclesOverview';
+import VehicleParts from './pages/VehicleParts';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -55,6 +56,11 @@ function App() {
           <Route path="/vehicles/overview" element={
             <Layout>
               <VehiclesOverview />
+            </Layout>
+          } />
+          <Route path="/vehicles/parts" element={
+            <Layout>
+              <VehicleParts />
             </Layout>
           } />
           <Route path="/predictive-maintenance" element={
