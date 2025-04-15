@@ -268,6 +268,62 @@ Sekcja zarządzania kierowcami umożliwia kompleksowe zarządzanie personelem ki
 - Tabele i wykresy dostosowują się do dostępnej przestrzeni
 - Specjalne widoki dla urządzeń mobilnych
 
+### Pojazdy (Vehicles)
+
+Sekcja pojazdów umożliwia kompleksowe zarządzanie flotą pojazdów, ich stanem technicznym, częściami, oponami oraz monitorowanie kluczowych wskaźników wydajności.
+
+#### Funkcje i metody:
+- `fetchVehiclesData()` - pobiera dane KPI, listę pojazdów i szczegóły wybranego pojazdu
+- `handleVehicleSelect()` - obsługuje wybór pojazdu z listy
+- `fetchVehicleDetails()` - pobiera szczegółowe dane wybranego pojazdu
+- `handleFilterChange()` - obsługuje zmianę filtrów listy pojazdów
+- `handleSearch()` - obsługuje wyszukiwanie pojazdów
+- `handlePageChange()` - obsługuje zmianę strony w paginacji listy pojazdów
+- `handleExportData()` - obsługuje eksport danych do CSV/PDF
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Podstrony:
+- **Overview (Przegląd)** - główny widok z dashboardem KPI, mapą floty, listą pojazdów i statystykami
+- **Maintenance (Konserwacja)** - zarządzanie harmonogramem przeglądów, napraw i serwisów
+- **Parts (Części)** - inwentaryzacja i zarządzanie częściami zamiennymi
+- **Tires (Opony)** - zarządzanie oponami, ich stanem, rotacją i wymianą sezonową
+
+#### Komponenty Overview:
+- **Dashboard KPI** - wyświetla kluczowe wskaźniki floty (liczba pojazdów, średni wiek, przebieg, wykorzystanie, zgodność z harmonogramem)
+- **Mapa floty** - interaktywna mapa pokazująca lokalizacje wszystkich pojazdów z kolorowym oznaczeniem statusu
+- **Lista pojazdów** - tabela z filtrowaniem i sortowaniem zawierająca dane pojazdów (ID, model, rok, przebieg, status, stan techniczny)
+- **Szczegóły pojazdu** - panel z pełnymi danymi technicznymi, historią przeglądów, przypisanymi kierowcami, zużyciem paliwa
+- **Statystyki floty** - wykresy i trendy pokazujące strukturę floty, wiek pojazdów, zużycie paliwa, koszty utrzymania
+
+#### Stany (hooks):
+- `vehicles` - lista pojazdów
+- `selectedVehicle` - wybrany pojazd
+- `vehicleDetails` - szczegóły pojazdu
+- `vehicleLocations` - dane lokalizacji pojazdów dla mapy
+- `fleetStatistics` - statystyki floty
+- `kpiData` - dane KPI floty
+- `filters` - filtry dla listy pojazdów (status, typ, wyszukiwanie, strona)
+- `isLoading` - stan ładowania listy pojazdów
+- `isDetailLoading` - stan ładowania szczegółów pojazdu
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `vehiclesService` lub `mockVehiclesService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getVehicles()`, `getVehicleDetails()`, `getFleetKPIs()`, `getVehicleLocations()`, `getFleetStatistics()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
 ## Serwisy danych
 
 ### dashboardService
@@ -300,6 +356,17 @@ Serwis dostarczający dane testowe dla komponentu Bezpieczeństwo Kierowcy, gdy 
 - Dane wykrywania rozproszenia uwagi z typami rozproszenia
 - Dane sesji coachingowych z tematami i statusami
 - Dane telematyki wideo z nagraniami incydentów i statystykami
+
+### vehiclesService
+Serwis do pobierania danych dla komponentu Pojazdy z rzeczywistego API.
+
+### mockVehiclesService
+Serwis dostarczający dane testowe dla komponentu Pojazdy, gdy backend nie jest dostępny. Zawiera:
+- Dane pojazdów z informacjami o statusie, modelu, roku produkcji, przebiegu, stanie technicznym
+- Szczegóły pojazdów z pełnymi danymi technicznymi, historią przeglądów, przypisanymi kierowcami
+- Dane KPI floty z kluczowymi wskaźnikami (liczba pojazdów, średni wiek, przebieg, wykorzystanie)
+- Dane lokalizacji pojazdów dla mapy z kolorowym oznaczeniem statusu
+- Dane statystyk floty z wykresami struktury, wieku, zużycia paliwa, kosztów utrzymania
 
 ## Uruchomienie aplikacji
 
