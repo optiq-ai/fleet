@@ -305,48 +305,33 @@ Sekcja Road Tolls umożliwia kompleksowe zarządzanie opłatami drogowymi, trans
 - `handleTransponderFilterChange()` - obsługuje zmianę filtrów transponderów
 - `handleViolationFilterChange()` - obsługuje zmianę filtrów naruszeń
 - `handleReportFilterChange()` - obsługuje zmianę filtrów raportów
-- `handleRouteSearch()` - obsługuje wyszukiwanie tras do optymalizacji
+- `handleRouteFilterChange()` - obsługuje zmianę filtrów optymalizacji tras
 - `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
 
-#### Komponenty:
-- **Dashboard** - główny ekran z KPI, mapą aktywności opłat drogowych, trendami wydatków i alertami
-- **Transpondery** - zarządzanie urządzeniami do automatycznego poboru opłat
-  - Lista transponderów z filtrowaniem i paginacją
-  - Szczegóły transpondera z historią użycia i konserwacji
-- **Naruszenia** - rejestr naruszeń związanych z opłatami drogowymi
-  - Lista naruszeń z filtrowaniem i paginacją
-  - Szczegóły naruszenia z historią kwestionowania i płatności
-- **Raporty wydatków** - analizy i raporty wydatków na opłaty drogowe
-  - Grupowanie według pojazdu, kierowcy, trasy lub operatora
-  - Różne zakresy czasowe (dzień, tydzień, miesiąc, kwartał, rok)
-- **Operatorzy opłat** - informacje o operatorach systemów opłat drogowych
-  - Lista operatorów z mapą zasięgu
-  - Szczegóły operatora z cennikiem i punktami poboru opłat
-- **Optymalizacja tras** - porównanie i optymalizacja tras pod kątem kosztów opłat
-  - Wyszukiwanie tras między punktem początkowym a docelowym
-  - Porównanie standardowych tras z alternatywnymi
-  - Wizualizacja tras na mapie z zaznaczeniem punktów poboru opłat
-  - Szczegółowe porównanie kosztów dla różnych opcji
+#### Zakładki:
+- **Dashboard** - główny widok z KPI i mapą aktywności opłat drogowych
+- **Transpondery** - zarządzanie transponderami z filtrowaniem i szczegółami
+- **Naruszenia** - rejestr naruszeń z filtrowaniem i szczegółami
+- **Raporty wydatków** - raporty wydatków z różnymi opcjami grupowania
+- **Operatorzy opłat** - informacje o operatorach opłat drogowych
+- **Optymalizacja tras** - optymalizacja tras z porównaniem kosztów
 
 #### Stany (hooks):
-- `dashboardData` - dane dashboardu (KPI, mapa, trendy, alerty)
-- `transponders` - dane transponderów z paginacją
-- `selectedTransponder` - szczegóły wybranego transpondera
-- `violations` - dane naruszeń z paginacją
-- `selectedViolation` - szczegóły wybranego naruszenia
-- `expenseReports` - dane raportów wydatków
-- `tollOperators` - dane operatorów opłat drogowych
+- `kpiData` - dane KPI
+- `mapData` - dane mapy aktywności opłat drogowych
+- `expenseTrends` - trendy wydatków na opłaty drogowe
+- `alerts` - alerty dotyczące opłat drogowych
+- `transponders` - lista transponderów
+- `selectedTransponder` - wybrany transponder
+- `violations` - rejestr naruszeń
+- `selectedViolation` - wybrane naruszenie
+- `expenseReports` - raporty wydatków
+- `tollOperators` - operatorzy opłat drogowych
 - `routeOptimization` - dane optymalizacji tras
-- `activeTab` - aktywna główna zakładka
-- `activeSubTab` - aktywna podzakładka
-- `isLoading` - stan ładowania danych
+- `activeTab` - aktywna zakładka
+- `isLoading` - stan ładowania
 - `error` - stan błędu
 - `useMockData` - przełącznik źródła danych (API vs Mock)
-- `dataLoadedRef` - referencja śledząca, które dane zostały już załadowane
-- `transponderFilters` - filtry dla transponderów (status, wyszukiwanie, strona)
-- `violationFilters` - filtry dla naruszeń (status, wyszukiwanie, strona)
-- `reportFilters` - filtry dla raportów (grupowanie, zakres czasowy)
-- `routeFilters` - filtry dla optymalizacji tras (początek, cel)
 
 #### Integracja z API:
 - Komponent korzysta z `roadTollsService` lub `mockRoadTollsService` w zależności od stanu przełącznika `useMockData`
@@ -357,95 +342,113 @@ Sekcja Road Tolls umożliwia kompleksowe zarządzanie opłatami drogowymi, trans
 - Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
 - Osobna obsługa błędów dla różnych typów danych
 - Logowanie błędów do konsoli
-- Mechanizm debounce dla filtrów wyszukiwania, aby zapobiec zbyt częstym wywołaniom API
-
-#### Optymalizacja wydajności:
-- Wykorzystanie `useRef` do śledzenia załadowanych danych bez wywoływania ponownego renderowania
-- Implementacja `useCallback` dla funkcji ładujących dane
-- Mechanizm debounce dla filtrów wyszukiwania
-- Ładowanie danych tylko wtedy, gdy nie zostały jeszcze załadowane
-- Zapobieganie równoległym wywołaniom API podczas ładowania danych
 
 #### Responsywność:
 - Układ dostosowuje się do różnych rozmiarów ekranu
-- Zastosowano media queries dla różnych breakpointów
 - Tabele i wykresy dostosowują się do dostępnej przestrzeni
-- Specjalne widoki dla urządzeń mobilnych
+- Mapy są responsywne i dostosowują się do rozmiaru kontenera
 
 ### Route Optimization (Optymalizacja Tras)
 
-Sekcja Route Optimization, będąca częścią komponentu Road Tolls, umożliwia zaawansowaną optymalizację tras pod kątem minimalizacji kosztów opłat drogowych, czasu przejazdu i zużycia paliwa. Komponent ten pozwala na porównanie różnych wariantów tras i wybór najbardziej optymalnego rozwiązania.
-
-#### Obecna funkcjonalność:
-- Wyszukiwanie tras między punktem początkowym a docelowym
-- Porównanie standardowych tras z alternatywnymi
-- Wyświetlanie potencjalnych oszczędności na opłatach drogowych
-- Podstawowa wizualizacja tras na mapie
-
-#### Planowane rozszerzenia funkcjonalności:
-
-##### Faza 1 (krótkoterminowa)
-1. **Zaawansowana wizualizacja**
-   - Interaktywna mapa z możliwością modyfikacji trasy
-   - Wizualizacja punktów poboru opłat z informacją o stawkach
-   - Kolorowanie odcinków trasy według kosztów opłat (heat map)
-
-2. **Optymalizacja wielokryterialna**
-   - Minimalizacja kosztów opłat drogowych
-   - Minimalizacja zużycia paliwa
-   - Minimalizacja czasu przejazdu
-   - Minimalizacja emisji CO2
-
-3. **Integracja z modułem transponderów**
-   - Automatyczne przypisywanie transponderów do zaplanowanych tras
-   - Monitorowanie stanu konta transponderów przed planowanymi przejazdami
-   - Alerty o konieczności doładowania transponderów
-
-##### Faza 2 (średnioterminowa)
-1. **Zaawansowana analityka i raportowanie**
-   - Szczegółowe raporty oszczędności dzięki optymalizacji tras
-   - Analiza porównawcza planowanych vs. rzeczywistych kosztów opłat
-   - Identyfikacja kierowców/pojazdów generujących najwyższe koszty opłat
-
-2. **Predykcja ruchu i kosztów**
-   - Analiza historycznych danych o ruchu drogowym
-   - Predykcja natężenia ruchu w różnych porach dnia/tygodnia
-   - Uwzględnianie sezonowych zmian opłat drogowych
-
-3. **Optymalizacja dla floty pojazdów**
-   - Planowanie tras dla wielu pojazdów jednocześnie
-   - Optymalizacja przydziału pojazdów do tras
-   - Koordynacja przejazdów w celu minimalizacji łącznych kosztów opłat
-
-##### Faza 3 (długoterminowa)
-1. **Integracja z systemami nawigacyjnymi**
-   - Eksport zoptymalizowanych tras do systemów nawigacyjnych
-   - Integracja z popularnymi aplikacjami nawigacyjnymi
-   - Aktualizacja trasy w czasie rzeczywistym
-
-2. **Automatyzacja i inteligentne rekomendacje**
-   - Automatyczne sugerowanie alternatywnych tras przy planowaniu przejazdów
-   - Powiadomienia o zmianach w opłatach drogowych na często używanych trasach
-   - Rekomendacje dotyczące zakupu abonamentów/voucherów na opłaty drogowe
-
-3. **Pełna integracja z modułem zarządzania kosztami**
-   - Automatyczne księgowanie kosztów opłat drogowych
-   - Przypisywanie kosztów do odpowiednich centrów kosztowych
-   - Analiza rentowności tras z uwzględnieniem wszystkich kosztów
+Sekcja Route Optimization służy do optymalizacji tras pojazdów w celu minimalizacji kosztów opłat drogowych, zużycia paliwa, czasu przejazdu oraz emisji CO2. Umożliwia porównanie tras standardowych z alternatywnymi, wizualizację punktów poboru opłat oraz integrację z systemem transponderów.
 
 #### Funkcje i metody:
-- `loadRouteOptimization()` - pobiera dane optymalizacji tras z porównaniem kosztów
-- `handleRouteSearch()` - obsługuje wyszukiwanie tras do optymalizacji
-- `handleRouteFilterChange()` - obsługuje zmianę filtrów tras
-- `calculateSavings()` - oblicza potencjalne oszczędności między różnymi wariantami tras
-- `visualizeRoute()` - wizualizuje trasę na mapie z zaznaczeniem punktów poboru opłat
+- `loadRouteOptimization()` - pobiera dane optymalizacji tras na podstawie podanych filtrów
+- `loadTollPoints()` - pobiera dane punktów poboru opłat
+- `loadTransponders()` - pobiera dane transponderów (przekierowuje do komponentu Road Tolls)
+- `loadRouteDetails()` - pobiera szczegółowe informacje o wybranej trasie
+- `handleRouteSearch()` - obsługuje wyszukiwanie tras
+- `handleTabChange()` - obsługuje zmianę zakładki (w tym przekierowanie do Road Tolls)
+- `handleRouteFilterChange()` - obsługuje zmianę filtrów podstawowych tras
+- `handleAdvancedFilterChange()` - obsługuje zmianę filtrów zaawansowanych
+- `handleToggleAdvancedFilters()` - obsługuje pokazywanie/ukrywanie filtrów zaawansowanych
+- `handleMapViewChange()` - obsługuje zmianę widoku mapy
+- `handleToggleTollPoints()` - obsługuje pokazywanie/ukrywanie punktów poboru opłat na mapie
+- `handleToggleTrafficData()` - obsługuje pokazywanie/ukrywanie danych o ruchu drogowym
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+- `formatCurrency()` - formatuje wartości walutowe
+- `formatDate()` - formatuje daty
+- `calculateSavingsPercentage()` - oblicza procent oszczędności między trasą standardową a alternatywną
 
-#### Komponenty:
-- **Formularz wyszukiwania tras** - umożliwia wprowadzenie punktu początkowego i docelowego
-- **Mapa tras** - wizualizuje różne warianty tras na mapie
-- **Tabela porównawcza** - porównuje koszty, czas i dystans dla różnych wariantów tras
-- **Szczegóły trasy** - prezentuje szczegółowe informacje o wybranej trasie, w tym punkty poboru opłat
+#### Zakładki główne:
+- **Wyszukiwanie tras** - umożliwia wyszukiwanie i porównywanie tras
+- **Punkty poboru opłat** - wyświetla mapę i listę punktów poboru opłat
+- **Transpondery** - przekierowuje do sekcji transponderów w komponencie Road Tolls
+
+#### Podkomponenty:
+- **Formularz wyszukiwania** - zawiera filtry podstawowe i zaawansowane
+- **Karta trasy** - wyświetla informacje o trasie standardowej i alternatywnej
+- **Mapa tras** - wizualizuje trasy standardowe i alternatywne
+- **Porównanie tras** - szczegółowe porównanie kosztów, czasu, dystansu i emisji
+- **Mapa punktów poboru opłat** - wizualizuje punkty poboru opłat na mapie
+- **Lista punktów poboru opłat** - tabela z informacjami o punktach poboru opłat
+
+#### Stany (hooks):
+- `routeOptimization` - dane optymalizacji tras
+- `selectedRoute` - wybrana trasa do szczegółowego widoku
+- `tollPoints` - dane punktów poboru opłat
+- `transponders` - dane transponderów
+- `routeComparison` - dane porównania tras
+- `activeTab` - aktywna zakładka główna
+- `activeSubTab` - aktywna podzakładka
+- `isLoading` - stan ładowania
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+- `showAdvancedFilters` - stan widoczności filtrów zaawansowanych
+- `routeFilters` - filtry podstawowe tras (początek, cel, typ pojazdu, kryterium optymalizacji)
+- `advancedFilters` - filtry zaawansowane (czas wyjazdu/przyjazdu, maksymalny objazd, unikanie autostrad/opłat)
+- `mapView` - widok mapy
+- `showTollPoints` - stan widoczności punktów poboru opłat na mapie
+- `showTrafficData` - stan widoczności danych o ruchu drogowym
+
+#### Współdzielone dane i komponenty z Road Tolls:
+
+##### Współdzielone serwisy API:
+- `roadTollsService` - serwis API do pobierania danych o opłatach drogowych
+- `mockRoadTollsService` - mockowy serwis do testowania bez backendu
+
+##### Współdzielone metody API:
+- `getRouteOptimization()` - pobiera dane optymalizacji tras
+  - Używane w Road Tolls w zakładce "optimization"
+  - Używane w Route Optimization jako główne źródło danych
+- `getTransponders()` - pobiera dane transponderów
+  - Używane w Road Tolls w zakładce "transponders"
+  - Używane w Route Optimization do integracji z transponderami
+- `getTollPoints()` - pobiera dane punktów poboru opłat
+  - Używane w Road Tolls do wizualizacji na mapie
+  - Używane w Route Optimization w zakładce "toll_points"
+
+##### Współdzielone struktury danych:
+1. **Punkty poboru opłat (Toll Points)**
+   - Identyfikator, nazwa, droga, kraj, operator
+   - Stawki dla ciężarówek i samochodów osobowych
+   - Metody płatności, współrzędne geograficzne
+2. **Transpondery (Transponders)**
+   - Identyfikator, numer seryjny, status
+   - Przypisany pojazd i kierowca
+   - Daty ważności, operator, saldo
+3. **Optymalizacja tras (Route Optimization)**
+   - Trasy standardowe i alternatywne
+   - Koszty opłat drogowych, paliwa i całkowite
+   - Potencjalne oszczędności, liczba punktów poboru opłat
+
+##### Mechanizm przekierowania:
+- Kliknięcie w zakładkę "Transpondery" w Route Optimization przekierowuje do komponentu Road Tolls z aktywną zakładką "transponders"
+- Przekierowanie wykorzystuje hook `useNavigate` z React Router
+- Stan przekierowania jest przekazywany przez `location.state`
+- Komponent Road Tolls sprawdza `location.state` przy montowaniu i ustawia odpowiednią zakładkę
 
 #### Integracja z API:
-- Komponent korzysta z `roadTollsService.getRouteOptimization()` lub `mockRoadTollsService.getRouteOptimization()`
-- API zwraca dane o różnych wariantach tras, ich kosztach, czasie przejazdu i dystansie
+- Komponent korzysta z `roadTollsService` lub `mockRoadTollsService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getRouteOptimization()`, `getTollPoints()`, `getTransponders()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Logowanie błędów do konsoli
+- Osobna obsługa błędów dla różnych typów danych
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Formularze i tabele dostosowują się do dostępnej przestrzeni
+- Mapy są responsywne i dostosowują się do rozmiaru kontenera
