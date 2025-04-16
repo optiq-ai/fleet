@@ -18,6 +18,7 @@ import RoadTolls from './pages/RoadTolls';
 import RouteOptimization from './pages/RouteOptimization';
 import FerryBookings from './pages/FerryBookings';
 import Geofencing from './pages/Geofencing';
+import DocumentManagement from './pages/DocumentManagement';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -112,6 +113,11 @@ function App() {
           <Route path="/geofencing" element={
             <Layout>
               <Geofencing />
+            </Layout>
+          } />
+          <Route path="/document-management" element={
+            <Layout>
+              <DocumentManagement />
             </Layout>
           } />
           {/* Fallback route for any unmatched paths */}
