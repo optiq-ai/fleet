@@ -19,6 +19,7 @@ import RouteOptimization from './pages/RouteOptimization';
 import FerryBookings from './pages/FerryBookings';
 import Geofencing from './pages/Geofencing';
 import DocumentManagement from './pages/DocumentManagement';
+import AssetManagement from './pages/AssetManagement';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -120,6 +121,11 @@ function App() {
               <DocumentManagement />
             </Layout>
           } />
+          <Route path="/asset-management" element={
+            <Layout>
+              <AssetManagement />
+            </Layout>
+          } key="asset-management-route" />
           {/* Fallback route for any unmatched paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
