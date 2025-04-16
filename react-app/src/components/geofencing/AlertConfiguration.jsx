@@ -1,7 +1,349 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import styled from 'styled-components';
 import Card from '../common/Card';
 import Table from '../common/Table';
 import * as geofencingService from '../../services/api/mockGeofencingService';
+
+const ConfigurationContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const FiltersContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+  
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+  
+  label {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  select, input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    
+    &:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
+  }
+`;
+
+const CreateButton = styled.button`
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-left: auto;
+  
+  &:hover {
+    background-color: #303f9f;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-left: 0;
+  }
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  
+  button {
+    padding: 8px 16px;
+    background-color: ${props => props.disabled ? '#f5f5f5' : '#3f51b5'};
+    color: ${props => props.disabled ? '#999' : 'white'};
+    border: none;
+    border-radius: 4px;
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+    transition: background-color 0.3s;
+    
+    &:hover:not(:disabled) {
+      background-color: #303f9f;
+    }
+    
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+  
+  span {
+    color: #666;
+  }
+`;
+
+const TableActions = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const ActionButton = styled.button`
+  padding: 6px 12px;
+  background-color: ${props => props.delete ? '#f44336' : '#3f51b5'};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+  
+  &:hover {
+    background-color: ${props => props.delete ? '#d32f2f' : '#303f9f'};
+  }
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 16px;
+  
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    
+    &:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
+  }
+  
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+`;
+
+const ScheduleContainer = styled.div`
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+`;
+
+const ScheduleActive = styled.div`
+  margin-bottom: 16px;
+  
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    
+    input {
+      width: auto;
+    }
+  }
+`;
+
+const ScheduleDays = styled.div`
+  margin-bottom: 16px;
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+  }
+`;
+
+const DaysCheckboxes = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  
+  label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    margin-bottom: 0;
+    
+    input {
+      width: auto;
+    }
+  }
+`;
+
+const ScheduleTimes = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const TimeInput = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const RecipientsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const RecipientRow = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const RecipientType = styled.div`
+  flex: 1;
+`;
+
+const RecipientValue = styled.div`
+  flex: 2;
+`;
+
+const RecipientActions = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const AddRecipientButton = styled.button`
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  align-self: flex-start;
+  margin-top: 8px;
+  
+  &:hover {
+    background-color: #303f9f;
+  }
+`;
+
+const RemoveRecipientButton = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  
+  &:hover {
+    background-color: #d32f2f;
+  }
+  
+  @media (max-width: 576px) {
+    align-self: flex-end;
+  }
+`;
+
+const FormActions = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+`;
+
+const SaveButton = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  
+  &:hover {
+    background-color: #388e3c;
+  }
+  
+  @media (max-width: 576px) {
+    order: 1;
+  }
+`;
+
+const CancelButton = styled.button`
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  
+  &:hover {
+    background-color: #e0e0e0;
+  }
+  
+  @media (max-width: 576px) {
+    order: 2;
+  }
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+  font-size: 16px;
+`;
+
+const ErrorMessage = styled.div`
+  color: #d32f2f;
+  padding: 16px;
+  background-color: #ffebee;
+  border-radius: 8px;
+  margin-bottom: 20px;
+`;
 
 /**
  * AlertConfiguration Component
@@ -310,11 +652,11 @@ const AlertConfiguration = () => {
   };
 
   return (
-    <div className="alert-configuration">
+    <ConfigurationContainer>
       {/* Filters */}
-      <Card title="Filters" className="filters-card">
-        <div className="filters-container">
-          <div className="filter-group">
+      <Card title="Filters">
+        <FiltersContainer>
+          <FilterGroup>
             <label htmlFor="geofence-filter">Geofence:</label>
             <select 
               id="geofence-filter" 
@@ -326,23 +668,20 @@ const AlertConfiguration = () => {
                 <option key={geofence.id} value={geofence.id}>{geofence.name}</option>
               ))}
             </select>
-          </div>
+          </FilterGroup>
           
-          <button 
-            className="create-button"
-            onClick={handleCreateNew}
-          >
+          <CreateButton onClick={handleCreateNew}>
             Create New Alert Rule
-          </button>
-        </div>
+          </CreateButton>
+        </FiltersContainer>
       </Card>
       
       {/* Alert Rules List */}
-      <Card title="Alert Rules" className="alert-rules-list-card">
+      <Card title="Alert Rules">
         {isLoading ? (
-          <div className="loading">Loading alert rules...</div>
+          <LoadingContainer>Loading alert rules...</LoadingContainer>
         ) : error ? (
-          <div className="error-message">{error}</div>
+          <ErrorMessage>{error}</ErrorMessage>
         ) : alertRules.items && alertRules.items.length > 0 ? (
           <>
             <Table
@@ -353,26 +692,25 @@ const AlertConfiguration = () => {
                 rule.triggerOn,
                 rule.priority,
                 rule.status,
-                <div className="table-actions">
-                  <button 
-                    className="edit-button"
+                <TableActions>
+                  <ActionButton 
                     onClick={() => handleRuleSelect(rule.id)}
                   >
                     Edit
-                  </button>
-                  <button 
-                    className="delete-button"
+                  </ActionButton>
+                  <ActionButton 
+                    delete
                     onClick={() => handleDelete(rule.id)}
                   >
                     Delete
-                  </button>
-                </div>
+                  </ActionButton>
+                </TableActions>
               ])}
               onRowClick={(index) => handleRuleSelect(alertRules.items[index].id)}
             />
             
             {/* Pagination */}
-            <div className="pagination">
+            <Pagination>
               <button 
                 disabled={filters.page === 1}
                 onClick={() => handleFilterChange('page', filters.page - 1)}
@@ -386,7 +724,7 @@ const AlertConfiguration = () => {
               >
                 Next
               </button>
-            </div>
+            </Pagination>
           </>
         ) : (
           <p>No alert rules found.</p>
@@ -394,12 +732,12 @@ const AlertConfiguration = () => {
       </Card>
       
       {/* Alert Rule Form */}
-      <Card title={isEditing ? `Edit Alert Rule: ${formData.name}` : "Create New Alert Rule"} className="alert-rule-form-card">
+      <Card title={isEditing ? `Edit Alert Rule: ${formData.name}` : "Create New Alert Rule"}>
         {isDetailLoading ? (
-          <div className="loading">Loading alert rule details...</div>
+          <LoadingContainer>Loading alert rule details...</LoadingContainer>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="geofenceId">Geofence:</label>
               <select 
                 id="geofenceId" 
@@ -413,9 +751,9 @@ const AlertConfiguration = () => {
                   <option key={geofence.id} value={geofence.id}>{geofence.name}</option>
                 ))}
               </select>
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="name">Name:</label>
               <input 
                 type="text" 
@@ -425,9 +763,9 @@ const AlertConfiguration = () => {
                 onChange={handleInputChange}
                 required
               />
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="description">Description:</label>
               <textarea 
                 id="description" 
@@ -435,9 +773,9 @@ const AlertConfiguration = () => {
                 value={formData.description} 
                 onChange={handleInputChange}
               />
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="triggerOn">Trigger On:</label>
               <select 
                 id="triggerOn" 
@@ -449,10 +787,10 @@ const AlertConfiguration = () => {
                 <option value="exit">Exit</option>
                 <option value="dwell">Dwell Time</option>
               </select>
-            </div>
+            </FormGroup>
             
             {formData.triggerOn === 'dwell' && (
-              <div className="form-group">
+              <FormGroup>
                 <label htmlFor="dwellThreshold">Dwell Threshold (seconds):</label>
                 <input 
                   type="number" 
@@ -463,10 +801,10 @@ const AlertConfiguration = () => {
                   min="1"
                   required
                 />
-              </div>
+              </FormGroup>
             )}
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="priority">Priority:</label>
               <select 
                 id="priority" 
@@ -478,9 +816,9 @@ const AlertConfiguration = () => {
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
               </select>
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="status">Status:</label>
               <select 
                 id="status" 
@@ -491,12 +829,12 @@ const AlertConfiguration = () => {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label>Schedule:</label>
-              <div className="schedule-container">
-                <div className="schedule-active">
+              <ScheduleContainer>
+                <ScheduleActive>
                   <label>
                     <input 
                       type="checkbox" 
@@ -505,11 +843,11 @@ const AlertConfiguration = () => {
                     />
                     Active
                   </label>
-                </div>
+                </ScheduleActive>
                 
-                <div className="schedule-days">
+                <ScheduleDays>
                   <label>Days:</label>
-                  <div className="days-checkboxes">
+                  <DaysCheckboxes>
                     {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => (
                       <label key={day}>
                         <input 
@@ -520,11 +858,11 @@ const AlertConfiguration = () => {
                         {day.charAt(0).toUpperCase() + day.slice(1)}
                       </label>
                     ))}
-                  </div>
-                </div>
+                  </DaysCheckboxes>
+                </ScheduleDays>
                 
-                <div className="schedule-times">
-                  <div className="time-input">
+                <ScheduleTimes>
+                  <TimeInput>
                     <label htmlFor="startTime">Start Time:</label>
                     <input 
                       type="time" 
@@ -532,9 +870,9 @@ const AlertConfiguration = () => {
                       value={formData.schedule.startTime} 
                       onChange={(e) => handleScheduleChange('startTime', e.target.value)}
                     />
-                  </div>
+                  </TimeInput>
                   
-                  <div className="time-input">
+                  <TimeInput>
                     <label htmlFor="endTime">End Time:</label>
                     <input 
                       type="time" 
@@ -542,62 +880,75 @@ const AlertConfiguration = () => {
                       value={formData.schedule.endTime} 
                       onChange={(e) => handleScheduleChange('endTime', e.target.value)}
                     />
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </TimeInput>
+                </ScheduleTimes>
+              </ScheduleContainer>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label>Recipients:</label>
-              <div className="recipients-container">
+              <RecipientsContainer>
                 {formData.recipients.map((recipient, index) => (
-                  <div key={index} className="recipient-row">
-                    <select 
-                      value={recipient.type} 
-                      onChange={(e) => handleRecipientChange(index, 'type', e.target.value)}
-                    >
-                      <option value="email">Email</option>
-                      <option value="sms">SMS</option>
-                    </select>
-                    <input 
-                      type={recipient.type === 'email' ? 'email' : 'tel'} 
-                      value={recipient.value} 
-                      onChange={(e) => handleRecipientChange(index, 'value', e.target.value)}
-                      placeholder={recipient.type === 'email' ? 'Email address' : 'Phone number'}
-                      required
-                    />
-                    <button 
-                      type="button" 
-                      className="remove-button"
-                      onClick={() => handleRemoveRecipient(index)}
-                      disabled={formData.recipients.length <= 1}
-                    >
-                      Remove
-                    </button>
-                  </div>
+                  <RecipientRow key={index}>
+                    <RecipientType>
+                      <label htmlFor={`recipientType-${index}`}>Type:</label>
+                      <select 
+                        id={`recipientType-${index}`}
+                        value={recipient.type} 
+                        onChange={(e) => handleRecipientChange(index, 'type', e.target.value)}
+                      >
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                        <option value="webhook">Webhook</option>
+                      </select>
+                    </RecipientType>
+                    
+                    <RecipientValue>
+                      <label htmlFor={`recipientValue-${index}`}>Value:</label>
+                      <input 
+                        type="text" 
+                        id={`recipientValue-${index}`}
+                        value={recipient.value} 
+                        onChange={(e) => handleRecipientChange(index, 'value', e.target.value)}
+                        placeholder={recipient.type === 'email' ? 'email@example.com' : recipient.type === 'sms' ? '+1234567890' : 'https://example.com/webhook'}
+                        required
+                      />
+                    </RecipientValue>
+                    
+                    {formData.recipients.length > 1 && (
+                      <RecipientActions>
+                        <RemoveRecipientButton 
+                          type="button"
+                          onClick={() => handleRemoveRecipient(index)}
+                        >
+                          Remove
+                        </RemoveRecipientButton>
+                      </RecipientActions>
+                    )}
+                  </RecipientRow>
                 ))}
-                <button 
-                  type="button" 
-                  className="add-button"
+                
+                <AddRecipientButton 
+                  type="button"
                   onClick={handleAddRecipient}
                 >
                   Add Recipient
-                </button>
-              </div>
-            </div>
+                </AddRecipientButton>
+              </RecipientsContainer>
+            </FormGroup>
             
-            <div className="form-actions">
-              <button type="submit" className="save-button">
+            <FormActions>
+              <SaveButton type="submit">
                 {isEditing ? 'Update Alert Rule' : 'Create Alert Rule'}
-              </button>
-              <button type="button" className="cancel-button" onClick={handleCreateNew}>
+              </SaveButton>
+              <CancelButton type="button" onClick={handleCreateNew}>
                 Cancel
-              </button>
-            </div>
+              </CancelButton>
+            </FormActions>
           </form>
         )}
       </Card>
-    </div>
+    </ConfigurationContainer>
   );
 };
 

@@ -1,7 +1,261 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import styled from 'styled-components';
 import Card from '../common/Card';
 import Table from '../common/Table';
 import * as geofencingService from '../../services/api/mockGeofencingService';
+
+const ManagerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const FiltersContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+  
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+  
+  label {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  select, input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    
+    &:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
+  }
+`;
+
+const CreateButton = styled.button`
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-left: auto;
+  
+  &:hover {
+    background-color: #303f9f;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-left: 0;
+  }
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  
+  button {
+    padding: 8px 16px;
+    background-color: ${props => props.disabled ? '#f5f5f5' : '#3f51b5'};
+    color: ${props => props.disabled ? '#999' : 'white'};
+    border: none;
+    border-radius: 4px;
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+    transition: background-color 0.3s;
+    
+    &:hover:not(:disabled) {
+      background-color: #303f9f;
+    }
+    
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+  
+  span {
+    color: #666;
+  }
+`;
+
+const TableActions = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const ActionButton = styled.button`
+  padding: 6px 12px;
+  background-color: ${props => props.delete ? '#f44336' : '#3f51b5'};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+  
+  &:hover {
+    background-color: ${props => props.delete ? '#d32f2f' : '#303f9f'};
+  }
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 16px;
+  
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    
+    &:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
+  }
+  
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+`;
+
+const CoordinatesPlaceholder = styled.div`
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: #666;
+`;
+
+const ScheduleContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+`;
+
+const ScheduleDay = styled.div`
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 12px;
+`;
+
+const DayName = styled.div`
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333;
+`;
+
+const TimeInputs = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  input {
+    flex: 1;
+    padding: 8px;
+  }
+  
+  span {
+    color: #666;
+  }
+`;
+
+const FormActions = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+`;
+
+const SaveButton = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  
+  &:hover {
+    background-color: #388e3c;
+  }
+  
+  @media (max-width: 576px) {
+    order: 1;
+  }
+`;
+
+const CancelButton = styled.button`
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  
+  &:hover {
+    background-color: #e0e0e0;
+  }
+  
+  @media (max-width: 576px) {
+    order: 2;
+  }
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+  font-size: 16px;
+`;
+
+const ErrorMessage = styled.div`
+  color: #d32f2f;
+  padding: 16px;
+  background-color: #ffebee;
+  border-radius: 8px;
+  margin-bottom: 20px;
+`;
 
 /**
  * GeofenceManager Component
@@ -211,11 +465,11 @@ const GeofenceManager = () => {
   };
 
   return (
-    <div className="geofence-manager">
+    <ManagerContainer>
       {/* Filters */}
-      <Card title="Filters" className="filters-card">
-        <div className="filters-container">
-          <div className="filter-group">
+      <Card title="Filters">
+        <FiltersContainer>
+          <FilterGroup>
             <label htmlFor="category-filter">Category:</label>
             <select 
               id="category-filter" 
@@ -229,9 +483,9 @@ const GeofenceManager = () => {
               <option value="hazardous">Hazardous</option>
               <option value="corridor">Corridor</option>
             </select>
-          </div>
+          </FilterGroup>
           
-          <div className="filter-group">
+          <FilterGroup>
             <label htmlFor="status-filter">Status:</label>
             <select 
               id="status-filter" 
@@ -242,9 +496,9 @@ const GeofenceManager = () => {
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-          </div>
+          </FilterGroup>
           
-          <div className="filter-group">
+          <FilterGroup>
             <label htmlFor="search-filter">Search:</label>
             <input 
               type="text" 
@@ -253,23 +507,20 @@ const GeofenceManager = () => {
               onChange={(e) => handleFilterChange('search', e.target.value)}
               placeholder="Search by name or description"
             />
-          </div>
+          </FilterGroup>
           
-          <button 
-            className="create-button"
-            onClick={handleCreateNew}
-          >
+          <CreateButton onClick={handleCreateNew}>
             Create New Geofence
-          </button>
-        </div>
+          </CreateButton>
+        </FiltersContainer>
       </Card>
       
       {/* Geofence List */}
-      <Card title="Geofences" className="geofences-list-card">
+      <Card title="Geofences">
         {isLoading ? (
-          <div className="loading">Loading geofences...</div>
+          <LoadingContainer>Loading geofences...</LoadingContainer>
         ) : error ? (
-          <div className="error-message">{error}</div>
+          <ErrorMessage>{error}</ErrorMessage>
         ) : geofences.items && geofences.items.length > 0 ? (
           <>
             <Table
@@ -279,26 +530,25 @@ const GeofenceManager = () => {
                 geofence.type,
                 geofence.category,
                 geofence.status,
-                <div className="table-actions">
-                  <button 
-                    className="edit-button"
+                <TableActions>
+                  <ActionButton 
                     onClick={() => handleGeofenceSelect(geofence.id)}
                   >
                     Edit
-                  </button>
-                  <button 
-                    className="delete-button"
+                  </ActionButton>
+                  <ActionButton 
+                    delete
                     onClick={() => handleDelete(geofence.id)}
                   >
                     Delete
-                  </button>
-                </div>
+                  </ActionButton>
+                </TableActions>
               ])}
               onRowClick={(index) => handleGeofenceSelect(geofences.items[index].id)}
             />
             
             {/* Pagination */}
-            <div className="pagination">
+            <Pagination>
               <button 
                 disabled={filters.page === 1}
                 onClick={() => handleFilterChange('page', filters.page - 1)}
@@ -312,7 +562,7 @@ const GeofenceManager = () => {
               >
                 Next
               </button>
-            </div>
+            </Pagination>
           </>
         ) : (
           <p>No geofences found.</p>
@@ -320,12 +570,12 @@ const GeofenceManager = () => {
       </Card>
       
       {/* Geofence Form */}
-      <Card title={isEditing ? `Edit Geofence: ${formData.name}` : "Create New Geofence"} className="geofence-form-card">
+      <Card title={isEditing ? `Edit Geofence: ${formData.name}` : "Create New Geofence"}>
         {isDetailLoading ? (
-          <div className="loading">Loading geofence details...</div>
+          <LoadingContainer>Loading geofence details...</LoadingContainer>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="name">Name:</label>
               <input 
                 type="text" 
@@ -335,9 +585,9 @@ const GeofenceManager = () => {
                 onChange={handleInputChange}
                 required
               />
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="description">Description:</label>
               <textarea 
                 id="description" 
@@ -345,9 +595,9 @@ const GeofenceManager = () => {
                 value={formData.description} 
                 onChange={handleInputChange}
               />
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="type">Type:</label>
               <select 
                 id="type" 
@@ -359,9 +609,9 @@ const GeofenceManager = () => {
                 <option value="circle">Circle</option>
                 <option value="corridor">Corridor</option>
               </select>
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="category">Category:</label>
               <select 
                 id="category" 
@@ -375,9 +625,9 @@ const GeofenceManager = () => {
                 <option value="hazardous">Hazardous</option>
                 <option value="corridor">Corridor</option>
               </select>
-            </div>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor="status">Status:</label>
               <select 
                 id="status" 
@@ -388,10 +638,10 @@ const GeofenceManager = () => {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-            </div>
+            </FormGroup>
             
             {formData.type === 'circle' && (
-              <div className="form-group">
+              <FormGroup>
                 <label htmlFor="radius">Radius (meters):</label>
                 <input 
                   type="number" 
@@ -402,28 +652,28 @@ const GeofenceManager = () => {
                   min="1"
                   required
                 />
-              </div>
+              </FormGroup>
             )}
             
-            <div className="form-group">
+            <FormGroup>
               <label>Coordinates:</label>
-              <div className="coordinates-placeholder">
+              <CoordinatesPlaceholder>
                 <p>Coordinates would be set using an interactive map.</p>
                 {formData.type === 'circle' ? (
                   <p>Center point: Lat: {formData.coordinates[0]?.lat || 0}, Lng: {formData.coordinates[0]?.lng || 0}</p>
                 ) : (
                   <p>Polygon with {formData.coordinates.length} points</p>
                 )}
-              </div>
-            </div>
+              </CoordinatesPlaceholder>
+            </FormGroup>
             
-            <div className="form-group">
+            <FormGroup>
               <label>Schedule:</label>
-              <div className="schedule-container">
+              <ScheduleContainer>
                 {Object.keys(formData.schedule).map(day => (
-                  <div key={day} className="schedule-day">
-                    <div className="day-name">{day.charAt(0).toUpperCase() + day.slice(1)}</div>
-                    <div className="time-inputs">
+                  <ScheduleDay key={day}>
+                    <DayName>{day.charAt(0).toUpperCase() + day.slice(1)}</DayName>
+                    <TimeInputs>
                       <input 
                         type="time" 
                         value={formData.schedule[day].start || ''} 
@@ -435,24 +685,24 @@ const GeofenceManager = () => {
                         value={formData.schedule[day].end || ''} 
                         onChange={(e) => handleScheduleChange(day, 'end', e.target.value)}
                       />
-                    </div>
-                  </div>
+                    </TimeInputs>
+                  </ScheduleDay>
                 ))}
-              </div>
-            </div>
+              </ScheduleContainer>
+            </FormGroup>
             
-            <div className="form-actions">
-              <button type="submit" className="save-button">
+            <FormActions>
+              <SaveButton type="submit">
                 {isEditing ? 'Update Geofence' : 'Create Geofence'}
-              </button>
-              <button type="button" className="cancel-button" onClick={handleCreateNew}>
+              </SaveButton>
+              <CancelButton type="button" onClick={handleCreateNew}>
                 Cancel
-              </button>
-            </div>
+              </CancelButton>
+            </FormActions>
           </form>
         )}
       </Card>
-    </div>
+    </ManagerContainer>
   );
 };
 

@@ -1,7 +1,157 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import styled from 'styled-components';
 import Card from '../common/Card';
 import Table from '../common/Table';
 import * as geofencingService from '../../services/api/mockGeofencingService';
+
+const ReportsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const ReportTypeSelector = styled.div`
+  display: flex;
+  gap: 16px;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+`;
+
+const ReportTypeButton = styled.button`
+  flex: 1;
+  padding: 12px 16px;
+  background-color: ${props => props.active ? '#3f51b5' : '#f5f5f5'};
+  color: ${props => props.active ? 'white' : '#666'};
+  border: 1px solid ${props => props.active ? '#3f51b5' : '#ddd'};
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  
+  &:hover {
+    background-color: ${props => props.active ? '#303f9f' : '#e0e0e0'};
+  }
+`;
+
+const FiltersContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+  
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+  
+  label {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  select, input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    
+    &:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
+  }
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  
+  button {
+    padding: 8px 16px;
+    background-color: ${props => props.disabled ? '#f5f5f5' : '#3f51b5'};
+    color: ${props => props.disabled ? '#999' : 'white'};
+    border: none;
+    border-radius: 4px;
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+    transition: background-color 0.3s;
+    
+    &:hover:not(:disabled) {
+      background-color: #303f9f;
+    }
+    
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+  
+  span {
+    color: #666;
+  }
+`;
+
+const ExportButtons = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+`;
+
+const ExportButton = styled.button`
+  flex: 1;
+  padding: 12px 16px;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  
+  &:hover:not(:disabled) {
+    background-color: #303f9f;
+  }
+  
+  &:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+  }
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+  font-size: 16px;
+`;
+
+const ErrorMessage = styled.div`
+  color: #d32f2f;
+  padding: 16px;
+  background-color: #ffebee;
+  border-radius: 8px;
+  margin-bottom: 20px;
+`;
 
 /**
  * GeofencingReports Component
@@ -106,29 +256,29 @@ const GeofencingReports = () => {
   };
 
   return (
-    <div className="geofencing-reports">
+    <ReportsContainer>
       {/* Report Type Selector */}
-      <Card className="report-type-selector-card">
-        <div className="report-type-selector">
-          <button 
-            className={`report-type-button ${activeReportType === 'violations' ? 'active' : ''}`}
+      <Card>
+        <ReportTypeSelector>
+          <ReportTypeButton 
+            active={activeReportType === 'violations'}
             onClick={() => handleReportTypeChange('violations')}
           >
             Violations Report
-          </button>
-          <button 
-            className={`report-type-button ${activeReportType === 'timeInZone' ? 'active' : ''}`}
+          </ReportTypeButton>
+          <ReportTypeButton 
+            active={activeReportType === 'timeInZone'}
             onClick={() => handleReportTypeChange('timeInZone')}
           >
             Time in Zone Report
-          </button>
-        </div>
+          </ReportTypeButton>
+        </ReportTypeSelector>
       </Card>
       
       {/* Filters */}
-      <Card title="Report Filters" className="filters-card">
-        <div className="filters-container">
-          <div className="filter-group">
+      <Card title="Report Filters">
+        <FiltersContainer>
+          <FilterGroup>
             <label htmlFor="geofence-filter">Geofence:</label>
             <select 
               id="geofence-filter" 
@@ -140,9 +290,9 @@ const GeofencingReports = () => {
                 <option key={geofence.id} value={geofence.id}>{geofence.name}</option>
               ))}
             </select>
-          </div>
+          </FilterGroup>
           
-          <div className="filter-group">
+          <FilterGroup>
             <label htmlFor="vehicle-filter">Vehicle:</label>
             <select 
               id="vehicle-filter" 
@@ -154,9 +304,9 @@ const GeofencingReports = () => {
                 <option key={vehicle.id} value={vehicle.id}>{vehicle.plate}</option>
               ))}
             </select>
-          </div>
+          </FilterGroup>
           
-          <div className="filter-group">
+          <FilterGroup>
             <label htmlFor="driver-filter">Driver:</label>
             <select 
               id="driver-filter" 
@@ -168,9 +318,9 @@ const GeofencingReports = () => {
                 <option key={driver.id} value={driver.id}>{driver.name}</option>
               ))}
             </select>
-          </div>
+          </FilterGroup>
           
-          <div className="filter-group">
+          <FilterGroup>
             <label htmlFor="date-from">Date From:</label>
             <input 
               type="date" 
@@ -178,9 +328,9 @@ const GeofencingReports = () => {
               value={filters.dateFrom} 
               onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
             />
-          </div>
+          </FilterGroup>
           
-          <div className="filter-group">
+          <FilterGroup>
             <label htmlFor="date-to">Date To:</label>
             <input 
               type="date" 
@@ -188,10 +338,10 @@ const GeofencingReports = () => {
               value={filters.dateTo} 
               onChange={(e) => handleFilterChange('dateTo', e.target.value)}
             />
-          </div>
+          </FilterGroup>
           
           {activeReportType === 'timeInZone' && (
-            <div className="filter-group">
+            <FilterGroup>
               <label htmlFor="group-by">Group By:</label>
               <select 
                 id="group-by" 
@@ -205,20 +355,19 @@ const GeofencingReports = () => {
                 <option value="week">Week</option>
                 <option value="month">Month</option>
               </select>
-            </div>
+            </FilterGroup>
           )}
-        </div>
+        </FiltersContainer>
       </Card>
       
       {/* Report Data */}
       <Card 
-        title={activeReportType === 'violations' ? 'Violations Report' : 'Time in Zone Report'} 
-        className="report-data-card"
+        title={activeReportType === 'violations' ? 'Violations Report' : 'Time in Zone Report'}
       >
         {isLoading ? (
-          <div className="loading">Loading report data...</div>
+          <LoadingContainer>Loading report data...</LoadingContainer>
         ) : error ? (
-          <div className="error-message">{error}</div>
+          <ErrorMessage>{error}</ErrorMessage>
         ) : reportData && reportData.items && reportData.items.length > 0 ? (
           <>
             {activeReportType === 'violations' && (
@@ -251,7 +400,7 @@ const GeofencingReports = () => {
             )}
             
             {/* Pagination */}
-            <div className="pagination">
+            <Pagination>
               <button 
                 disabled={filters.page === 1}
                 onClick={() => handleFilterChange('page', filters.page - 1)}
@@ -265,7 +414,7 @@ const GeofencingReports = () => {
               >
                 Next
               </button>
-            </div>
+            </Pagination>
           </>
         ) : (
           <p>No report data available for the selected filters.</p>
@@ -273,32 +422,29 @@ const GeofencingReports = () => {
       </Card>
       
       {/* Export Options */}
-      <Card title="Export Options" className="export-options-card">
-        <div className="export-buttons">
-          <button 
-            className="export-button"
+      <Card title="Export Options">
+        <ExportButtons>
+          <ExportButton 
             onClick={() => handleExportReport('pdf')}
             disabled={isLoading || !reportData || !reportData.items || reportData.items.length === 0}
           >
             Export as PDF
-          </button>
-          <button 
-            className="export-button"
+          </ExportButton>
+          <ExportButton 
             onClick={() => handleExportReport('csv')}
             disabled={isLoading || !reportData || !reportData.items || reportData.items.length === 0}
           >
             Export as CSV
-          </button>
-          <button 
-            className="export-button"
+          </ExportButton>
+          <ExportButton 
             onClick={() => handleExportReport('xlsx')}
             disabled={isLoading || !reportData || !reportData.items || reportData.items.length === 0}
           >
             Export as Excel
-          </button>
-        </div>
+          </ExportButton>
+        </ExportButtons>
       </Card>
-    </div>
+    </ReportsContainer>
   );
 };
 
