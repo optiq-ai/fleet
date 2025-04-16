@@ -1,0 +1,2910 @@
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  font-size: inherit;
+  color: inherit;
+  vertical-align: -0.125em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+/* Dashboard Icons */
+.icon-dashboard:before {
+  content: "\f0e4"; /* tachometer-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-line:before {
+  content: "\f201"; /* chart-line */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-bar:before {
+  content: "\f080"; /* chart-bar */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-pie:before {
+  content: "\f200"; /* chart-pie */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bell:before {
+  content: "\f0f3"; /* bell */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* API Management Icons */
+.icon-key:before {
+  content: "\f084"; /* key */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lock:before {
+  content: "\f023"; /* lock */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-unlock:before {
+  content: "\f09c"; /* unlock */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-shield-alt:before {
+  content: "\f3ed"; /* shield-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-user-shield:before {
+  content: "\f505"; /* user-shield */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* Connector Icons */
+.icon-plug:before {
+  content: "\f1e6"; /* plug */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-link:before {
+  content: "\f0c1"; /* link */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-unlink:before {
+  content: "\f127"; /* unlink */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-exchange-alt:before {
+  content: "\f362"; /* exchange-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sync:before {
+  content: "\f021"; /* sync */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* Telematics Icons */
+.icon-satellite:before {
+  content: "\f7bf"; /* satellite */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-satellite-dish:before {
+  content: "\f7c0"; /* satellite-dish */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-broadcast-tower:before {
+  content: "\f519"; /* broadcast-tower */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-signal:before {
+  content: "\f012"; /* signal */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wifi:before {
+  content: "\f1eb"; /* wifi */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-microchip:before {
+  content: "\f2db"; /* microchip */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* Fuel Card Icons */
+.icon-gas-pump:before {
+  content: "\f52f"; /* gas-pump */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-credit-card:before {
+  content: "\f09d"; /* credit-card */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-money-bill:before {
+  content: "\f0d6"; /* money-bill */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-receipt:before {
+  content: "\f543"; /* receipt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-invoice-dollar:before {
+  content: "\f571"; /* file-invoice-dollar */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* Maintenance Icons */
+.icon-wrench:before {
+  content: "\f0ad"; /* wrench */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tools:before {
+  content: "\f7d9"; /* tools */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cogs:before {
+  content: "\f085"; /* cogs */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-clipboard-list:before {
+  content: "\f46d"; /* clipboard-list */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-clipboard-check:before {
+  content: "\f46c"; /* clipboard-check */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* Custom Integration Icons */
+.icon-code:before {
+  content: "\f121"; /* code */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-code-branch:before {
+  content: "\f126"; /* code-branch */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-terminal:before {
+  content: "\f120"; /* terminal */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-code:before {
+  content: "\f1c9"; /* file-code */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-alt:before {
+  content: "\f15c"; /* file-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* General Icons */
+.icon-plus:before {
+  content: "\f067"; /* plus */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-minus:before {
+  content: "\f068"; /* minus */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-times:before {
+  content: "\f00d"; /* times */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-check:before {
+  content: "\f00c"; /* check */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-exclamation-triangle:before {
+  content: "\f071"; /* exclamation-triangle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-exclamation-circle:before {
+  content: "\f06a"; /* exclamation-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-info-circle:before {
+  content: "\f05a"; /* info-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-question-circle:before {
+  content: "\f059"; /* question-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cog:before {
+  content: "\f013"; /* cog */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-search:before {
+  content: "\f002"; /* search */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-filter:before {
+  content: "\f0b0"; /* filter */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-download:before {
+  content: "\f019"; /* download */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-upload:before {
+  content: "\f093"; /* upload */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-trash-alt:before {
+  content: "\f2ed"; /* trash-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-edit:before {
+  content: "\f044"; /* edit */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-eye:before {
+  content: "\f06e"; /* eye */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-eye-slash:before {
+  content: "\f070"; /* eye-slash */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-calendar-alt:before {
+  content: "\f073"; /* calendar-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-clock:before {
+  content: "\f017"; /* clock */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-database:before {
+  content: "\f1c0"; /* database */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-server:before {
+  content: "\f233"; /* server */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cloud:before {
+  content: "\f0c2"; /* cloud */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cloud-upload-alt:before {
+  content: "\f382"; /* cloud-upload-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cloud-download-alt:before {
+  content: "\f381"; /* cloud-download-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-paper-plane:before {
+  content: "\f1d8"; /* paper-plane */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-envelope:before {
+  content: "\f0e0"; /* envelope */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-comment:before {
+  content: "\f075"; /* comment */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-comments:before {
+  content: "\f086"; /* comments */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-phone:before {
+  content: "\f095"; /* phone */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-mobile-alt:before {
+  content: "\f3cd"; /* mobile-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-truck:before {
+  content: "\f0d1"; /* truck */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-car:before {
+  content: "\f1b9"; /* car */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-building:before {
+  content: "\f1ad"; /* building */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-users:before {
+  content: "\f0c0"; /* users */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-user:before {
+  content: "\f007"; /* user */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-user-tie:before {
+  content: "\f508"; /* user-tie */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-user-hard-hat:before {
+  content: "\f82c"; /* user-hard-hat */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-signature:before {
+  content: "\f573"; /* file-signature */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-contract:before {
+  content: "\f56c"; /* file-contract */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-invoice:before {
+  content: "\f570"; /* file-invoice */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-pdf:before {
+  content: "\f1c1"; /* file-pdf */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-excel:before {
+  content: "\f1c3"; /* file-excel */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-csv:before {
+  content: "\f6dd"; /* file-csv */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-import:before {
+  content: "\f56f"; /* file-import */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-export:before {
+  content: "\f56e"; /* file-export */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-area:before {
+  content: "\f1fe"; /* chart-area */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-network:before {
+  content: "\f78a"; /* chart-network */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-project-diagram:before {
+  content: "\f542"; /* project-diagram */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sitemap:before {
+  content: "\f0e8"; /* sitemap */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-network-wired:before {
+  content: "\f6ff"; /* network-wired */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-robot:before {
+  content: "\f544"; /* robot */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-magic:before {
+  content: "\f0d0"; /* magic */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wand:before {
+  content: "\f72a"; /* wand */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bolt:before {
+  content: "\f0e7"; /* bolt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt:before {
+  content: "\f3fd"; /* tachometer-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt-fast:before {
+  content: "\f625"; /* tachometer-alt-fast */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt-average:before {
+  content: "\f624"; /* tachometer-alt-average */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt-slow:before {
+  content: "\f627"; /* tachometer-alt-slow */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-map-marker-alt:before {
+  content: "\f3c5"; /* map-marker-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-map:before {
+  content: "\f279"; /* map */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-route:before {
+  content: "\f4d7"; /* route */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-road:before {
+  content: "\f018"; /* road */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-compass:before {
+  content: "\f14e"; /* compass */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-location-arrow:before {
+  content: "\f124"; /* location-arrow */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-directions:before {
+  content: "\f5eb"; /* directions */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-globe:before {
+  content: "\f0ac"; /* globe */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-globe-americas:before {
+  content: "\f57d"; /* globe-americas */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-globe-europe:before {
+  content: "\f7a2"; /* globe-europe */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-globe-asia:before {
+  content: "\f57e"; /* globe-asia */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-globe-africa:before {
+  content: "\f57c"; /* globe-africa */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-temperature-high:before {
+  content: "\f769"; /* temperature-high */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-temperature-low:before {
+  content: "\f76b"; /* temperature-low */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-thermometer-half:before {
+  content: "\f2c9"; /* thermometer-half */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tint:before {
+  content: "\f043"; /* tint */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-oil-can:before {
+  content: "\f613"; /* oil-can */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tire:before {
+  content: "\f631"; /* tire */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tire-flat:before {
+  content: "\f632"; /* tire-flat */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tire-pressure-warning:before {
+  content: "\f633"; /* tire-pressure-warning */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tire-rugged:before {
+  content: "\f634"; /* tire-rugged */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-oil-temp:before {
+  content: "\f614"; /* oil-temp */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-battery-full:before {
+  content: "\f240"; /* battery-full */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-battery-three-quarters:before {
+  content: "\f241"; /* battery-three-quarters */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-battery-half:before {
+  content: "\f242"; /* battery-half */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-battery-quarter:before {
+  content: "\f243"; /* battery-quarter */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-battery-empty:before {
+  content: "\f244"; /* battery-empty */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-charging-station:before {
+  content: "\f5e7"; /* charging-station */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-car-battery:before {
+  content: "\f5df"; /* car-battery */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-car-crash:before {
+  content: "\f5e1"; /* car-crash */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-car-side:before {
+  content: "\f5e4"; /* car-side */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-truck-loading:before {
+  content: "\f4de"; /* truck-loading */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-truck-moving:before {
+  content: "\f4df"; /* truck-moving */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-shipping-fast:before {
+  content: "\f48b"; /* shipping-fast */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dolly:before {
+  content: "\f472"; /* dolly */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dolly-flatbed:before {
+  content: "\f474"; /* dolly-flatbed */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-pallet:before {
+  content: "\f482"; /* pallet */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-boxes:before {
+  content: "\f468"; /* boxes */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-box:before {
+  content: "\f466"; /* box */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-box-open:before {
+  content: "\f49e"; /* box-open */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-warehouse:before {
+  content: "\f494"; /* warehouse */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-store:before {
+  content: "\f54e"; /* store */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-store-alt:before {
+  content: "\f54f"; /* store-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-industry:before {
+  content: "\f275"; /* industry */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-factory:before {
+  content: "\f275"; /* factory (same as industry) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-city:before {
+  content: "\f64f"; /* city */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bridge:before {
+  content: "\e4c9"; /* bridge */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-road-bridge:before {
+  content: "\e563"; /* road-bridge */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-ship:before {
+  content: "\f21a"; /* ship */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-ferry:before {
+  content: "\e4ea"; /* ferry */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-anchor:before {
+  content: "\f13d"; /* anchor */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-plane:before {
+  content: "\f072"; /* plane */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-plane-departure:before {
+  content: "\f5b0"; /* plane-departure */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-plane-arrival:before {
+  content: "\f5af"; /* plane-arrival */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-helicopter:before {
+  content: "\f533"; /* helicopter */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-train:before {
+  content: "\f238"; /* train */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-subway:before {
+  content: "\f239"; /* subway */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bus:before {
+  content: "\f207"; /* bus */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bus-alt:before {
+  content: "\f55e"; /* bus-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-taxi:before {
+  content: "\f1ba"; /* taxi */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bicycle:before {
+  content: "\f206"; /* bicycle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-motorcycle:before {
+  content: "\f21c"; /* motorcycle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-walking:before {
+  content: "\f554"; /* walking */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-running:before {
+  content: "\f70c"; /* running */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wheelchair:before {
+  content: "\f193"; /* wheelchair */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wheelchair-move:before {
+  content: "\f193"; /* wheelchair-move (same as wheelchair) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-traffic-light:before {
+  content: "\f637"; /* traffic-light */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-traffic-light-go:before {
+  content: "\f638"; /* traffic-light-go */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-traffic-light-slow:before {
+  content: "\f639"; /* traffic-light-slow */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-traffic-light-stop:before {
+  content: "\f63a"; /* traffic-light-stop */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sign:before {
+  content: "\f4d9"; /* sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sign-in-alt:before {
+  content: "\f2f6"; /* sign-in-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sign-out-alt:before {
+  content: "\f2f5"; /* sign-out-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-parking:before {
+  content: "\f540"; /* parking */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-parking-circle:before {
+  content: "\f615"; /* parking-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-parking-circle-slash:before {
+  content: "\f616"; /* parking-circle-slash */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-ban:before {
+  content: "\f05e"; /* ban */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-stop:before {
+  content: "\f04d"; /* stop */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-stop-circle:before {
+  content: "\f28d"; /* stop-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-play:before {
+  content: "\f04b"; /* play */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-play-circle:before {
+  content: "\f144"; /* play-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-pause:before {
+  content: "\f04c"; /* pause */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-pause-circle:before {
+  content: "\f28b"; /* pause-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-forward:before {
+  content: "\f04e"; /* forward */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-backward:before {
+  content: "\f04a"; /* backward */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-fast-forward:before {
+  content: "\f050"; /* fast-forward */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-fast-backward:before {
+  content: "\f049"; /* fast-backward */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-step-forward:before {
+  content: "\f051"; /* step-forward */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-step-backward:before {
+  content: "\f048"; /* step-backward */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-redo:before {
+  content: "\f01e"; /* redo */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-undo:before {
+  content: "\f0e2"; /* undo */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-redo-alt:before {
+  content: "\f2f9"; /* redo-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-undo-alt:before {
+  content: "\f2ea"; /* undo-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-history:before {
+  content: "\f1da"; /* history */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-clock-rotate-left:before {
+  content: "\f1da"; /* clock-rotate-left (same as history) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrows-alt:before {
+  content: "\f0b2"; /* arrows-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrows-alt-h:before {
+  content: "\f337"; /* arrows-alt-h */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrows-alt-v:before {
+  content: "\f338"; /* arrows-alt-v */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-expand:before {
+  content: "\f065"; /* expand */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-compress:before {
+  content: "\f066"; /* compress */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-expand-alt:before {
+  content: "\f424"; /* expand-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-compress-alt:before {
+  content: "\f422"; /* compress-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-expand-arrows-alt:before {
+  content: "\f31e"; /* expand-arrows-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-compress-arrows-alt:before {
+  content: "\f78c"; /* compress-arrows-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-up:before {
+  content: "\f062"; /* arrow-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-down:before {
+  content: "\f063"; /* arrow-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-left:before {
+  content: "\f060"; /* arrow-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-right:before {
+  content: "\f061"; /* arrow-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-up-right:before {
+  content: "\f14c"; /* arrow-up-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-up-left:before {
+  content: "\f14d"; /* arrow-up-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-down-right:before {
+  content: "\f14d"; /* arrow-down-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-down-left:before {
+  content: "\f14c"; /* arrow-down-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-alt-circle-up:before {
+  content: "\f35b"; /* arrow-alt-circle-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-alt-circle-down:before {
+  content: "\f358"; /* arrow-alt-circle-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-alt-circle-left:before {
+  content: "\f359"; /* arrow-alt-circle-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-arrow-alt-circle-right:before {
+  content: "\f35a"; /* arrow-alt-circle-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-long-arrow-alt-up:before {
+  content: "\f30c"; /* long-arrow-alt-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-long-arrow-alt-down:before {
+  content: "\f309"; /* long-arrow-alt-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-long-arrow-alt-left:before {
+  content: "\f30a"; /* long-arrow-alt-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-long-arrow-alt-right:before {
+  content: "\f30b"; /* long-arrow-alt-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-up:before {
+  content: "\f077"; /* chevron-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-down:before {
+  content: "\f078"; /* chevron-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-left:before {
+  content: "\f053"; /* chevron-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-right:before {
+  content: "\f054"; /* chevron-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-circle-up:before {
+  content: "\f139"; /* chevron-circle-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-circle-down:before {
+  content: "\f13a"; /* chevron-circle-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-circle-left:before {
+  content: "\f137"; /* chevron-circle-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chevron-circle-right:before {
+  content: "\f138"; /* chevron-circle-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-up:before {
+  content: "\f106"; /* angle-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-down:before {
+  content: "\f107"; /* angle-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-left:before {
+  content: "\f104"; /* angle-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-right:before {
+  content: "\f105"; /* angle-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-double-up:before {
+  content: "\f102"; /* angle-double-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-double-down:before {
+  content: "\f103"; /* angle-double-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-double-left:before {
+  content: "\f100"; /* angle-double-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-angle-double-right:before {
+  content: "\f101"; /* angle-double-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-up:before {
+  content: "\f0d8"; /* caret-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-down:before {
+  content: "\f0d7"; /* caret-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-left:before {
+  content: "\f0d9"; /* caret-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-right:before {
+  content: "\f0da"; /* caret-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-square-up:before {
+  content: "\f151"; /* caret-square-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-square-down:before {
+  content: "\f150"; /* caret-square-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-square-left:before {
+  content: "\f191"; /* caret-square-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-caret-square-right:before {
+  content: "\f152"; /* caret-square-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort:before {
+  content: "\f0dc"; /* sort */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-up:before {
+  content: "\f0de"; /* sort-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-down:before {
+  content: "\f0dd"; /* sort-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-alpha-up:before {
+  content: "\f15e"; /* sort-alpha-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-alpha-down:before {
+  content: "\f15d"; /* sort-alpha-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-numeric-up:before {
+  content: "\f163"; /* sort-numeric-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-numeric-down:before {
+  content: "\f162"; /* sort-numeric-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-amount-up:before {
+  content: "\f161"; /* sort-amount-up */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-amount-down:before {
+  content: "\f160"; /* sort-amount-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-alpha-up-alt:before {
+  content: "\f882"; /* sort-alpha-up-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-alpha-down-alt:before {
+  content: "\f881"; /* sort-alpha-down-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-numeric-up-alt:before {
+  content: "\f887"; /* sort-numeric-up-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-numeric-down-alt:before {
+  content: "\f886"; /* sort-numeric-down-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-amount-up-alt:before {
+  content: "\f885"; /* sort-amount-up-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sort-amount-down-alt:before {
+  content: "\f884"; /* sort-amount-down-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-ellipsis-h:before {
+  content: "\f141"; /* ellipsis-h */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-ellipsis-v:before {
+  content: "\f142"; /* ellipsis-v */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bars:before {
+  content: "\f0c9"; /* bars */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-th:before {
+  content: "\f00a"; /* th */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-th-large:before {
+  content: "\f009"; /* th-large */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-th-list:before {
+  content: "\f00b"; /* th-list */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-list:before {
+  content: "\f03a"; /* list */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-list-ul:before {
+  content: "\f0ca"; /* list-ul */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-list-ol:before {
+  content: "\f0cb"; /* list-ol */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-list-alt:before {
+  content: "\f022"; /* list-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-clipboard-list:before {
+  content: "\f46d"; /* clipboard-list */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tasks:before {
+  content: "\f0ae"; /* tasks */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-check-square:before {
+  content: "\f14a"; /* check-square */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-check-circle:before {
+  content: "\f058"; /* check-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-check-double:before {
+  content: "\f560"; /* check-double */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-times-circle:before {
+  content: "\f057"; /* times-circle */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-times-square:before {
+  content: "\f2d3"; /* times-square */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-window-close:before {
+  content: "\f410"; /* window-close */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-window-maximize:before {
+  content: "\f2d0"; /* window-maximize */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-window-minimize:before {
+  content: "\f2d1"; /* window-minimize */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-window-restore:before {
+  content: "\f2d2"; /* window-restore */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-external-link-alt:before {
+  content: "\f35d"; /* external-link-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-external-link-square-alt:before {
+  content: "\f360"; /* external-link-square-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-share:before {
+  content: "\f064"; /* share */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-share-alt:before {
+  content: "\f1e0"; /* share-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-share-square:before {
+  content: "\f14d"; /* share-square */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-share-alt-square:before {
+  content: "\f1e1"; /* share-alt-square */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-reply:before {
+  content: "\f3e5"; /* reply */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-reply-all:before {
+  content: "\f122"; /* reply-all */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-retweet:before {
+  content: "\f079"; /* retweet */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-random:before {
+  content: "\f074"; /* random */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-random-alt:before {
+  content: "\f074"; /* random-alt (same as random) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-exchange:before {
+  content: "\f0ec"; /* exchange */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-exchange-alt:before {
+  content: "\f362"; /* exchange-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sync-alt:before {
+  content: "\f2f1"; /* sync-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sync:before {
+  content: "\f021"; /* sync */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-spinner:before {
+  content: "\f110"; /* spinner */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-circle-notch:before {
+  content: "\f1ce"; /* circle-notch */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cog:before {
+  content: "\f013"; /* cog */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cogs:before {
+  content: "\f085"; /* cogs */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sliders-h:before {
+  content: "\f1de"; /* sliders-h */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sliders-v:before {
+  content: "\f3f1"; /* sliders-v */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wrench:before {
+  content: "\f0ad"; /* wrench */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-screwdriver:before {
+  content: "\f54a"; /* screwdriver */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tools:before {
+  content: "\f7d9"; /* tools */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-toolbox:before {
+  content: "\f552"; /* toolbox */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-hammer:before {
+  content: "\f6e3"; /* hammer */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-hammer-war:before {
+  content: "\f6e4"; /* hammer-war */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-magic:before {
+  content: "\f0d0"; /* magic */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wand:before {
+  content: "\f72a"; /* wand */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wand-magic:before {
+  content: "\f72b"; /* wand-magic */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-hat-wizard:before {
+  content: "\f6e8"; /* hat-wizard */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-robot:before {
+  content: "\f544"; /* robot */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-microchip:before {
+  content: "\f2db"; /* microchip */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-memory:before {
+  content: "\f538"; /* memory */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cpu:before {
+  content: "\f538"; /* cpu (same as memory) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-hdd:before {
+  content: "\f0a0"; /* hdd */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sd-card:before {
+  content: "\f7c2"; /* sd-card */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sim-card:before {
+  content: "\f7c4"; /* sim-card */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-database:before {
+  content: "\f1c0"; /* database */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-server:before {
+  content: "\f233"; /* server */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-network-wired:before {
+  content: "\f6ff"; /* network-wired */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-project-diagram:before {
+  content: "\f542"; /* project-diagram */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-sitemap:before {
+  content: "\f0e8"; /* sitemap */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-network:before {
+  content: "\f78a"; /* chart-network */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-code-branch:before {
+  content: "\f126"; /* code-branch */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-code:before {
+  content: "\f121"; /* code */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-code-commit:before {
+  content: "\f386"; /* code-commit */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-code-merge:before {
+  content: "\f387"; /* code-merge */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-terminal:before {
+  content: "\f120"; /* terminal */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-console:before {
+  content: "\f120"; /* console (same as terminal) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-laptop-code:before {
+  content: "\f5fc"; /* laptop-code */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-laptop:before {
+  content: "\f109"; /* laptop */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-desktop:before {
+  content: "\f108"; /* desktop */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-mobile:before {
+  content: "\f10b"; /* mobile */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-mobile-alt:before {
+  content: "\f3cd"; /* mobile-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tablet:before {
+  content: "\f10a"; /* tablet */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tablet-alt:before {
+  content: "\f3fa"; /* tablet-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tv:before {
+  content: "\f26c"; /* tv */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-plug:before {
+  content: "\f1e6"; /* plug */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-power-off:before {
+  content: "\f011"; /* power-off */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-toggle-on:before {
+  content: "\f205"; /* toggle-on */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-toggle-off:before {
+  content: "\f204"; /* toggle-off */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lightbulb:before {
+  content: "\f0eb"; /* lightbulb */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lightbulb-on:before {
+  content: "\f672"; /* lightbulb-on */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lightbulb-slash:before {
+  content: "\f673"; /* lightbulb-slash */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lightbulb-exclamation:before {
+  content: "\f671"; /* lightbulb-exclamation */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lightbulb-dollar:before {
+  content: "\f670"; /* lightbulb-dollar */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-idea:before {
+  content: "\f0eb"; /* idea (same as lightbulb) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bulb:before {
+  content: "\f0eb"; /* bulb (same as lightbulb) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lamp:before {
+  content: "\f4ca"; /* lamp */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lamp-desk:before {
+  content: "\e014"; /* lamp-desk */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lamp-floor:before {
+  content: "\e015"; /* lamp-floor */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-lira-sign:before {
+  content: "\f195"; /* lira-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dollar-sign:before {
+  content: "\f155"; /* dollar-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-euro-sign:before {
+  content: "\f153"; /* euro-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-pound-sign:before {
+  content: "\f154"; /* pound-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-yen-sign:before {
+  content: "\f157"; /* yen-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-ruble-sign:before {
+  content: "\f158"; /* ruble-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-rupee-sign:before {
+  content: "\f156"; /* rupee-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-shekel-sign:before {
+  content: "\f20b"; /* shekel-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-won-sign:before {
+  content: "\f159"; /* won-sign */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-bitcoin:before {
+  content: "\f379"; /* bitcoin */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-btc:before {
+  content: "\f15a"; /* btc */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-ethereum:before {
+  content: "\f42e"; /* ethereum */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-credit-card:before {
+  content: "\f09d"; /* credit-card */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-credit-card-front:before {
+  content: "\f38a"; /* credit-card-front */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-credit-card-back:before {
+  content: "\f38a"; /* credit-card-back (same as credit-card-front) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-money-bill:before {
+  content: "\f0d6"; /* money-bill */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-money-bill-alt:before {
+  content: "\f3d1"; /* money-bill-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-money-bill-wave:before {
+  content: "\f53a"; /* money-bill-wave */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-money-bill-wave-alt:before {
+  content: "\f53b"; /* money-bill-wave-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-money-check:before {
+  content: "\f53c"; /* money-check */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-money-check-alt:before {
+  content: "\f53d"; /* money-check-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-coins:before {
+  content: "\f51e"; /* coins */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-wallet:before {
+  content: "\f555"; /* wallet */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cash-register:before {
+  content: "\f788"; /* cash-register */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-receipt:before {
+  content: "\f543"; /* receipt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-invoice:before {
+  content: "\f570"; /* file-invoice */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-file-invoice-dollar:before {
+  content: "\f571"; /* file-invoice-dollar */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-percentage:before {
+  content: "\f541"; /* percentage */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-percent:before {
+  content: "\f295"; /* percent */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tags:before {
+  content: "\f02c"; /* tags */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tag:before {
+  content: "\f02b"; /* tag */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-shopping-cart:before {
+  content: "\f07a"; /* shopping-cart */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-shopping-bag:before {
+  content: "\f290"; /* shopping-bag */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-shopping-basket:before {
+  content: "\f291"; /* shopping-basket */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-store:before {
+  content: "\f54e"; /* store */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-store-alt:before {
+  content: "\f54f"; /* store-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cart-plus:before {
+  content: "\f217"; /* cart-plus */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cart-arrow-down:before {
+  content: "\f218"; /* cart-arrow-down */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-cash-register:before {
+  content: "\f788"; /* cash-register */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-calculator:before {
+  content: "\f1ec"; /* calculator */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-calculator-alt:before {
+  content: "\f1ec"; /* calculator-alt (same as calculator) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-abacus:before {
+  content: "\f640"; /* abacus */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-analytics:before {
+  content: "\f643"; /* analytics */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-bar:before {
+  content: "\f080"; /* chart-bar */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-line:before {
+  content: "\f201"; /* chart-line */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-pie:before {
+  content: "\f200"; /* chart-pie */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-area:before {
+  content: "\f1fe"; /* chart-area */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-network:before {
+  content: "\f78a"; /* chart-network */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-pie-alt:before {
+  content: "\f64e"; /* chart-pie-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chart-scatter:before {
+  content: "\f7ee"; /* chart-scatter */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-analytics:before {
+  content: "\f643"; /* analytics */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-presentation:before {
+  content: "\f685"; /* presentation */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chalkboard:before {
+  content: "\f51b"; /* chalkboard */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-chalkboard-teacher:before {
+  content: "\f51c"; /* chalkboard-teacher */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-projector:before {
+  content: "\f8d6"; /* projector */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-projector-screen:before {
+  content: "\f8d7"; /* projector-screen */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-poll:before {
+  content: "\f681"; /* poll */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-poll-h:before {
+  content: "\f682"; /* poll-h */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-square-poll-vertical:before {
+  content: "\f681"; /* square-poll-vertical (same as poll) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-square-poll-horizontal:before {
+  content: "\f682"; /* square-poll-horizontal (same as poll-h) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer:before {
+  content: "\f0e4"; /* tachometer */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt:before {
+  content: "\f3fd"; /* tachometer-alt */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt-fast:before {
+  content: "\f625"; /* tachometer-alt-fast */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt-average:before {
+  content: "\f624"; /* tachometer-alt-average */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-alt-slow:before {
+  content: "\f627"; /* tachometer-alt-slow */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge:before {
+  content: "\f0e4"; /* gauge (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-high:before {
+  content: "\f625"; /* gauge-high (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-med:before {
+  content: "\f624"; /* gauge-med (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-low:before {
+  content: "\f627"; /* gauge-low (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard:before {
+  content: "\f0e4"; /* dashboard (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer:before {
+  content: "\f0e4"; /* speedometer (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter:before {
+  content: "\f0e4"; /* meter (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-simple:before {
+  content: "\f0e4"; /* gauge-simple (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-simple-high:before {
+  content: "\f625"; /* gauge-simple-high (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-simple-med:before {
+  content: "\f624"; /* gauge-simple-med (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-simple-low:before {
+  content: "\f627"; /* gauge-simple-low (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-fastest:before {
+  content: "\f626"; /* tachometer-fastest */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-fast:before {
+  content: "\f625"; /* tachometer-fast */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-average:before {
+  content: "\f624"; /* tachometer-average */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-slow:before {
+  content: "\f627"; /* tachometer-slow */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-tachometer-slowest:before {
+  content: "\f628"; /* tachometer-slowest */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer:before {
+  content: "\f0e4"; /* speedometer (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer:before {
+  content: "\f0e4"; /* odometer (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-fast:before {
+  content: "\f625"; /* odometer-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-average:before {
+  content: "\f624"; /* odometer-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-slow:before {
+  content: "\f627"; /* odometer-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard:before {
+  content: "\f0e4"; /* dashboard (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt:before {
+  content: "\f3fd"; /* dashboard-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt-fast:before {
+  content: "\f625"; /* dashboard-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt-average:before {
+  content: "\f624"; /* dashboard-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt-slow:before {
+  content: "\f627"; /* dashboard-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge:before {
+  content: "\f0e4"; /* gauge (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt:before {
+  content: "\f3fd"; /* gauge-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt-fast:before {
+  content: "\f625"; /* gauge-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt-average:before {
+  content: "\f624"; /* gauge-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt-slow:before {
+  content: "\f627"; /* gauge-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter:before {
+  content: "\f0e4"; /* meter (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt:before {
+  content: "\f3fd"; /* meter-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt-fast:before {
+  content: "\f625"; /* meter-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt-average:before {
+  content: "\f624"; /* meter-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt-slow:before {
+  content: "\f627"; /* meter-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer:before {
+  content: "\f0e4"; /* speedometer (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt:before {
+  content: "\f3fd"; /* speedometer-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt-fast:before {
+  content: "\f625"; /* speedometer-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt-average:before {
+  content: "\f624"; /* speedometer-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt-slow:before {
+  content: "\f627"; /* speedometer-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer:before {
+  content: "\f0e4"; /* odometer (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt:before {
+  content: "\f3fd"; /* odometer-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt-fast:before {
+  content: "\f625"; /* odometer-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt-average:before {
+  content: "\f624"; /* odometer-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt-slow:before {
+  content: "\f627"; /* odometer-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard:before {
+  content: "\f0e4"; /* dashboard (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt:before {
+  content: "\f3fd"; /* dashboard-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt-fast:before {
+  content: "\f625"; /* dashboard-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt-average:before {
+  content: "\f624"; /* dashboard-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-dashboard-alt-slow:before {
+  content: "\f627"; /* dashboard-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge:before {
+  content: "\f0e4"; /* gauge (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt:before {
+  content: "\f3fd"; /* gauge-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt-fast:before {
+  content: "\f625"; /* gauge-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt-average:before {
+  content: "\f624"; /* gauge-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-gauge-alt-slow:before {
+  content: "\f627"; /* gauge-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter:before {
+  content: "\f0e4"; /* meter (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt:before {
+  content: "\f3fd"; /* meter-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt-fast:before {
+  content: "\f625"; /* meter-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt-average:before {
+  content: "\f624"; /* meter-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-meter-alt-slow:before {
+  content: "\f627"; /* meter-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer:before {
+  content: "\f0e4"; /* speedometer (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt:before {
+  content: "\f3fd"; /* speedometer-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt-fast:before {
+  content: "\f625"; /* speedometer-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt-average:before {
+  content: "\f624"; /* speedometer-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-speedometer-alt-slow:before {
+  content: "\f627"; /* speedometer-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer:before {
+  content: "\f0e4"; /* odometer (same as tachometer) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt:before {
+  content: "\f3fd"; /* odometer-alt (same as tachometer-alt) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt-fast:before {
+  content: "\f625"; /* odometer-alt-fast (same as tachometer-alt-fast) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt-average:before {
+  content: "\f624"; /* odometer-alt-average (same as tachometer-alt-average) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.icon-odometer-alt-slow:before {
+  content: "\f627"; /* odometer-alt-slow (same as tachometer-alt-slow) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}

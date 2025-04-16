@@ -21,6 +21,7 @@ import Geofencing from './pages/Geofencing';
 import DocumentManagement from './pages/DocumentManagement';
 import AssetManagement from './pages/AssetManagement';
 import Communication from './pages/Communication';
+import Integrations from './pages/Integrations';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -132,6 +133,11 @@ function App() {
               <Communication />
             </Layout>
           } key="communication-route" />
+          <Route path="/integrations" element={
+            <Layout>
+              <Integrations />
+            </Layout>
+          } key="integrations-route" />
           {/* Fallback route for any unmatched paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
