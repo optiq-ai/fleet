@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
+import { useLocation } from 'react-router-dom';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
@@ -11,6 +12,9 @@ import mockRoadTollsService from '../services/api/mockRoadTollsService';
  * @returns {JSX.Element} Road Tolls component
  */
 const RoadTolls = () => {
+  // React Router location hook to access location state
+  const location = useLocation();
+  
   // State for data
   const [dashboardData, setDashboardData] = useState(null);
   const [transponders, setTransponders] = useState({ items: [], pagination: {} });
@@ -352,7 +356,35 @@ const RoadTolls = () => {
 
   // Initial data load - only once on component mount
   useEffect(() => {
-    loadDashboardData();
+    // Check if we have location state with activeTab
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+      
+      // Load data based on the activeTab from location state
+      switch (location.state.activeTab) {
+        case 'transponders':
+          loadTransponders();
+          break;
+        case 'violations':
+          loadViolations();
+          break;
+        case 'reports':
+          loadExpenseReports();
+          break;
+        case 'operators':
+          loadTollOperators();
+          break;
+        case 'optimization':
+          loadRouteOptimization();
+          break;
+        default:
+          loadDashboardData();
+          break;
+      }
+    } else {
+      // Default behavior - load dashboard data
+      loadDashboardData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
