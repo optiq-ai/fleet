@@ -24,12 +24,12 @@ const GeofencingReports = () => {
     limit: 10
   });
   const [geofences, setGeofences] = useState([]);
-  const [vehicles, setVehicles] = useState([
+  const [vehicles] = useState([
     { id: 'veh-001', plate: 'WA 12345' },
     { id: 'veh-002', plate: 'WA 54321' },
     { id: 'veh-003', plate: 'WA 98765' }
   ]);
-  const [drivers, setDrivers] = useState([
+  const [drivers] = useState([
     { id: 'drv-001', name: 'Adam Nowak' },
     { id: 'drv-002', name: 'Piotr Kowalski' },
     { id: 'drv-003', name: 'Katarzyna Wiśniewska' }

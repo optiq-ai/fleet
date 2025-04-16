@@ -4,7 +4,7 @@
  * Mock service for geofencing functionality during development.
  */
 
-import { generateRandomId } from '../../utils/helpers';
+import { generateId } from '../../utils/index';
 
 // Mock data for geofences
 const mockGeofences = [
@@ -638,7 +638,7 @@ export const createGeofence = async (geofenceData) => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const newGeofence = {
-        id: `geo-${generateRandomId()}`,
+        id: `geo-${generateId(6)}`,
         ...geofenceData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -843,7 +843,7 @@ export const configureAlertRule = async (ruleData) => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const newRule = {
-        id: `rule-${generateRandomId()}`,
+        id: `rule-${generateId(6)}`,
         ...ruleData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
