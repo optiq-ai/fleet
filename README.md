@@ -33,12 +33,114 @@ Sekcja Document Management umożliwia centralne zarządzanie wszystkimi dokument
 - **DocumentSearch** - zaawansowane wyszukiwanie dokumentów z filtrowaniem i sortowaniem
 - **DocumentAutomation** - automatyzacja procesów dokumentacyjnych, szablony i przypomnienia
 
+#### Funkcje i metody:
+- `fetchDocumentsDashboard()` - pobiera dane KPI, alerty dokumentów i statystyki zgodności
+- `fetchDocuments()` - pobiera listę dokumentów z możliwością filtrowania po typie, kategorii i statusie
+- `fetchDocumentDetails()` - pobiera szczegółowe informacje o wybranym dokumencie
+- `uploadDocument()` - obsługuje przesyłanie nowych dokumentów
+- `updateDocument()` - obsługuje aktualizację istniejących dokumentów
+- `deleteDocument()` - obsługuje usuwanie dokumentów
+- `createDocumentTemplate()` - tworzy nowy szablon dokumentu
+- `generateDocumentFromTemplate()` - generuje dokument na podstawie szablonu
+- `setDocumentReminder()` - ustawia przypomnienie o terminie ważności dokumentu
+- `createAutomationRule()` - tworzy regułę automatyzacji dla dokumentów
+- `handleTabChange()` - obsługuje zmianę głównej zakładki
+- `handleFilterChange()` - obsługuje zmianę filtrów dokumentów
+- `handleSearch()` - obsługuje wyszukiwanie dokumentów
+- `handlePageChange()` - obsługuje zmianę strony w paginacji dokumentów
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Stany (hooks):
+- `activeTab` - aktywna zakładka główna
+- `documents` - lista dokumentów
+- `selectedDocument` - wybrany dokument
+- `documentCategories` - kategorie dokumentów
+- `documentTemplates` - szablony dokumentów
+- `automationRules` - reguły automatyzacji
+- `reminderSettings` - ustawienia przypomnień
+- `dashboardData` - dane dashboardu dokumentów
+- `filters` - filtry dla dokumentów (typ, kategoria, status, wyszukiwanie, strona)
+- `pagination` - dane paginacji (strona, limit, total, pages)
+- `isLoading` - stan ładowania
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Źródła danych i przepływy:
+- **API Service**: `documentManagementService.js` - zawiera metody do komunikacji z backendem:
+  - `getDocumentsDashboard()` - pobiera dane dashboardu z endpointu `/documents/dashboard`
+  - `getDocuments()` - pobiera listę dokumentów z endpointu `/documents`
+  - `getDocumentDetails()` - pobiera szczegóły dokumentu z endpointu `/documents/{id}`
+  - `uploadDocument()` - wysyła nowy dokument do endpointu `/documents` (multipart/form-data)
+  - `updateDocument()` - aktualizuje dokument przez endpoint `/documents/{id}`
+  - `deleteDocument()` - usuwa dokument przez endpoint `/documents/{id}`
+  - `searchDocuments()` - wyszukuje dokumenty przez endpoint `/documents/search`
+  - `getDocumentTemplates()` - pobiera szablony z endpointu `/documents/templates`
+  - `createDocumentTemplate()` - tworzy szablon przez endpoint `/documents/templates`
+  - `generateDocumentFromTemplate()` - generuje dokument z szablonu przez endpoint `/documents/templates/{id}/generate`
+  - `getDocumentCategories()` - pobiera kategorie z endpointu `/documents/categories`
+  - `getDocumentAlerts()` - pobiera alerty z endpointu `/documents/alerts`
+
+- **Mock Service**: `mockDocumentManagementService.js` - zawiera dane testowe używane podczas developmentu:
+  - Symuluje wszystkie metody API service
+  - Zawiera predefiniowane dane dokumentów, szablonów, kategorii, alertów
+  - Implementuje podstawową logikę filtrowania, sortowania i paginacji
+  - Domyślnie używany w aplikacji (przełączany przez `useMockData`)
+
+- **Współdzielenie danych z innymi komponentami**:
+  - **Fleet Management** - wykorzystuje dane dokumentów pojazdów
+  - **Drivers** - wykorzystuje dane dokumentów kierowców
+  - **Geofencing** - wykorzystuje dane dokumentów wymaganych dla określonych stref
+  - **Ferry Bookings** - wykorzystuje dane dokumentów wymaganych do przepraw promowych
+  - **Road Tolls** - wykorzystuje dane dokumentów wymaganych do opłat drogowych
+
+#### Struktury danych:
+- **Document** - struktura dokumentu zawiera pola:
+  - `id` - unikalny identyfikator dokumentu
+  - `name` - nazwa dokumentu
+  - `type` - typ dokumentu (vehicle, driver, operational, compliance)
+  - `category` - kategoria dokumentu (np. registration, insurance)
+  - `vehicleId/driverId` - powiązanie z pojazdem lub kierowcą
+  - `issueDate/expiryDate` - daty wydania i wygaśnięcia
+  - `status` - status dokumentu (active, expired, pending, archived)
+  - `fileUrl/fileType/fileSize` - informacje o pliku
+  - `tags/notes` - dodatkowe informacje
+  - `createdAt/updatedAt/createdBy/lastViewedAt` - metadane
+
+- **DocumentTemplate** - struktura szablonu dokumentu
+- **AutomationRule** - struktura reguły automatyzacji
+- **ReminderSettings** - struktura ustawień przypomnień
+
 #### Techniczne aspekty:
 - Wszystkie komponenty używają czystego CSS do stylowania i ikon (plik IconStyles.css)
 - Ikony są implementowane jako elementy span z odpowiednimi klasami CSS
 - Brak zależności od zewnętrznych bibliotek ikon jak react-icons/fa
 - Komponenty są zintegrowane z API poprzez documentManagementService
 - Dostępne są również mocki danych w mockDocumentManagementService
+- Komponenty DocumentAutomation używa domyślnych wartości dla props, aby uniknąć błędów przy niezdefiniowanych danych
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Walidacja formularzy przed wysłaniem danych
+- Obsługa błędów przesyłania plików
+- Logowanie błędów do konsoli
+
+#### Korzyści biznesowe:
+1. **Zwiększenie zgodności z przepisami**
+   - Centralne zarządzanie wszystkimi dokumentami wymaganymi przez przepisy
+   - Automatyczne przypomnienia o zbliżających się terminach ważności dokumentów
+   - Śledzenie statusu zgodności dokumentacyjnej dla całej floty
+
+2. **Redukcja ryzyka operacyjnego**
+   - Eliminacja ryzyka związanego z przeterminowanymi dokumentami
+   - Zapobieganie karom i opłatom za brak wymaganych dokumentów
+   - Szybki dostęp do dokumentów w przypadku kontroli
+
+3. **Zwiększenie efektywności operacyjnej**
+   - Automatyzacja procesów dokumentacyjnych
+   - Szybkie wyszukiwanie i dostęp do dokumentów
+   - Eliminacja papierowej dokumentacji i związanych z nią kosztów
 
 ### Dashboard
 
