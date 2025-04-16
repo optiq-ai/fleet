@@ -17,6 +17,7 @@ import FuelAnalysis from './pages/FuelAnalysis';
 import RoadTolls from './pages/RoadTolls';
 import RouteOptimization from './pages/RouteOptimization';
 import FerryBookings from './pages/FerryBookings';
+import Geofencing from './pages/Geofencing';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -106,6 +107,11 @@ function App() {
           <Route path="/ferry-bookings" element={
             <Layout>
               <FerryBookings />
+            </Layout>
+          } />
+          <Route path="/geofencing" element={
+            <Layout>
+              <Geofencing />
             </Layout>
           } />
           {/* Fallback route for any unmatched paths */}

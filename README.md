@@ -303,7 +303,190 @@ Sekcja Road Tolls umożliwia kompleksowe zarządzanie opłatami drogowymi, trans
 - `loadRouteOptimization()` - pobiera dane optymalizacji tras z porównaniem kosztów
 - `handleTabChange()` - obsługuje zmianę głównej zakładki
 - `handleTransponderFilterChange()` - obsługuje zmianę filtrów transponderów
-- `handleViolationFilterChange
+- `handleViolationFilterChange()` - obsługuje zmianę filtrów naruszeń
+- `handleReportFilterChange()` - obsługuje zmianę filtrów raportów
+- `handleExportData()` - obsługuje eksport danych do CSV/PDF
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Dashboard** - wyświetla KPI, mapę aktywności opłat drogowych, trendy wydatków i alerty
+- **Transponders** - zarządza urządzeniami do automatycznego poboru opłat
+- **Violations** - monitoruje i zarządza naruszeniami opłat drogowych
+- **Expense Reports** - generuje raporty wydatków na opłaty drogowe
+- **Toll Operators** - dostarcza informacje o operatorach opłat drogowych
+- **Route Optimization** - optymalizuje trasy pod kątem minimalizacji kosztów opłat drogowych
+
+#### Stany (hooks):
+- `activeTab` - aktywna zakładka główna
+- `dashboardData` - dane dashboardu
+- `transponders` - lista transponderów
+- `selectedTransponder` - wybrany transponder
+- `violations` - lista naruszeń
+- `selectedViolation` - wybrane naruszenie
+- `expenseReports` - dane raportów wydatków
+- `tollOperators` - lista operatorów opłat drogowych
+- `routeOptimization` - dane optymalizacji tras
+- `filters` - filtry dla różnych list (status, pojazd, data, wyszukiwanie, strona)
+- `isLoading` - stan ładowania danych
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `roadTollsService` lub `mockRoadTollsService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getDashboardData()`, `getTransponders()`, `getTransponderDetails()`, `getViolations()`, `getViolationDetails()`, `getExpenseReports()`, `getTollOperators()`, `getRouteOptimization()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
+### Ferry Bookings (Rezerwacje Promów)
+
+Sekcja Ferry Bookings umożliwia kompleksowe zarządzanie rezerwacjami przepraw promowych, wyszukiwanie połączeń, zarządzanie pojazdami i kierowcami przypisanymi do przepraw, oraz analizę kosztów i optymalizację tras.
+
+#### Funkcje i metody:
+- `loadDashboardData()` - pobiera dane KPI, mapę aktywności przepraw, nadchodzące przeprawy i alerty
+- `searchConnections()` - wyszukuje dostępne połączenia promowe według kryteriów
+- `loadBookings()` - pobiera listę rezerwacji z możliwością filtrowania
+- `loadBookingDetails()` - pobiera szczegółowe informacje o wybranej rezerwacji
+- `createBooking()` - tworzy nową rezerwację przeprawy
+- `updateBooking()` - aktualizuje istniejącą rezerwację
+- `cancelBooking()` - anuluje rezerwację
+- `loadOperators()` - pobiera informacje o operatorach promowych
+- `loadRoutes()` - pobiera informacje o trasach promowych
+- `loadPricing()` - pobiera informacje o cennikach przepraw
+- `loadVehicleAvailability()` - sprawdza dostępność pojazdów w danym terminie
+- `loadDriverAvailability()` - sprawdza dostępność kierowców w danym terminie
+- `loadBookingHistory()` - pobiera historię rezerwacji
+- `generateReport()` - generuje raport z analizą kosztów przepraw
+- `handleTabChange()` - obsługuje zmianę głównej zakładki
+- `handleFilterChange()` - obsługuje zmianę filtrów dla różnych list
+- `handleExportData()` - obsługuje eksport danych do CSV/PDF
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **Dashboard** - wyświetla KPI, mapę aktywności przepraw, nadchodzące przeprawy i alerty
+- **Search Connections** - wyszukuje dostępne połączenia promowe
+- **Bookings Management** - zarządza rezerwacjami przepraw
+- **Operators** - dostarcza informacje o operatorach promowych
+- **Routes & Pricing** - prezentuje informacje o trasach i cennikach
+- **Vehicle & Driver Management** - zarządza przypisaniem pojazdów i kierowców do przepraw
+- **Reports & Analytics** - generuje raporty i analizy kosztów przepraw
+
+#### Stany (hooks):
+- `activeTab` - aktywna zakładka główna
+- `dashboardData` - dane dashboardu
+- `searchParams` - parametry wyszukiwania połączeń
+- `searchResults` - wyniki wyszukiwania połączeń
+- `bookings` - lista rezerwacji
+- `selectedBooking` - wybrana rezerwacja
+- `operators` - lista operatorów promowych
+- `routes` - lista tras promowych
+- `pricing` - dane cenników
+- `vehicleAvailability` - dostępność pojazdów
+- `driverAvailability` - dostępność kierowców
+- `bookingHistory` - historia rezerwacji
+- `reportData` - dane raportu
+- `filters` - filtry dla różnych list (status, operator, trasa, data, wyszukiwanie, strona)
+- `isLoading` - stan ładowania danych
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `ferryBookingsService` lub `mockFerryBookingsService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getDashboardData()`, `searchConnections()`, `getBookings()`, `getBookingDetails()`, `createBooking()`, `updateBooking()`, `cancelBooking()`, `getOperators()`, `getRoutes()`, `getPricing()`, `getVehicleAvailability()`, `getDriverAvailability()`, `getBookingHistory()`, `generateReport()`
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
+
+### Geofencing (Strefy Geograficzne)
+
+Sekcja Geofencing umożliwia tworzenie wirtualnych granic geograficznych (geofences) wokół określonych lokalizacji, monitorowanie przekraczania tych granic przez pojazdy floty oraz generowanie alertów i raportów na podstawie tych zdarzeń.
+
+#### Funkcje i metody:
+- `loadDashboardData()` - pobiera dane KPI, mapę stref geofencingu, alerty i statystyki wykorzystania stref
+- `loadGeofences()` - pobiera listę stref geofencingu z możliwością filtrowania
+- `loadGeofenceDetails()` - pobiera szczegółowe informacje o wybranej strefie
+- `createGeofence()` - tworzy nową strefę geofencingu
+- `updateGeofence()` - aktualizuje istniejącą strefę
+- `deleteGeofence()` - usuwa strefę
+- `loadViolations()` - pobiera listę naruszeń stref z możliwością filtrowania
+- `loadTimeInZoneReports()` - pobiera raporty czasu spędzonego w strefach
+- `configureAlertRule()` - konfiguruje regułę alertu dla strefy
+- `loadAlertRules()` - pobiera listę reguł alertów
+- `updateAlertRule()` - aktualizuje istniejącą regułę alertu
+- `deleteAlertRule()` - usuwa regułę alertu
+- `optimizeRouteWithGeofences()` - optymalizuje trasę z uwzględnieniem stref geofencingu
+- `exportGeofencingReport()` - eksportuje raport geofencingu do wybranego formatu
+- `handleTabChange()` - obsługuje zmianę głównej zakładki
+- `handleFilterChange()` - obsługuje zmianę filtrów dla różnych list
+- `handleExportData()` - obsługuje eksport danych do CSV/PDF/XLSX
+- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
+
+#### Komponenty:
+- **GeofencingDashboard** - wyświetla KPI, mapę stref geofencingu, alerty i statystyki wykorzystania stref
+- **GeofenceManager** - zarządza strefami geofencingu (tworzenie, edycja, usuwanie)
+- **AlertConfiguration** - konfiguruje reguły alertów dla stref
+- **GeofencingReports** - generuje i wyświetla raporty związane z geofencingiem
+- **RouteIntegration** - integruje strefy geofencingu z optymalizacją tras
+
+#### Stany (hooks):
+- `activeTab` - aktywna zakładka główna
+- `dashboardData` - dane dashboardu
+- `geofences` - lista stref geofencingu
+- `selectedGeofence` - wybrana strefa
+- `violations` - lista naruszeń stref
+- `timeInZoneReports` - raporty czasu spędzonego w strefach
+- `alertRules` - lista reguł alertów
+- `selectedAlertRule` - wybrana reguła alertu
+- `optimizedRoute` - zoptymalizowana trasa z uwzględnieniem stref
+- `filters` - filtry dla różnych list (kategoria, status, data, wyszukiwanie, strona)
+- `isLoading` - stan ładowania danych
+- `isDetailLoading` - stan ładowania szczegółów
+- `error` - stan błędu
+- `useMockData` - przełącznik źródła danych (API vs Mock)
+
+#### Integracja z API:
+- Komponent korzysta z `geofencingService` lub `mockGeofencingService` w zależności od stanu przełącznika `useMockData`
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getGeofencingDashboard()`, `getGeofences()`, `getGeofenceDetails()`, `createGeofence()`, `updateGeofence()`, `deleteGeofence()`, `getGeofenceViolations()`, `getTimeInZoneReport()`, `configureAlertRule()`, `getAlertRules()`, `updateAlertRule()`, `deleteAlertRule()`, `optimizeRouteWithGeofences()`, `exportGeofencingReport()`
+
+#### Współdzielenie danych z innymi komponentami:
+- **Monitoring** - wykorzystuje dane o lokalizacji pojazdów w czasie rzeczywistym
+- **Drivers** - wykorzystuje dane o kierowcach
+- **Fleet Management** - integruje się z harmonogramem floty
+- **Road Tolls** - współdzieli dane o trasach i kosztach
+- **Route Optimization** - integruje strefy z optymalizacją tras
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+- Mechanizm retry dla operacji sieciowych
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych
 
 ### Ferry Bookings (Rezerwacje Promów)
 
