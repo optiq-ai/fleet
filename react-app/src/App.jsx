@@ -20,6 +20,7 @@ import FerryBookings from './pages/FerryBookings';
 import Geofencing from './pages/Geofencing';
 import DocumentManagement from './pages/DocumentManagement';
 import AssetManagement from './pages/AssetManagement';
+import Communication from './pages/Communication';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -126,6 +127,11 @@ function App() {
               <AssetManagement />
             </Layout>
           } key="asset-management-route" />
+          <Route path="/communication" element={
+            <Layout>
+              <Communication />
+            </Layout>
+          } key="communication-route" />
           {/* Fallback route for any unmatched paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
