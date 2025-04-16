@@ -16,6 +16,7 @@ import VehicleTires from './pages/VehicleTires';
 import FuelAnalysis from './pages/FuelAnalysis';
 import RoadTolls from './pages/RoadTolls';
 import RouteOptimization from './pages/RouteOptimization';
+import FerryBookings from './pages/FerryBookings';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -100,6 +101,11 @@ function App() {
           <Route path="/route-optimization" element={
             <Layout>
               <RouteOptimization />
+            </Layout>
+          } />
+          <Route path="/ferry-bookings" element={
+            <Layout>
+              <FerryBookings />
             </Layout>
           } />
           {/* Fallback route for any unmatched paths */}

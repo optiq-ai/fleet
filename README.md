@@ -303,7 +303,76 @@ Sekcja Road Tolls umożliwia kompleksowe zarządzanie opłatami drogowymi, trans
 - `loadRouteOptimization()` - pobiera dane optymalizacji tras z porównaniem kosztów
 - `handleTabChange()` - obsługuje zmianę głównej zakładki
 - `handleTransponderFilterChange()` - obsługuje zmianę filtrów transponderów
-- `handleViolationFilterChange()` - obsługuje zmianę filtrów naruszeń
+- `handleViolationFilterChange
+
+### Ferry Bookings (Rezerwacje Promów)
+
+Sekcja Ferry Bookings umożliwia kompleksowe zarządzanie rezerwacjami promowymi, wyszukiwanie połączeń, zarządzanie pojazdami i kierowcami przypisanymi do przepraw, monitorowanie operatorów promowych oraz analizę kosztów i optymalizację tras.
+
+#### Funkcje i metody:
+- `loadDashboardData()` - pobiera dane KPI, mapę aktywności przepraw promowych, trendy wydatków i alerty
+- `loadBookingsData()` - pobiera listę rezerwacji promowych z możliwością filtrowania
+- `loadBookingDetails()` - pobiera szczegółowe informacje o wybranej rezerwacji
+- `loadOperatorsData()` - pobiera listę operatorów promowych z możliwością filtrowania
+- `loadOperatorDetails()` - pobiera szczegółowe informacje o wybranym operatorze
+- `loadConnectionsData()` - wyszukuje dostępne połączenia promowe według kryteriów
+- `loadCalendarEvents()` - pobiera wydarzenia kalendarzowe związane z przeprawami
+- `handleTabChange()` - obsługuje zmianę głównej zakładki
+- `handleBookingSelect()` - obsługuje wybór rezerwacji z listy
+- `handleOperatorSelect()` - obsługuje wybór operatora z listy
+- `handleBookingsFilterChange()` - obsługuje zmianę filtrów rezerwacji
+- `handleOperatorsFilterChange()` - obsługuje zmianę filtrów operatorów
+- `handleConnectionsFilterChange()` - obsługuje zmianę filtrów wyszukiwania połączeń
+- `handleSearchConnections()` - obsługuje wyszukiwanie połączeń
+
+#### Komponenty:
+- **Dashboard** - wyświetla kluczowe wskaźniki, mapę aktywności przepraw, nadchodzące odjazdy, alerty i trendy wydatków
+- **Bookings (Rezerwacje)** - zarządza listą rezerwacji promowych z filtrowaniem i szczegółami
+- **Operators (Operatorzy)** - prezentuje informacje o operatorach promowych, ich trasach i warunkach
+- **Connections (Połączenia)** - umożliwia wyszukiwanie dostępnych połączeń promowych
+- **Calendar (Kalendarz)** - wyświetla harmonogram przepraw w formie kalendarza
+
+#### Stany (hooks):
+- `activeTab` - aktywna zakładka główna
+- `isLoading` - stan ładowania danych
+- `error` - stan błędu
+- `dashboardData` - dane dashboardu
+- `bookings` - dane rezerwacji
+- `bookingDetails` - szczegóły wybranej rezerwacji
+- `operators` - dane operatorów
+- `operatorDetails` - szczegóły wybranego operatora
+- `connections` - dane wyszukanych połączeń
+- `calendarEvents` - wydarzenia kalendarzowe
+- `selectedBookingId` - ID wybranej rezerwacji
+- `selectedOperatorId` - ID wybranego operatora
+- `bookingsFilter` - filtry dla rezerwacji (status, wyszukiwanie, daty, strona)
+- `operatorsFilter` - filtry dla operatorów (kraj, wyszukiwanie, strona)
+- `connectionsFilter` - filtry dla wyszukiwania połączeń (początek, cel, daty, typ pojazdu)
+- `dataLoadedRef` - referencja do śledzenia załadowanych danych
+- `searchTimerRef` - referencja do timera opóźniającego wyszukiwanie
+
+#### Integracja z API:
+- Komponent korzysta z `ferryBookingsService` lub `mockFerryBookingsService` w zależności od konfiguracji
+- Domyślnie używane są dane mockowe, co pozwala na działanie aplikacji bez backendu
+- API udostępnia metody: `getFerryBookingsDashboard()`, `getFerryBookings()`, `getFerryBookingDetails()`, `getFerryOperators()`, `getFerryOperatorDetails()`, `searchFerryConnections()`, `getCalendarEvents()`
+
+#### Współdzielenie danych z innymi komponentami:
+- **Drivers** - wykorzystanie danych o kierowcach i ich dostępności
+- **Vehicles** - wykorzystanie danych o pojazdach i ich parametrach
+- **Route Optimization** - współdzielenie danych o trasach i kosztach
+- **Road Tolls** - współdzielenie danych o kosztach opłat drogowych
+
+#### Obsługa błędów:
+- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
+- Osobna obsługa błędów dla głównych danych i szczegółów
+- Logowanie błędów do konsoli
+- Mechanizm debounce dla filtrów wyszukiwania, aby uniknąć zbyt częstych wywołań API
+
+#### Responsywność:
+- Układ dostosowuje się do różnych rozmiarów ekranu
+- Zastosowano media queries dla różnych breakpointów
+- Tabele i wykresy dostosowują się do dostępnej przestrzeni
+- Specjalne widoki dla urządzeń mobilnych()` - obsługuje zmianę filtrów naruszeń
 - `handleReportFilterChange()` - obsługuje zmianę filtrów raportów
 - `handleRouteFilterChange()` - obsługuje zmianę filtrów optymalizacji tras
 - `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
