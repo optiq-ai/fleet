@@ -3,9 +3,13 @@ import styled from 'styled-components';
 import './IconStyles.css';
 
 const DocumentAutomation = ({ 
-  automationRules, 
-  documentTemplates, 
-  reminderSettings, 
+  automationRules = [], 
+  documentTemplates = [], 
+  reminderSettings = {
+    defaultSchedule: [],
+    notificationMethods: [],
+    escalationRules: []
+  }, 
   isLoading, 
   error, 
   onSaveRule,
