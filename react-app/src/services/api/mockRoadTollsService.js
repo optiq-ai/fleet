@@ -179,6 +179,25 @@ const mockTollOperators = [
   { id: '6', name: 'MYTO CZ', country: 'Czech Republic', website: 'https://mytocz.eu', supportPhone: '+420 123 456 789', supportEmail: 'support@mytocz.eu' }
 ];
 
+// Mock data for toll points
+const mockTollPoints = [
+  { id: 'TP-1001', name: 'Punkt poboru A2 - Konin', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 15.50, carRate: 9.90, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 52.223, lng: 18.251 } },
+  { id: 'TP-1002', name: 'Punkt poboru A2 - Poznań Wschód', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 22.75, carRate: 12.50, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 52.401, lng: 17.068 } },
+  { id: 'TP-1003', name: 'Punkt poboru A2 - Poznań Zachód', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 18.20, carRate: 10.30, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 52.390, lng: 16.711 } },
+  { id: 'TP-1004', name: 'Punkt poboru A2 - Świecko', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 12.90, carRate: 8.50, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 52.294, lng: 14.685 } },
+  { id: 'TP-1005', name: 'Punkt poboru A4 - Kraków', road: 'A4', country: 'Polska', operator: 'ViaTOLL', truckRate: 20.00, carRate: 10.00, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 50.010, lng: 19.994 } },
+  { id: 'TP-1006', name: 'Punkt poboru A4 - Katowice', road: 'A4', country: 'Polska', operator: 'ViaTOLL', truckRate: 18.50, carRate: 9.50, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 50.214, lng: 19.134 } },
+  { id: 'TP-1007', name: 'Punkt poboru A4 - Wrocław', road: 'A4', country: 'Polska', operator: 'ViaTOLL', truckRate: 19.30, carRate: 9.80, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 51.036, lng: 17.124 } },
+  { id: 'TP-1008', name: 'Punkt poboru A1 - Gdańsk', road: 'A1', country: 'Polska', operator: 'ViaTOLL', truckRate: 16.70, carRate: 9.20, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 54.349, lng: 18.659 } },
+  { id: 'TP-1009', name: 'Punkt poboru A1 - Toruń', road: 'A1', country: 'Polska', operator: 'ViaTOLL', truckRate: 17.40, carRate: 9.40, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 53.035, lng: 18.604 } },
+  { id: 'TP-1010', name: 'Punkt poboru A1 - Łódź', road: 'A1', country: 'Polska', operator: 'ViaTOLL', truckRate: 18.10, carRate: 9.60, paymentMethods: 'Transponder, Gotówka, Karta', coordinates: { lat: 51.759, lng: 19.461 } },
+  { id: 'TP-2001', name: 'Toll Point A9 - Berlin', road: 'A9', country: 'Germany', operator: 'TollCollect', truckRate: 25.80, carRate: 12.40, paymentMethods: 'Transponder, Cash, Card', coordinates: { lat: 52.520, lng: 13.405 } },
+  { id: 'TP-2002', name: 'Toll Point A8 - Munich', road: 'A8', country: 'Germany', operator: 'TollCollect', truckRate: 24.50, carRate: 11.90, paymentMethods: 'Transponder, Cash, Card', coordinates: { lat: 48.137, lng: 11.576 } },
+  { id: 'TP-3001', name: 'Toll Point A1 - Vienna', road: 'A1', country: 'Austria', operator: 'ASFINAG', truckRate: 22.30, carRate: 10.80, paymentMethods: 'Transponder, Cash, Card', coordinates: { lat: 48.208, lng: 16.372 } },
+  { id: 'TP-4001', name: 'Toll Point D1 - Prague', road: 'D1', country: 'Czech Republic', operator: 'MYTO CZ', truckRate: 19.70, carRate: 9.90, paymentMethods: 'Transponder, Cash, Card', coordinates: { lat: 50.075, lng: 14.437 } },
+  { id: 'TP-5001', name: 'Toll Point A1 - Milan', road: 'A1', country: 'Italy', operator: 'AutoStrade', truckRate: 28.40, carRate: 14.20, paymentMethods: 'Transponder, Cash, Card', coordinates: { lat: 45.464, lng: 9.190 } }
+];
+
 // Mock data for route optimization
 const mockRouteOptimization = {
   routes: [
@@ -523,6 +542,43 @@ export const getTollOperators = async () => {
 };
 
 /**
+ * Get toll points data
+ * @param {Object} params - Query parameters
+ * @param {string} params.country - Filter by country
+ * @param {string} params.operator - Filter by operator
+ * @param {string} params.search - Search term
+ * @returns {Promise<Array>} Toll points data
+ */
+export const getTollPoints = async (params = {}) => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  let filteredTollPoints = [...mockTollPoints];
+  
+  // Apply country filter
+  if (params.country && params.country !== 'all') {
+    filteredTollPoints = filteredTollPoints.filter(tp => tp.country === params.country);
+  }
+  
+  // Apply operator filter
+  if (params.operator && params.operator !== 'all') {
+    filteredTollPoints = filteredTollPoints.filter(tp => tp.operator === params.operator);
+  }
+  
+  // Apply search filter
+  if (params.search) {
+    const searchLower = params.search.toLowerCase();
+    filteredTollPoints = filteredTollPoints.filter(tp => 
+      tp.name.toLowerCase().includes(searchLower) ||
+      tp.road.toLowerCase().includes(searchLower) ||
+      tp.country.toLowerCase().includes(searchLower)
+    );
+  }
+  
+  return filteredTollPoints;
+};
+
+/**
  * Get route optimization data with toll costs
  * @param {Object} params - Query parameters
  * @param {string} params.origin - Origin location
@@ -580,14 +636,14 @@ export const getRouteOptimization = async (params = {}) => {
     };
   }
   
-  // Return all routes if no specific parameters
+  // Return all routes if no specific origin/destination
   return {
     routes: mockRouteOptimization.routes,
     count: mockRouteOptimization.routes.length
   };
 };
 
-const mockRoadTollsService = {
+export default {
   getRoadTollsDashboard,
   getTransponders,
   getTransponderDetails,
@@ -595,7 +651,6 @@ const mockRoadTollsService = {
   getViolationDetails,
   getExpenseReports,
   getTollOperators,
+  getTollPoints,
   getRouteOptimization
 };
-
-export default mockRoadTollsService;

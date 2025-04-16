@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
@@ -11,6 +12,9 @@ import mockRoadTollsService from '../services/api/mockRoadTollsService';
  * @returns {JSX.Element} Route Optimization component
  */
 const RouteOptimization = () => {
+  // React Router navigation hook
+  const navigate = useNavigate();
+  
   // State for data
   const [routeOptimization, setRouteOptimization] = useState({ routes: [], count: 0 });
   const [selectedRoute, setSelectedRoute] = useState(null);
@@ -186,6 +190,12 @@ const RouteOptimization = () => {
   const handleTabChange = useCallback((tab) => {
     if (tab === activeTab) return; // Prevent unnecessary re-renders
     
+    // Redirect to Road Tolls transponders tab if transponders tab is selected
+    if (tab === 'transponders') {
+      navigate('/road-tolls', { state: { activeTab: 'transponders' } });
+      return;
+    }
+    
     setActiveTab(tab);
     setSelectedRoute(null);
     
@@ -197,13 +207,10 @@ const RouteOptimization = () => {
       case 'toll_points':
         if (!dataLoadedRef.current.tollPoints) loadTollPoints();
         break;
-      case 'transponders':
-        if (!dataLoadedRef.current.transponders) loadTransponders();
-        break;
       default:
         break;
     }
-  }, [activeTab, loadTollPoints, loadTransponders]);
+  }, [activeTab, loadTollPoints, navigate]);
 
   // Handle sub tab change
   const handleSubTabChange = useCallback((tab) => {
@@ -1002,9 +1009,16 @@ const RouteOptimization = () => {
           {activeTab === 'toll_points' && renderTollPoints()}
           {activeTab === 'transponders' && (
             <PageContainer>
-              <InfoAlert>
-                Sekcja transponderów jest dostępna w zakładce "Transpondery" w głównym menu aplikacji.
-              </InfoAlert>
+              <Card title="Transpondery">
+                <InfoAlert>
+                  Sekcja transponderów jest dostępna w zakładce "Transpondery" w głównym menu aplikacji.
+                  <ActionButtonsContainer>
+                    <ActionButton primary onClick={() => navigate('/road-tolls', { state: { activeTab: 'transponders' } })}>
+                      Przejdź do sekcji Transpondery
+                    </ActionButton>
+                  </ActionButtonsContainer>
+                </InfoAlert>
+              </Card>
             </PageContainer>
           )}
         </TabContent>
