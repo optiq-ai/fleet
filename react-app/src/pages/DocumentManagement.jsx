@@ -5,20 +5,20 @@ import {
   getDocuments, 
   getDocumentCategories, 
   getDocumentAlerts 
-} from '../../services/api/documentManagementService';
+} from '../services/api/documentManagementService';
 import { 
   getDocumentsDashboard as getMockDocumentsDashboard, 
   getDocuments as getMockDocuments, 
   getDocumentCategories as getMockDocumentCategories, 
   getDocumentAlerts as getMockDocumentAlerts 
-} from '../../services/api/mockDocumentManagementService';
-import DocumentsDashboard from '../../components/document-management/DocumentsDashboard';
-import VehicleDocuments from '../../components/document-management/VehicleDocuments';
-import DriverDocuments from '../../components/document-management/DriverDocuments';
-import OperationalDocuments from '../../components/document-management/OperationalDocuments';
-import ComplianceDocuments from '../../components/document-management/ComplianceDocuments';
-import DocumentSearch from '../../components/document-management/DocumentSearch';
-import DocumentAutomation from '../../components/document-management/DocumentAutomation';
+} from '../services/api/mockDocumentManagementService';
+import DocumentsDashboard from '../components/document-management/DocumentsDashboard';
+import VehicleDocuments from '../components/document-management/VehicleDocuments';
+import DriverDocuments from '../components/document-management/DriverDocuments';
+import OperationalDocuments from '../components/document-management/OperationalDocuments';
+import ComplianceDocuments from '../components/document-management/ComplianceDocuments';
+import DocumentSearch from '../components/document-management/DocumentSearch';
+import DocumentAutomation from '../components/document-management/DocumentAutomation';
 
 const DocumentManagement = () => {
   // State for active tab
