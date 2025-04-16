@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaFileAlt, FaSearch, FaFilter, FaDownload, FaPlus, FaEllipsisV } from 'react-icons/fa';
+import './IconStyles.css';
 
 const DocumentSearch = ({ 
   documents, 
@@ -109,7 +109,7 @@ const DocumentSearch = ({
       <SearchSection>
         <MainSearchContainer>
           <SearchIcon>
-            <FaSearch />
+            <span className="icon icon-search"></span>
           </SearchIcon>
           <MainSearchInput 
             type="text" 
@@ -270,7 +270,7 @@ const DocumentSearch = ({
             </ResultsCount>
             <ResultsActions>
               <SecondaryButton>
-                <FaDownload /> Export Results
+                <span className="icon icon-download"></span> Export Results
               </SecondaryButton>
             </ResultsActions>
           </ResultsHeader>
@@ -284,19 +284,19 @@ const DocumentSearch = ({
                   </DocumentTypeLabel>
                   <DocumentCardActions>
                     <ActionButton onClick={() => toggleDocumentActions(document.id)}>
-                      <FaEllipsisV />
+                      <span className="icon icon-ellipsis-v"></span>
                     </ActionButton>
                     
                     {activeDocument === document.id && (
                       <ActionsMenu>
                         <ActionMenuItem>
-                          <FaDownload /> Download
+                          <span className="icon icon-download"></span> Download
                         </ActionMenuItem>
                         <ActionMenuItem>
-                          <FaSearch /> View Details
+                          <span className="icon icon-search"></span> View Details
                         </ActionMenuItem>
                         <ActionMenuItem>
-                          <FaPlus /> Set Reminder
+                          <span className="icon icon-plus"></span> Set Reminder
                         </ActionMenuItem>
                       </ActionsMenu>
                     )}
@@ -304,7 +304,7 @@ const DocumentSearch = ({
                 </DocumentCardHeader>
                 
                 <DocumentIcon>
-                  <FaFileAlt />
+                  <span className="icon icon-file"></span>
                 </DocumentIcon>
                 
                 <DocumentCardContent>

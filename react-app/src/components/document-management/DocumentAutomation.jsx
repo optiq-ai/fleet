@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaFileAlt, FaSearch, FaFilter, FaDownload, FaPlus, FaEllipsisV, FaCog, FaBell, FaCalendarAlt, FaRobot } from 'react-icons/fa';
+import './IconStyles.css';
 
 const DocumentAutomation = ({ 
   automationRules, 
@@ -70,19 +70,19 @@ const DocumentAutomation = ({
           active={activeTab === 'rules'} 
           onClick={() => handleTabChange('rules')}
         >
-          <FaRobot /> Automation Rules
+          <span className="icon icon-file"></span> Automation Rules
         </Tab>
         <Tab 
           active={activeTab === 'templates'} 
           onClick={() => handleTabChange('templates')}
         >
-          <FaFileAlt /> Document Templates
+          <span className="icon icon-file"></span> Document Templates
         </Tab>
         <Tab 
           active={activeTab === 'reminders'} 
           onClick={() => handleTabChange('reminders')}
         >
-          <FaBell /> Reminder Settings
+          <span className="icon icon-calendar"></span> Reminder Settings
         </Tab>
       </TabsContainer>
       
@@ -91,7 +91,7 @@ const DocumentAutomation = ({
           <SectionHeader>
             <SectionTitle>Automation Rules</SectionTitle>
             <PrimaryButton>
-              <FaPlus /> Create New Rule
+              <span className="icon icon-plus"></span> Create New Rule
             </PrimaryButton>
           </SectionHeader>
           
@@ -149,7 +149,7 @@ const DocumentAutomation = ({
                     
                     <RuleActions>
                       <SecondaryButton onClick={() => handleEditRule(rule)}>
-                        <FaCog /> Edit
+                        <span className="icon icon-file"></span> Edit
                       </SecondaryButton>
                     </RuleActions>
                   </RuleFooter>
@@ -169,7 +169,7 @@ const DocumentAutomation = ({
           <SectionHeader>
             <SectionTitle>Document Templates</SectionTitle>
             <PrimaryButton>
-              <FaPlus /> Create New Template
+              <span className="icon icon-plus"></span> Create New Template
             </PrimaryButton>
           </SectionHeader>
           
@@ -182,7 +182,7 @@ const DocumentAutomation = ({
               {documentTemplates.map(template => (
                 <TemplateCard key={template.id}>
                   <TemplateIcon>
-                    <FaFileAlt />
+                    <span className="icon icon-file"></span>
                   </TemplateIcon>
                   
                   <TemplateName>{template.name}</TemplateName>
@@ -197,7 +197,7 @@ const DocumentAutomation = ({
                     
                     <TemplateActions>
                       <ActionButton onClick={() => handleEditTemplate(template)}>
-                        <FaEllipsisV />
+                        <span className="icon icon-ellipsis-v"></span>
                       </ActionButton>
                     </TemplateActions>
                   </TemplateFooter>
@@ -217,7 +217,7 @@ const DocumentAutomation = ({
           <SectionHeader>
             <SectionTitle>Reminder Settings</SectionTitle>
             <PrimaryButton onClick={handleEditReminderSettings}>
-              <FaCog /> Edit Settings
+              <span className="icon icon-file"></span> Edit Settings
             </PrimaryButton>
           </SectionHeader>
           
@@ -235,7 +235,7 @@ const DocumentAutomation = ({
               <ReminderScheduleList>
                 {reminderSettings.defaultSchedule.map((days, index) => (
                   <ReminderScheduleItem key={index}>
-                    <FaCalendarAlt /> {days} days before expiry
+                    <span className="icon icon-calendar"></span> {days} days before expiry
                   </ReminderScheduleItem>
                 ))}
               </ReminderScheduleList>

@@ -1,0 +1,228 @@
+/* CSS Icons for Document Management Components */
+
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  position: relative;
+  vertical-align: middle;
+}
+
+/* Document icon */
+.icon-file {
+  position: relative;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.icon-file::before {
+  content: '';
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  bottom: 0.4em;
+  left: 0.2em;
+  border-bottom: 1px solid currentColor;
+}
+
+.icon-file::after {
+  content: '';
+  position: absolute;
+  top: 0.5em;
+  right: 0.2em;
+  bottom: 0.2em;
+  left: 0.2em;
+  border-top: 1px solid currentColor;
+}
+
+/* Warning triangle icon */
+.icon-warning {
+  position: relative;
+  width: 0;
+  height: 0;
+  border-left: 0.5em solid transparent;
+  border-right: 0.5em solid transparent;
+  border-bottom: 0.9em solid currentColor;
+  transform: translateX(-0.25em);
+}
+
+.icon-warning::after {
+  content: '!';
+  position: absolute;
+  top: 0.2em;
+  left: -0.1em;
+  font-size: 0.7em;
+  font-weight: bold;
+  color: white;
+}
+
+/* Check circle icon */
+.icon-check-circle {
+  position: relative;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.icon-check-circle::before {
+  content: '';
+  position: absolute;
+  top: 0.5em;
+  left: 0.25em;
+  width: 0.3em;
+  height: 0.15em;
+  border-left: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+/* Calendar icon */
+.icon-calendar {
+  position: relative;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.icon-calendar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0.2em;
+  right: 0.2em;
+  height: 0.3em;
+  border-bottom: 1px solid currentColor;
+}
+
+.icon-calendar::after {
+  content: '';
+  position: absolute;
+  top: 0.5em;
+  left: 0.25em;
+  width: 0.5em;
+  height: 0.25em;
+  border: 1px solid currentColor;
+  border-radius: 1px;
+}
+
+/* Search icon */
+.icon-search {
+  position: relative;
+}
+
+.icon-search::before {
+  content: '';
+  position: absolute;
+  top: 0.1em;
+  left: 0.1em;
+  width: 0.6em;
+  height: 0.6em;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.icon-search::after {
+  content: '';
+  position: absolute;
+  top: 0.6em;
+  left: 0.6em;
+  width: 0.3em;
+  height: 1px;
+  background-color: currentColor;
+  transform: rotate(45deg);
+  transform-origin: 0 0;
+}
+
+/* Filter icon */
+.icon-filter {
+  position: relative;
+}
+
+.icon-filter::before {
+  content: '';
+  position: absolute;
+  top: 0.1em;
+  left: 0.1em;
+  right: 0.1em;
+  height: 0.2em;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+}
+
+.icon-filter::after {
+  content: '';
+  position: absolute;
+  top: 0.5em;
+  left: 0.3em;
+  right: 0.3em;
+  height: 0.2em;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+}
+
+/* Download icon */
+.icon-download {
+  position: relative;
+}
+
+.icon-download::before {
+  content: '';
+  position: absolute;
+  top: 0.1em;
+  left: 0.4em;
+  width: 0.2em;
+  height: 0.6em;
+  background-color: currentColor;
+}
+
+.icon-download::after {
+  content: '';
+  position: absolute;
+  top: 0.5em;
+  left: 0.2em;
+  width: 0.6em;
+  height: 0.6em;
+  border-left: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+/* Plus icon */
+.icon-plus {
+  position: relative;
+}
+
+.icon-plus::before {
+  content: '';
+  position: absolute;
+  top: 0.1em;
+  bottom: 0.1em;
+  left: 0.45em;
+  width: 0.1em;
+  background-color: currentColor;
+}
+
+.icon-plus::after {
+  content: '';
+  position: absolute;
+  left: 0.1em;
+  right: 0.1em;
+  top: 0.45em;
+  height: 0.1em;
+  background-color: currentColor;
+}
+
+/* Ellipsis vertical icon */
+.icon-ellipsis-v {
+  position: relative;
+}
+
+.icon-ellipsis-v::before {
+  content: '';
+  position: absolute;
+  top: 0.2em;
+  left: 0.4em;
+  width: 0.2em;
+  height: 0.2em;
+  background-color: currentColor;
+  border-radius: 50%;
+  box-shadow: 0 0.3em 0 currentColor, 0 0.6em 0 currentColor;
+}

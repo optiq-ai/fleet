@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaFileAlt, FaExclamationTriangle, FaCheckCircle, FaCalendarAlt } from 'react-icons/fa';
+import './IconStyles.css';
 
 const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => {
   if (isLoading) {
@@ -20,7 +20,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
       <KPISection>
         <KPICard>
           <KPIIcon>
-            <FaFileAlt />
+            <span className="icon icon-file"></span>
           </KPIIcon>
           <KPIContent>
             <KPITitle>Total Documents</KPITitle>
@@ -45,7 +45,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
 
         <KPICard>
           <KPIIcon className="expiring">
-            <FaCalendarAlt />
+            <span className="icon icon-calendar"></span>
           </KPIIcon>
           <KPIContent>
             <KPITitle>Expiring Documents</KPITitle>
@@ -67,7 +67,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
 
         <KPICard>
           <KPIIcon className="compliance">
-            <FaCheckCircle />
+            <span className="icon icon-check-circle"></span>
           </KPIIcon>
           <KPIContent>
             <KPITitle>Compliance Rate</KPITitle>
@@ -92,7 +92,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
 
         <KPICard>
           <KPIIcon className="activity">
-            <FaFileAlt />
+            <span className="icon icon-file"></span>
           </KPIIcon>
           <KPIContent>
             <KPITitle>Recent Activity</KPITitle>
@@ -115,7 +115,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
 
       <AlertsSection>
         <SectionTitle>
-          <FaExclamationTriangle /> Active Alerts
+          <span className="icon icon-warning"></span> Active Alerts
         </SectionTitle>
         {alerts && alerts.length > 0 ? (
           <AlertsList>
@@ -151,7 +151,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
       <ActionSection>
         <ActionCard onClick={() => onTabChange('search')}>
           <ActionIcon>
-            <FaFileAlt />
+            <span className="icon icon-file"></span>
           </ActionIcon>
           <ActionTitle>Search Documents</ActionTitle>
           <ActionDescription>
@@ -161,7 +161,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
 
         <ActionCard onClick={() => onTabChange('vehicle')}>
           <ActionIcon>
-            <FaFileAlt />
+            <span className="icon icon-file"></span>
           </ActionIcon>
           <ActionTitle>Vehicle Documents</ActionTitle>
           <ActionDescription>
@@ -171,7 +171,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
 
         <ActionCard onClick={() => onTabChange('driver')}>
           <ActionIcon>
-            <FaFileAlt />
+            <span className="icon icon-file"></span>
           </ActionIcon>
           <ActionTitle>Driver Documents</ActionTitle>
           <ActionDescription>
@@ -181,7 +181,7 @@ const DocumentsDashboard = ({ data, alerts, isLoading, error, onTabChange }) => 
 
         <ActionCard onClick={() => onTabChange('automation')}>
           <ActionIcon>
-            <FaFileAlt />
+            <span className="icon icon-file"></span>
           </ActionIcon>
           <ActionTitle>Document Automation</ActionTitle>
           <ActionDescription>

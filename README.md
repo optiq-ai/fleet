@@ -11,7 +11,34 @@ Projekt składa się z trzech głównych komponentów:
 - **Backend** - serwer Node.js
 - **Baza danych** - struktura SQL (PostgreSQL)
 
+## Technologie i konwencje
+
+- **React** - biblioteka JavaScript do budowania interfejsów użytkownika
+- **Styled Components** - biblioteka do stylowania komponentów React
+- **CSS** - do stylowania i ikon (zamiast zewnętrznych bibliotek ikon)
+- **JSX** - rozszerzenie składni JavaScript do tworzenia elementów React
+
 ## Komponenty aplikacji
+
+### Document Management
+
+Sekcja Document Management umożliwia centralne zarządzanie wszystkimi dokumentami związanymi z flotą pojazdów, kierowcami, operacjami i zgodnością z przepisami. Komponent ten zapewnia kompleksowe rozwiązanie do przechowywania, kategoryzowania, wyszukiwania i automatyzacji procesów dokumentacyjnych.
+
+#### Komponenty:
+- **DocumentsDashboard** - wyświetla KPI, alerty dokumentów i statystyki zgodności
+- **VehicleDocuments** - zarządza dokumentami pojazdów (dowody rejestracyjne, ubezpieczenia, przeglądy)
+- **DriverDocuments** - zarządza dokumentami kierowców (prawo jazdy, certyfikaty, badania)
+- **OperationalDocuments** - zarządza dokumentami operacyjnymi (umowy, faktury, raporty)
+- **ComplianceDocuments** - zarządza dokumentami zgodności z przepisami (licencje, zezwolenia, certyfikaty)
+- **DocumentSearch** - zaawansowane wyszukiwanie dokumentów z filtrowaniem i sortowaniem
+- **DocumentAutomation** - automatyzacja procesów dokumentacyjnych, szablony i przypomnienia
+
+#### Techniczne aspekty:
+- Wszystkie komponenty używają czystego CSS do stylowania i ikon (plik IconStyles.css)
+- Ikony są implementowane jako elementy span z odpowiednimi klasami CSS
+- Brak zależności od zewnętrznych bibliotek ikon jak react-icons/fa
+- Komponenty są zintegrowane z API poprzez documentManagementService
+- Dostępne są również mocki danych w mockDocumentManagementService
 
 ### Dashboard
 

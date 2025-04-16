@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaFileAlt, FaSearch, FaFilter, FaDownload, FaPlus, FaEllipsisV } from 'react-icons/fa';
+import './IconStyles.css';
 
 const ComplianceDocuments = ({ 
   documents, 
@@ -58,7 +58,7 @@ const ComplianceDocuments = ({
         <Title>Compliance Documents</Title>
         <Actions>
           <Button onClick={() => setShowUploadModal(true)}>
-            <FaPlus /> Upload Document
+            <span className="icon icon-plus"></span> Upload Document
           </Button>
         </Actions>
       </Header>
@@ -89,7 +89,7 @@ const ComplianceDocuments = ({
         
         <SearchContainer>
           <SearchIcon>
-            <FaSearch />
+            <span className="icon icon-search"></span>
           </SearchIcon>
           <SearchInput 
             type="text" 
@@ -125,7 +125,7 @@ const ComplianceDocuments = ({
                     <td>
                       <DocumentName>
                         <DocumentIcon>
-                          <FaFileAlt />
+                          <span className="icon icon-file"></span>
                         </DocumentIcon>
                         {document.name}
                       </DocumentName>
@@ -156,19 +156,19 @@ const ComplianceDocuments = ({
                     <td>
                       <ActionsContainer>
                         <ActionButton onClick={() => toggleDocumentActions(document.id)}>
-                          <FaEllipsisV />
+                          <span className="icon icon-ellipsis-v"></span>
                         </ActionButton>
                         
                         {activeDocument === document.id && (
                           <ActionsMenu>
                             <ActionMenuItem>
-                              <FaDownload /> Download
+                              <span className="icon icon-download"></span> Download
                             </ActionMenuItem>
                             <ActionMenuItem>
-                              <FaSearch /> View Details
+                              <span className="icon icon-search"></span> View Details
                             </ActionMenuItem>
                             <ActionMenuItem>
-                              <FaPlus /> Set Reminder
+                              <span className="icon icon-plus"></span> Set Reminder
                             </ActionMenuItem>
                           </ActionsMenu>
                         )}
