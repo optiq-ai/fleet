@@ -1,0 +1,280 @@
+/* IconStyles.css */
+
+/* General icon styles */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  position: relative;
+  margin-right: 0.2em;
+}
+
+/* Dashboard icon */
+.icon-dashboard::before {
+  content: "📊";
+}
+
+/* List icon */
+.icon-list::before {
+  content: "📋";
+}
+
+/* Wrench/maintenance icon */
+.icon-wrench::before {
+  content: "🔧";
+}
+
+/* Chart/graph icon */
+.icon-chart::before {
+  content: "📈";
+}
+
+/* Money/finance icon */
+.icon-money::before {
+  content: "💰";
+}
+
+/* File/document icon */
+.icon-file::before {
+  content: "📄";
+}
+
+/* PDF file icon */
+.icon-file-pdf::before {
+  content: "📕";
+}
+
+/* Excel file icon */
+.icon-file-excel::before {
+  content: "📗";
+}
+
+/* CSV file icon */
+.icon-file-csv::before {
+  content: "📊";
+}
+
+/* Plus/add icon */
+.icon-plus::before {
+  content: "➕";
+}
+
+/* Search icon */
+.icon-search::before {
+  content: "🔍";
+}
+
+/* Filter icon */
+.icon-filter::before {
+  content: "🔍";
+}
+
+/* Download icon */
+.icon-download::before {
+  content: "⬇️";
+}
+
+/* Upload icon */
+.icon-upload::before {
+  content: "⬆️";
+}
+
+/* Ellipsis/more icon */
+.icon-ellipsis-v::before {
+  content: "⋮";
+}
+
+/* Check/success icon */
+.icon-check::before {
+  content: "✅";
+}
+
+/* Eye/view icon */
+.icon-eye::before {
+  content: "👁️";
+}
+
+/* Flag/complete icon */
+.icon-flag::before {
+  content: "🚩";
+}
+
+/* Calendar icon */
+.icon-calendar::before {
+  content: "📅";
+}
+
+/* Map/location icon */
+.icon-map::before {
+  content: "🗺️";
+}
+
+/* Alert/warning icon */
+.icon-alert::before {
+  content: "⚠️";
+}
+
+/* Info icon */
+.icon-info::before {
+  content: "ℹ️";
+}
+
+/* Edit/pencil icon */
+.icon-edit::before {
+  content: "✏️";
+}
+
+/* Delete/trash icon */
+.icon-trash::before {
+  content: "🗑️";
+}
+
+/* Clock/time icon */
+.icon-clock::before {
+  content: "🕒";
+}
+
+/* Tag icon */
+.icon-tag::before {
+  content: "🏷️";
+}
+
+/* User icon */
+.icon-user::before {
+  content: "👤";
+}
+
+/* Users/group icon */
+.icon-users::before {
+  content: "👥";
+}
+
+/* Building/company icon */
+.icon-building::before {
+  content: "🏢";
+}
+
+/* Truck/vehicle icon */
+.icon-truck::before {
+  content: "🚚";
+}
+
+/* Tools icon */
+.icon-tools::before {
+  content: "🛠️";
+}
+
+/* Parts icon */
+.icon-parts::before {
+  content: "⚙️";
+}
+
+/* Refresh/reload icon */
+.icon-refresh::before {
+  content: "🔄";
+}
+
+/* Print icon */
+.icon-print::before {
+  content: "🖨️";
+}
+
+/* Link icon */
+.icon-link::before {
+  content: "🔗";
+}
+
+/* Settings/gear icon */
+.icon-settings::before {
+  content: "⚙️";
+}
+
+/* Bell/notification icon */
+.icon-bell::before {
+  content: "🔔";
+}
+
+/* Lock/security icon */
+.icon-lock::before {
+  content: "🔒";
+}
+
+/* Unlock icon */
+.icon-unlock::before {
+  content: "🔓";
+}
+
+/* Star/favorite icon */
+.icon-star::before {
+  content: "⭐";
+}
+
+/* Heart/like icon */
+.icon-heart::before {
+  content: "❤️";
+}
+
+/* Comment/message icon */
+.icon-comment::before {
+  content: "💬";
+}
+
+/* Email icon */
+.icon-email::before {
+  content: "📧";
+}
+
+/* Phone icon */
+.icon-phone::before {
+  content: "📞";
+}
+
+/* Home icon */
+.icon-home::before {
+  content: "🏠";
+}
+
+/* Arrow icons */
+.icon-arrow-up::before {
+  content: "⬆️";
+}
+
+.icon-arrow-down::before {
+  content: "⬇️";
+}
+
+.icon-arrow-left::before {
+  content: "⬅️";
+}
+
+.icon-arrow-right::before {
+  content: "➡️";
+}
+
+/* Sort icons */
+.icon-sort-asc::before {
+  content: "🔼";
+}
+
+.icon-sort-desc::before {
+  content: "🔽";
+}
+
+/* Success/error icons */
+.icon-success::before {
+  content: "✅";
+}
+
+.icon-error::before {
+  content: "❌";
+}
+
+.icon-warning::before {
+  content: "⚠️";
+}
+
+/* Robot/automation icon */
+.icon-robot::before {
+  content: "🤖";
+}
