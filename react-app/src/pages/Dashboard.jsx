@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import dashboardService from '../services/api/dashboardService';
 import mockDashboardService from '../services/api/mockDashboardService';
+import mockDashboardChartsService from '../services/api/mockDashboardChartsService';
 
 /**
  * @typedef {Object} KPIData
@@ -285,12 +288,31 @@ const Dashboard = () => {
     y: 0
   });
   
+  // Stany dla danych wykresów
+  const [fraudRiskData, setFraudRiskData] = useState(null);
+  const [fuelConsumptionData, setFuelConsumptionData] = useState(null);
+  const [operationalCostsData, setOperationalCostsData] = useState(null);
+  
   // Stany ładowania i błędów
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
   // Stan dla przełącznika źródła danych (API vs Mock)
   const [useMockData, setUseMockData] = useState(true);
+  
+  // Rejestracja komponentów Chart.js
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+  );
   
   // Wybór serwisu danych na podstawie stanu przełącznika
   const dataService = useMockData ? mockDashboardService : dashboardService;
@@ -314,14 +336,24 @@ const Dashboard = () => {
         const mapResponse = await dataService.getMapData('vehicles');
         setMapData(mapResponse);
         
+        // Pobieranie danych wykresów
+        const fraudRiskResponse = await mockDashboardChartsService.getFraudRiskData();
+        setFraudRiskData(fraudRiskResponse);
+        
+        const fuelConsumptionResponse = await mockDashboardChartsService.getFuelConsumptionData();
+        setFuelConsumptionData(fuelConsumptionResponse);
+        
+        const operationalCostsResponse = await mockDashboardChartsService.getOperationalCostsData();
+        setOperationalCostsData(operationalCostsResponse);
+        
         // Pobieranie statystyk floty (symulacja - w rzeczywistości byłoby to z API)
         setFleetStats({
           fuelConsumption: {
-            current: 8.5,
-            previous: 9.2,
+            current: fuelConsumptionResponse.current,
+            previous: fuelConsumptionResponse.previous,
             trend: 'down',
-            trendValue: '7.6%',
-            chartData: [8.9, 9.1, 9.0, 8.8, 8.7, 8.6, 8.5]
+            trendValue: `${Math.abs(fuelConsumptionResponse.change).toFixed(1)}%`,
+            chartData: fuelConsumptionResponse.trend.map(item => item.value)
           },
           driverEfficiency: {
             drivers: [
@@ -333,14 +365,8 @@ const Dashboard = () => {
             ]
           },
           operationalCosts: {
-            total: 125000,
-            breakdown: [
-              { category: 'Paliwo', value: 45000, percentage: 36 },
-              { category: 'Utrzymanie', value: 30000, percentage: 24 },
-              { category: 'Ubezpieczenie', value: 25000, percentage: 20 },
-              { category: 'Opłaty drogowe', value: 15000, percentage: 12 },
-              { category: 'Inne', value: 10000, percentage: 8 }
-            ]
+            total: operationalCostsResponse.total,
+            breakdown: operationalCostsResponse.breakdown
           },
           routeCompletion: {
             completed: 87,
@@ -527,7 +553,80 @@ const Dashboard = () => {
           </Card>
           
           <Card title="Wskaźnik ryzyka oszustw">
-            <ChartContainer>Wykres trendu ryzyka oszustw</ChartContainer>
+            <div>
+              <strong>Aktualny poziom ryzyka: </strong> 
+              {fraudRiskData?.current}
+              <span style={{ 
+                color: fraudRiskData?.change < 0 ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {fraudRiskData?.change < 0 ? '↓' : '↑'} {Math.abs(fraudRiskData?.change).toFixed(1)}%
+              </span>
+            </div>
+            <ChartContainer>
+              {fraudRiskData && (
+                <Line
+                  data={{
+                    labels: fraudRiskData.trend.map(item => item.date),
+                    datasets: [
+                      {
+                        label: 'Poziom ryzyka',
+                        data: fraudRiskData.trend.map(item => item.value),
+                        borderColor: '#f44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: fraudRiskData.trend.map(item => {
+                          if (item.value < fraudRiskData.categories.low.max) return fraudRiskData.categories.low.color;
+                          if (item.value < fraudRiskData.categories.medium.max) return fraudRiskData.categories.medium.color;
+                          return fraudRiskData.categories.high.color;
+                        }),
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            const value = context.raw;
+                            let category = 'Niskie';
+                            if (value >= fraudRiskData.categories.medium.min) category = 'Średnie';
+                            if (value >= fraudRiskData.categories.high.min) category = 'Wysokie';
+                            return `Poziom ryzyka: ${value} (${category})`;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                          callback: (value) => `${value}%`
+                        }
+                      },
+                      x: {
+                        grid: {
+                          display: false
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
           </Card>
         </GridSection>
       </>
@@ -545,15 +644,88 @@ const Dashboard = () => {
           <Card title="Zużycie paliwa">
             <div>
               <strong>Średnie zużycie: </strong> 
-              {fleetStats.fuelConsumption.current} l/100km
+              {fleetStats?.fuelConsumption?.current} {fuelConsumptionData?.unit}
               <span style={{ 
-                color: fleetStats.fuelConsumption.trend === 'down' ? '#4caf50' : '#f44336',
+                color: fuelConsumptionData?.change < 0 ? '#4caf50' : '#f44336',
                 marginLeft: '8px'
               }}>
-                {fleetStats.fuelConsumption.trend === 'down' ? '↓' : '↑'} {fleetStats.fuelConsumption.trendValue}
+                {fuelConsumptionData?.change < 0 ? '↓' : '↑'} {Math.abs(fuelConsumptionData?.change).toFixed(1)}%
               </span>
             </div>
-            <ChartContainer>Wykres trendu zużycia paliwa</ChartContainer>
+            <ChartContainer>
+              {fuelConsumptionData && (
+                <Line
+                  data={{
+                    labels: fuelConsumptionData.trend.map(item => item.date),
+                    datasets: [
+                      {
+                        label: 'Zużycie paliwa',
+                        data: fuelConsumptionData.trend.map(item => item.value),
+                        borderColor: '#2196f3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#2196f3',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                      },
+                      {
+                        label: 'Cel',
+                        data: Array(fuelConsumptionData.trend.length).fill(fuelConsumptionData.target),
+                        borderColor: '#4caf50',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                          boxWidth: 12,
+                          usePointStyle: true
+                        }
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            if (context.dataset.label === 'Cel') {
+                              return `Cel: ${context.raw} ${fuelConsumptionData.unit}`;
+                            }
+                            return `Zużycie: ${context.raw} ${fuelConsumptionData.unit}`;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: false,
+                        min: Math.min(fuelConsumptionData.target * 0.9, ...fuelConsumptionData.trend.map(item => item.value)) * 0.95,
+                        max: Math.max(fuelConsumptionData.target * 1.1, ...fuelConsumptionData.trend.map(item => item.value)) * 1.05,
+                        grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                          callback: (value) => `${value} ${fuelConsumptionData.unit}`
+                        }
+                      },
+                      x: {
+                        grid: {
+                          display: false
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
           </Card>
           
           <Card title="Efektywność kierowców">
@@ -574,9 +746,58 @@ const Dashboard = () => {
           <Card title="Koszty operacyjne">
             <div>
               <strong>Całkowite koszty: </strong> 
-              {fleetStats.operationalCosts.total.toLocaleString()} zł
+              {operationalCostsData?.total.toLocaleString()} {operationalCostsData?.unit}
+              <span style={{ 
+                color: operationalCostsData?.change < 0 ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {operationalCostsData?.change < 0 ? '↓' : '↑'} {Math.abs(operationalCostsData?.change).toFixed(1)}%
+              </span>
             </div>
-            <ChartContainer>Wykres struktury kosztów</ChartContainer>
+            <ChartContainer>
+              {operationalCostsData && (
+                <Pie
+                  data={{
+                    labels: operationalCostsData.breakdown.map(item => item.category),
+                    datasets: [
+                      {
+                        data: operationalCostsData.breakdown.map(item => item.value),
+                        backgroundColor: operationalCostsData.breakdown.map(item => item.color),
+                        borderColor: 'white',
+                        borderWidth: 2,
+                        hoverOffset: 10
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'right',
+                        labels: {
+                          boxWidth: 12,
+                          padding: 15,
+                          font: {
+                            size: 11
+                          }
+                        }
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            const value = context.raw;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ${value.toLocaleString()} ${operationalCostsData.unit} (${percentage}%)`;
+                          }
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
           </Card>
           
           <Card title="Realizacja tras">
