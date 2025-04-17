@@ -97,6 +97,9 @@ const AlertsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
 `;
 
 const AlertItem = styled.div`
@@ -525,7 +528,7 @@ const FraudDetection = () => {
         }
       }
       
-      if (activeTab === 'fuelTests' && !fuelTestsData) {
+      if (activeTab === 'fuelTests') {
         setIsLoadingFuelTests(true);
         try {
           const data = await mockFraudDetectionService.getFuelQualityTests();
@@ -539,7 +542,7 @@ const FraudDetection = () => {
     };
     
     fetchTabData();
-  }, [activeTab, patternData, fuelTestsData]);
+  }, [activeTab, patternData]);
   
   // Renderowanie analizy wzorców
   const renderPatternAnalysis = () => {
