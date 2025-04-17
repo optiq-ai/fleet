@@ -420,7 +420,7 @@ const Monitoring = () => {
     };
     
     fetchMonitoringData();
-  }, [dataService, useMockData]);
+  }, [dataService, useMockData, selectedVehicle]);
   
   // Handle vehicle selection
   const handleVehicleSelect = async (vehicleId) => {
@@ -445,25 +445,6 @@ const Monitoring = () => {
     } catch (err) {
       console.error('Error acknowledging alert:', err);
     }
-  };
-  
-  // Handle map point hover
-  const handleMapPointHover = (vehicle, event) => {
-    const rect = event.target.getBoundingClientRect();
-    setTooltip({
-      visible: true,
-      content: `${vehicle.name} (${vehicle.status})`,
-      x: rect.left,
-      y: rect.top - 30
-    });
-  };
-  
-  // Handle map point leave
-  const handleMapPointLeave = () => {
-    setTooltip({
-      ...tooltip,
-      visible: false
-    });
   };
   
   // Handle marker click on the map
@@ -721,10 +702,10 @@ const Monitoring = () => {
               <Table 
                 headers={['Priorytet', 'Pojazd', 'Opis', 'Data', 'Status']}
                 data={alerts.slice(0, 5).map(alert => [
-                  alert.priority,
-                  alert.vehicle,
-                  alert.description,
-                  alert.date,
+                  alert.severity,
+                  alert.vehicleId,
+                  alert.message,
+                  alert.timestamp,
                   alert.acknowledged ? 'Potwierdzony' : 'Nowy'
                 ])}
                 onRowClick={(index) => handleAcknowledgeAlert(alerts[index].id)}
@@ -744,8 +725,11 @@ const Monitoring = () => {
   const renderVehicleDetailsSection = () => {
     if (!selectedVehicle) return null;
     
+    // Check if selectedVehicle is from the map data or regular vehicle data
+    const isMapVehicle = !selectedVehicle.hasOwnProperty('mileage');
+    
     return (
-      <VehicleDetailsCard title={`Szczegóły pojazdu: ${selectedVehicle.name}`}>
+      <VehicleDetailsCard title={`Szczegóły pojazdu: ${selectedVehicle.name || selectedVehicle.vehicle}`}>
         <DetailRow>
           <DetailLabel>Status:</DetailLabel>
           <DetailValue>{selectedVehicle.status}</DetailValue>
@@ -756,26 +740,51 @@ const Monitoring = () => {
         </DetailRow>
         <DetailRow>
           <DetailLabel>Lokalizacja:</DetailLabel>
-          <DetailValue>{`${selectedVehicle.location.city}, ${selectedVehicle.location.street}`}</DetailValue>
+          <DetailValue>
+            {isMapVehicle 
+              ? selectedVehicle.location 
+              : `${selectedVehicle.location.city}, ${selectedVehicle.location.street}`
+            }
+          </DetailValue>
         </DetailRow>
         <DetailRow>
           <DetailLabel>Ostatnia aktualizacja:</DetailLabel>
-          <DetailValue>{selectedVehicle.lastUpdate}</DetailValue>
+          <DetailValue>{selectedVehicle.lastUpdate || selectedVehicle.date}</DetailValue>
         </DetailRow>
-        <DetailRow>
-          <DetailLabel>Przebieg:</DetailLabel>
-          <DetailValue>{`${selectedVehicle.mileage.toLocaleString()} km`}</DetailValue>
-        </DetailRow>
+        {!isMapVehicle && (
+          <DetailRow>
+            <DetailLabel>Przebieg:</DetailLabel>
+            <DetailValue>{`${selectedVehicle.mileage.toLocaleString()} km`}</DetailValue>
+          </DetailRow>
+        )}
         <DetailRow>
           <DetailLabel>Poziom paliwa:</DetailLabel>
-          <DetailValue>{`${selectedVehicle.fuelLevel}%`}</DetailValue>
+          <DetailValue>
+            {isMapVehicle 
+              ? `${selectedVehicle.amount}%` 
+              : `${selectedVehicle.fuelData?.level || 0}%`
+            }
+          </DetailValue>
         </DetailRow>
         
         <GaugeContainer>
           <GaugeBackground />
-          <GaugeFill percentage={selectedVehicle.fuelLevel} />
-          <GaugeLabel percentage={selectedVehicle.fuelLevel}>
-            {selectedVehicle.fuelLevel}%
+          <GaugeFill 
+            percentage={isMapVehicle 
+              ? selectedVehicle.amount 
+              : selectedVehicle.fuelData?.level || 0
+            } 
+          />
+          <GaugeLabel 
+            percentage={isMapVehicle 
+              ? selectedVehicle.amount 
+              : selectedVehicle.fuelData?.level || 0
+            }
+          >
+            {isMapVehicle 
+              ? `${selectedVehicle.amount}%` 
+              : `${selectedVehicle.fuelData?.level || 0}%`
+            }
           </GaugeLabel>
         </GaugeContainer>
       </VehicleDetailsCard>
