@@ -3,8 +3,26 @@ import styled from 'styled-components';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Pie, Line, Bar } from 'react-chartjs-2';
 import vehiclesService from '../services/api/vehiclesService';
 import mockVehiclesService from '../services/api/mockVehiclesService';
+import mockVehiclesMapService from '../services/api/mockVehiclesMapService';
+import mockVehiclesChartsService from '../services/api/mockVehiclesChartsService';
+import SuspiciousTransactionsMap from '../components/fraud/SuspiciousTransactionsMap';
+
+// Register ChartJS components
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 /**
  * Vehicles Overview component
@@ -19,10 +37,17 @@ const VehiclesOverview = () => {
   const [mapData, setMapData] = useState([]);
   const [fleetStats, setFleetStats] = useState(null);
   
+  // State for chart data
+  const [fleetByBrandData, setFleetByBrandData] = useState(null);
+  const [fleetByAgeData, setFleetByAgeData] = useState(null);
+  const [fuelConsumptionTrendData, setFuelConsumptionTrendData] = useState(null);
+  const [maintenanceCostTrendData, setMaintenanceCostTrendData] = useState(null);
+  
   // State for UI
   const [activeTab, setActiveTab] = useState('details');
   const [isLoading, setIsLoading] = useState(true);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
+  const [isMapLoading, setIsMapLoading] = useState(true);
   const [error, setError] = useState(null);
   const [useMockData, setUseMockData] = useState(true);
   
@@ -61,12 +86,27 @@ const VehiclesOverview = () => {
       setKpiData(kpiResponse);
       
       // Fetch map data
-      const mapResponse = await service.getVehicleLocations();
+      setIsMapLoading(true);
+      const mapResponse = await mockVehiclesMapService.getVehicleLocationsForMapComponent();
       setMapData(mapResponse);
+      setIsMapLoading(false);
       
       // Fetch fleet statistics
       const statsResponse = await service.getFleetStatistics();
       setFleetStats(statsResponse);
+      
+      // Fetch chart data
+      const fleetByBrandResponse = await mockVehiclesChartsService.getFleetStructureByBrand();
+      setFleetByBrandData(fleetByBrandResponse);
+      
+      const fleetByAgeResponse = await mockVehiclesChartsService.getFleetStructureByAge();
+      setFleetByAgeData(fleetByAgeResponse);
+      
+      const fuelConsumptionTrendResponse = await mockVehiclesChartsService.getFuelConsumptionTrend();
+      setFuelConsumptionTrendData(fuelConsumptionTrendResponse);
+      
+      const maintenanceCostTrendResponse = await mockVehiclesChartsService.getMaintenanceCostTrend();
+      setMaintenanceCostTrendData(maintenanceCostTrendResponse);
     } catch (err) {
       console.error('Error fetching fleet data:', err);
       setError('Nie udało się pobrać danych floty. Spróbuj odświeżyć stronę.');
@@ -154,6 +194,14 @@ const VehiclesOverview = () => {
   // Handle data source toggle
   const handleToggleDataSource = () => {
     setUseMockData(!useMockData);
+  };
+  
+  // Handle marker click on the map
+  const handleMarkerClick = (vehicle) => {
+    console.log('Clicked vehicle on map:', vehicle);
+    if (vehicle && vehicle.id) {
+      handleVehicleSelect({ id: vehicle.id });
+    }
   };
   
   // Handle export to CSV
@@ -247,39 +295,237 @@ const VehiclesOverview = () => {
     return (
       <Card title="Mapa floty">
         <MapContainer>
-          <MapPlaceholder>
-            <MapImage src="/map-placeholder.png" alt="Mapa floty" />
-            {mapData.map((vehicle, index) => (
-              <MapPoint 
-                key={index}
-                x={vehicle.coordinates.x} 
-                y={vehicle.coordinates.y}
-                status={vehicle.status}
-                onClick={() => handleVehicleSelect({ id: vehicle.id })}
-              >
-                <MapTooltip>
-                  <div><strong>{vehicle.id}</strong></div>
-                  <div>{vehicle.make} {vehicle.model}</div>
-                  <div>Status: {vehicle.status}</div>
-                </MapTooltip>
-              </MapPoint>
-            ))}
-          </MapPlaceholder>
-          <MapLegend>
-            <LegendItem>
-              <LegendPoint status="active" />
-              <span>Aktywny</span>
-            </LegendItem>
-            <LegendItem>
-              <LegendPoint status="inService" />
-              <span>W serwisie</span>
-            </LegendItem>
-            <LegendItem>
-              <LegendPoint status="inactive" />
-              <span>Nieaktywny</span>
-            </LegendItem>
-          </MapLegend>
+          {isMapLoading ? (
+            <MapPlaceholder>Ładowanie mapy floty...</MapPlaceholder>
+          ) : (
+            <SuspiciousTransactionsMap 
+              transactions={mapData}
+              onMarkerClick={handleMarkerClick}
+            />
+          )}
         </MapContainer>
+      </Card>
+    );
+  };
+  
+  // Render fleet structure by brand chart
+  const renderFleetStructureByBrandChart = () => {
+    if (!fleetByBrandData) return null;
+    
+    const chartData = {
+      labels: fleetByBrandData.map(item => item.name),
+      datasets: [
+        {
+          data: fleetByBrandData.map(item => item.value),
+          backgroundColor: fleetByBrandData.map(item => item.color),
+          borderColor: fleetByBrandData.map(item => item.color),
+          borderWidth: 1,
+        },
+      ],
+    };
+    
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 15,
+            padding: 15
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    };
+    
+    return (
+      <Card title="Struktura floty według marek">
+        <ChartContainer>
+          <Pie data={chartData} options={chartOptions} />
+        </ChartContainer>
+      </Card>
+    );
+  };
+  
+  // Render fleet structure by age chart
+  const renderFleetStructureByAgeChart = () => {
+    if (!fleetByAgeData) return null;
+    
+    const chartData = {
+      labels: fleetByAgeData.map(item => item.name),
+      datasets: [
+        {
+          data: fleetByAgeData.map(item => item.value),
+          backgroundColor: fleetByAgeData.map(item => item.color),
+          borderColor: fleetByAgeData.map(item => item.color),
+          borderWidth: 1,
+        },
+      ],
+    };
+    
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 15,
+            padding: 15
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    };
+    
+    return (
+      <Card title="Struktura wiekowa pojazdów">
+        <ChartContainer>
+          <Pie data={chartData} options={chartOptions} />
+        </ChartContainer>
+      </Card>
+    );
+  };
+  
+  // Render fuel consumption trends chart
+  const renderFuelConsumptionTrendsChart = () => {
+    if (!fuelConsumptionTrendData) return null;
+    
+    const chartData = {
+      labels: fuelConsumptionTrendData.map(item => item.month),
+      datasets: [
+        {
+          label: 'Zużycie paliwa (l/100km)',
+          data: fuelConsumptionTrendData.map(item => item.value),
+          borderColor: '#2196f3',
+          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    };
+    
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const label = context.dataset.label || '';
+              const value = context.raw || 0;
+              return `${label}: ${value} l/100km`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
+    };
+    
+    return (
+      <Card title="Trendy zużycia paliwa">
+        <ChartContainer>
+          <Line data={chartData} options={chartOptions} />
+        </ChartContainer>
+      </Card>
+    );
+  };
+  
+  // Render maintenance cost trends chart
+  const renderMaintenanceCostTrendsChart = () => {
+    if (!maintenanceCostTrendData) return null;
+    
+    const chartData = {
+      labels: maintenanceCostTrendData.map(item => item.month),
+      datasets: [
+        {
+          label: 'Koszty utrzymania (PLN)',
+          data: maintenanceCostTrendData.map(item => item.value),
+          backgroundColor: '#ff9800',
+          borderColor: '#ff9800',
+          borderWidth: 1,
+          borderRadius: 4
+        }
+      ]
+    };
+    
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const label = context.dataset.label || '';
+              const value = context.raw || 0;
+              return `${label}: ${value.toLocaleString()} PLN`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            callback: (value) => value.toLocaleString() + ' PLN'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
+    };
+    
+    return (
+      <Card title="Trendy kosztów utrzymania">
+        <ChartContainer>
+          <Bar data={chartData} options={chartOptions} />
+        </ChartContainer>
       </Card>
     );
   };
@@ -485,7 +731,7 @@ const VehiclesOverview = () => {
                       <DetailValue>{selectedVehicle.vin}</DetailValue>
                     </DetailItem>
                     <DetailItem>
-                      <DetailLabel>Numer rejestracyjny:</DetailLabel>
+                      <DetailLabel>Nr rejestracyjny:</DetailLabel>
                       <DetailValue>{selectedVehicle.registrationNumber}</DetailValue>
                     </DetailItem>
                     <DetailItem>
@@ -494,17 +740,21 @@ const VehiclesOverview = () => {
                     </DetailItem>
                     <DetailItem>
                       <DetailLabel>Przebieg:</DetailLabel>
-                      <DetailValue>{selectedVehicle.mileage} km</DetailValue>
+                      <DetailValue>{selectedVehicle.mileage.toLocaleString()} km</DetailValue>
                     </DetailItem>
                     <DetailItem>
                       <DetailLabel>Status:</DetailLabel>
                       <DetailValue>{selectedVehicle.status}</DetailValue>
                     </DetailItem>
+                    <DetailItem>
+                      <DetailLabel>Kierowca:</DetailLabel>
+                      <DetailValue>{selectedVehicle.driver}</DetailValue>
+                    </DetailItem>
                   </DetailGrid>
                 </DetailSection>
                 
                 <DetailSection>
-                  <DetailTitle>Specyfikacja techniczna</DetailTitle>
+                  <DetailTitle>Dane techniczne</DetailTitle>
                   <DetailGrid>
                     <DetailItem>
                       <DetailLabel>Typ nadwozia:</DetailLabel>
@@ -543,46 +793,42 @@ const VehiclesOverview = () => {
                 
                 <DetailSection>
                   <DetailTitle>Stan techniczny</DetailTitle>
-                  <HealthContainer>
-                    <HealthGauge value={selectedVehicle.healthPercentage} />
-                    <HealthDetails>
-                      {selectedVehicle.components && selectedVehicle.components.map((component, index) => (
-                        <ComponentHealth key={index}>
-                          <ComponentName>{component.name}</ComponentName>
-                          <HealthBar>
-                            <HealthBarFill 
-                              value={component.health} 
-                              color={getHealthColor(component.health)}
-                            />
-                          </HealthBar>
-                          <HealthValue>{component.health}%</HealthValue>
-                        </ComponentHealth>
-                      ))}
-                    </HealthDetails>
-                  </HealthContainer>
+                  <ComponentsContainer>
+                    {selectedVehicle.components.map((component, index) => (
+                      <ComponentItem key={index}>
+                        <ComponentName>{component.name}</ComponentName>
+                        <ComponentBar>
+                          <ComponentBarFill 
+                            percentage={component.health}
+                            status={getComponentStatus(component.health)}
+                          />
+                        </ComponentBar>
+                        <ComponentValue>{component.health}%</ComponentValue>
+                      </ComponentItem>
+                    ))}
+                  </ComponentsContainer>
                 </DetailSection>
               </DetailContainer>
             )}
             
             {activeTab === 'maintenance' && (
               <DetailContainer>
-                <TimelineContainer>
-                  {selectedVehicle.maintenanceHistory && selectedVehicle.maintenanceHistory.map((item, index) => (
-                    <TimelineItem key={index}>
-                      <TimelineDot color={getMaintenanceTypeColor(item.type)} />
-                      <TimelineContent>
-                        <TimelineDate>{item.date}</TimelineDate>
-                        <TimelineTitle>{item.type}</TimelineTitle>
-                        <TimelineDescription>{item.description}</TimelineDescription>
-                        <TimelineDetails>
-                          <span>Koszt: {item.cost} PLN</span>
-                          <span>Przebieg: {item.mileage} km</span>
-                          <span>Wykonawca: {item.provider}</span>
-                        </TimelineDetails>
-                      </TimelineContent>
-                    </TimelineItem>
-                  ))}
-                </TimelineContainer>
+                <Table 
+                  columns={[
+                    { key: 'date', label: 'Data' },
+                    { key: 'type', label: 'Typ' },
+                    { key: 'description', label: 'Opis' },
+                    { key: 'cost', label: 'Koszt' },
+                    { key: 'mileage', label: 'Przebieg' },
+                    { key: 'provider', label: 'Serwis' }
+                  ]}
+                  data={selectedVehicle.maintenanceHistory.map(item => ({
+                    ...item,
+                    cost: `${item.cost.toLocaleString()} PLN`,
+                    mileage: `${item.mileage.toLocaleString()} km`
+                  }))}
+                  emptyMessage="Brak historii przeglądów"
+                />
               </DetailContainer>
             )}
             
@@ -590,14 +836,17 @@ const VehiclesOverview = () => {
               <DetailContainer>
                 <Table 
                   columns={[
-                    { key: 'name', label: 'Imię i nazwisko' },
+                    { key: 'name', label: 'Kierowca' },
                     { key: 'startDate', label: 'Data rozpoczęcia' },
                     { key: 'endDate', label: 'Data zakończenia' },
                     { key: 'mileageDriven', label: 'Przejechane km' },
                     { key: 'incidents', label: 'Incydenty' }
                   ]}
-                  data={selectedVehicle.driverHistory || []}
-                  isLoading={false}
+                  data={selectedVehicle.driverHistory.map(item => ({
+                    ...item,
+                    endDate: item.endDate || 'Aktualny',
+                    mileageDriven: `${item.mileageDriven.toLocaleString()} km`
+                  }))}
                   emptyMessage="Brak historii kierowców"
                 />
               </DetailContainer>
@@ -605,74 +854,103 @@ const VehiclesOverview = () => {
             
             {activeTab === 'fuel' && (
               <DetailContainer>
-                <ChartContainer>
-                  <ChartTitle>Zużycie paliwa</ChartTitle>
-                  <FuelChart data={selectedVehicle.fuelConsumption || []} />
-                </ChartContainer>
-                <FuelStatsContainer>
-                  <FuelStatItem>
-                    <FuelStatLabel>Średnie zużycie</FuelStatLabel>
-                    <FuelStatValue>{selectedVehicle.averageFuelConsumption} l/100km</FuelStatValue>
-                  </FuelStatItem>
-                  <FuelStatItem>
-                    <FuelStatLabel>Łączne zużycie</FuelStatLabel>
-                    <FuelStatValue>{selectedVehicle.totalFuelConsumption} l</FuelStatValue>
-                  </FuelStatItem>
-                  <FuelStatItem>
-                    <FuelStatLabel>Koszt paliwa</FuelStatLabel>
-                    <FuelStatValue>{selectedVehicle.totalFuelCost} PLN</FuelStatValue>
-                  </FuelStatItem>
-                  <FuelStatItem>
-                    <FuelStatLabel>Emisja CO2</FuelStatLabel>
-                    <FuelStatValue>{selectedVehicle.co2Emission} kg</FuelStatValue>
-                  </FuelStatItem>
-                </FuelStatsContainer>
+                <DetailSection>
+                  <DetailTitle>Podsumowanie zużycia paliwa</DetailTitle>
+                  <DetailGrid>
+                    <DetailItem>
+                      <DetailLabel>Średnie zużycie:</DetailLabel>
+                      <DetailValue>{selectedVehicle.averageFuelConsumption} l/100km</DetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <DetailLabel>Całkowite zużycie:</DetailLabel>
+                      <DetailValue>{selectedVehicle.totalFuelConsumption.toLocaleString()} l</DetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <DetailLabel>Całkowity koszt:</DetailLabel>
+                      <DetailValue>{selectedVehicle.totalFuelCost.toLocaleString()} PLN</DetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <DetailLabel>Emisja CO2:</DetailLabel>
+                      <DetailValue>{selectedVehicle.co2Emission.toLocaleString()} g</DetailValue>
+                    </DetailItem>
+                  </DetailGrid>
+                </DetailSection>
+                
+                <DetailSection>
+                  <DetailTitle>Historia zużycia paliwa</DetailTitle>
+                  <Table 
+                    columns={[
+                      { key: 'month', label: 'Miesiąc' },
+                      { key: 'consumption', label: 'Zużycie (l/100km)' },
+                      { key: 'distance', label: 'Dystans (km)' },
+                      { key: 'cost', label: 'Koszt (PLN)' }
+                    ]}
+                    data={selectedVehicle.fuelConsumption.map(item => ({
+                      ...item,
+                      distance: item.distance.toLocaleString(),
+                      cost: item.cost.toLocaleString()
+                    }))}
+                    emptyMessage="Brak danych o zużyciu paliwa"
+                  />
+                </DetailSection>
               </DetailContainer>
             )}
             
             {activeTab === 'mileage' && (
               <DetailContainer>
-                <ChartContainer>
-                  <ChartTitle>Przebieg w czasie</ChartTitle>
-                  <MileageChart data={selectedVehicle.mileageHistory || []} />
-                </ChartContainer>
-                <MileageStatsContainer>
-                  <MileageStatItem>
-                    <MileageStatLabel>Średni miesięczny przebieg</MileageStatLabel>
-                    <MileageStatValue>{selectedVehicle.averageMonthlyMileage} km</MileageStatValue>
-                  </MileageStatItem>
-                  <MileageStatItem>
-                    <MileageStatLabel>Łączny przebieg</MileageStatLabel>
-                    <MileageStatValue>{selectedVehicle.mileage} km</MileageStatValue>
-                  </MileageStatItem>
-                  <MileageStatItem>
-                    <MileageStatLabel>Prognozowany roczny przebieg</MileageStatLabel>
-                    <MileageStatValue>{selectedVehicle.projectedAnnualMileage} km</MileageStatValue>
-                  </MileageStatItem>
-                </MileageStatsContainer>
+                <DetailSection>
+                  <DetailTitle>Podsumowanie przebiegu</DetailTitle>
+                  <DetailGrid>
+                    <DetailItem>
+                      <DetailLabel>Aktualny przebieg:</DetailLabel>
+                      <DetailValue>{selectedVehicle.mileage.toLocaleString()} km</DetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <DetailLabel>Średni miesięczny przebieg:</DetailLabel>
+                      <DetailValue>{selectedVehicle.averageMonthlyMileage.toLocaleString()} km</DetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <DetailLabel>Prognozowany roczny przebieg:</DetailLabel>
+                      <DetailValue>{selectedVehicle.projectedAnnualMileage.toLocaleString()} km</DetailValue>
+                    </DetailItem>
+                  </DetailGrid>
+                </DetailSection>
+                
+                <DetailSection>
+                  <DetailTitle>Historia przebiegu</DetailTitle>
+                  <Table 
+                    columns={[
+                      { key: 'month', label: 'Miesiąc' },
+                      { key: 'mileage', label: 'Przebieg (km)' },
+                      { key: 'monthlyMileage', label: 'Miesięczny przebieg (km)' }
+                    ]}
+                    data={selectedVehicle.mileageHistory.map(item => ({
+                      ...item,
+                      mileage: item.mileage.toLocaleString(),
+                      monthlyMileage: item.monthlyMileage.toLocaleString()
+                    }))}
+                    emptyMessage="Brak historii przebiegu"
+                  />
+                </DetailSection>
               </DetailContainer>
             )}
             
             {activeTab === 'documents' && (
               <DetailContainer>
-                <DocumentsGrid>
-                  {selectedVehicle.documents && selectedVehicle.documents.map((doc, index) => (
-                    <DocumentCard key={index}>
-                      <DocumentIcon type={doc.type} />
-                      <DocumentInfo>
-                        <DocumentTitle>{doc.title}</DocumentTitle>
-                        <DocumentMeta>
-                          <span>Ważny do: {doc.expiryDate}</span>
-                          <span>Dodano: {doc.addedDate}</span>
-                        </DocumentMeta>
-                      </DocumentInfo>
-                      <DocumentActions>
-                        <DocumentButton>Podgląd</DocumentButton>
-                        <DocumentButton>Pobierz</DocumentButton>
-                      </DocumentActions>
-                    </DocumentCard>
-                  ))}
-                </DocumentsGrid>
+                <Table 
+                  columns={[
+                    { key: 'title', label: 'Nazwa dokumentu' },
+                    { key: 'type', label: 'Typ' },
+                    { key: 'addedDate', label: 'Data dodania' },
+                    { key: 'expiryDate', label: 'Data ważności' },
+                    { key: 'actions', label: 'Akcje' }
+                  ]}
+                  data={selectedVehicle.documents.map(doc => ({
+                    ...doc,
+                    actions: <Button small>Pobierz</Button>
+                  }))}
+                  emptyMessage="Brak dokumentów"
+                />
               </DetailContainer>
             )}
           </>
@@ -681,155 +959,101 @@ const VehiclesOverview = () => {
     );
   };
   
-  // Render fleet statistics
-  const renderFleetStatistics = () => {
-    if (!fleetStats) return null;
-    
-    return (
-      <StatisticsContainer>
-        <Card title="Struktura floty według marek">
-          <ChartContainer>
-            <PieChart data={fleetStats.fleetByMake} />
-          </ChartContainer>
-        </Card>
-        
-        <Card title="Struktura wiekowa pojazdów">
-          <ChartContainer>
-            <BarChart data={fleetStats.fleetByAge} />
-          </ChartContainer>
-        </Card>
-        
-        <Card title="Trendy zużycia paliwa">
-          <ChartContainer>
-            <LineChart data={fleetStats.fuelConsumptionTrend} />
-          </ChartContainer>
-        </Card>
-        
-        <Card title="Trendy kosztów utrzymania">
-          <ChartContainer>
-            <LineChart data={fleetStats.maintenanceCostTrend} />
-          </ChartContainer>
-        </Card>
-      </StatisticsContainer>
-    );
-  };
-  
-  // Helper functions for UI elements
+  // Helper function to get status badge
   const getStatusBadge = (status) => {
-    const colors = {
-      active: '#4caf50',
-      inService: '#ff9800',
-      inactive: '#f44336'
-    };
+    let color;
+    let label;
     
-    const labels = {
-      active: 'Aktywny',
-      inService: 'W serwisie',
-      inactive: 'Nieaktywny'
-    };
+    switch (status) {
+      case 'active':
+        color = '#4caf50';
+        label = 'Aktywny';
+        break;
+      case 'inService':
+        color = '#ff9800';
+        label = 'W serwisie';
+        break;
+      case 'inactive':
+        color = '#f44336';
+        label = 'Nieaktywny';
+        break;
+      default:
+        color = '#9e9e9e';
+        label = status;
+    }
     
-    return (
-      <Badge color={colors[status]}>
-        {labels[status] || status}
-      </Badge>
-    );
+    return <StatusBadge color={color}>{label}</StatusBadge>;
   };
   
+  // Helper function to get health badge
   const getHealthBadge = (health) => {
     let color;
     
-    if (health >= 80) color = '#4caf50';
-    else if (health >= 60) color = '#8bc34a';
-    else if (health >= 40) color = '#ffc107';
-    else if (health >= 20) color = '#ff9800';
-    else color = '#f44336';
+    if (health >= 75) {
+      color = '#4caf50';
+    } else if (health >= 50) {
+      color = '#ff9800';
+    } else {
+      color = '#f44336';
+    }
     
-    return (
-      <HealthBadge color={color}>
-        {health}%
-      </HealthBadge>
-    );
+    return <HealthBadge color={color}>{health}%</HealthBadge>;
   };
   
-  const getHealthColor = (health) => {
-    if (health >= 80) return '#4caf50';
-    else if (health >= 60) return '#8bc34a';
-    else if (health >= 40) return '#ffc107';
-    else if (health >= 20) return '#ff9800';
-    else return '#f44336';
+  // Helper function to get component status
+  const getComponentStatus = (health) => {
+    if (health >= 75) {
+      return 'good';
+    } else if (health >= 50) {
+      return 'warning';
+    } else {
+      return 'critical';
+    }
   };
-  
-  const getMaintenanceTypeColor = (type) => {
-    const colors = {
-      'Przegląd okresowy': '#2196f3',
-      'Naprawa awaryjna': '#f44336',
-      'Wymiana oleju': '#4caf50',
-      'Wymiana opon': '#ff9800',
-      'Inne': '#9e9e9e'
-    };
-    
-    return colors[type] || '#9e9e9e';
-  };
-  
-  // Placeholder chart components
-  const PieChart = ({ data }) => (
-    <div>Wykres kołowy - dane zostaną zaimplementowane w przyszłej wersji</div>
-  );
-  
-  const BarChart = ({ data }) => (
-    <div>Wykres słupkowy - dane zostaną zaimplementowane w przyszłej wersji</div>
-  );
-  
-  const LineChart = ({ data }) => (
-    <div>Wykres liniowy - dane zostaną zaimplementowane w przyszłej wersji</div>
-  );
-  
-  const FuelChart = ({ data }) => (
-    <div>Wykres zużycia paliwa - dane zostaną zaimplementowane w przyszłej wersji</div>
-  );
-  
-  const MileageChart = ({ data }) => (
-    <div>Wykres przebiegu - dane zostaną zaimplementowane w przyszłej wersji</div>
-  );
-  
-  const HealthGauge = ({ value }) => (
-    <GaugeContainer>
-      <GaugeBackground />
-      <GaugeMask value={value} />
-      <GaugeCenter>
-        <GaugeValue>{value}%</GaugeValue>
-        <GaugeLabel>Stan techniczny</GaugeLabel>
-      </GaugeCenter>
-      <GaugeNeedle value={value} />
-    </GaugeContainer>
-  );
   
   return (
     <PageContainer>
-      <PageHeader>
-        <PageTitle>Przegląd pojazdów</PageTitle>
-        <DataSourceToggle>
-          <ToggleLabel>Źródło danych:</ToggleLabel>
-          <ToggleButton active={!useMockData} onClick={handleToggleDataSource}>
-            API
-          </ToggleButton>
-          <ToggleButton active={useMockData} onClick={handleToggleDataSource}>
-            Mock
-          </ToggleButton>
-        </DataSourceToggle>
-      </PageHeader>
+      <DataSourceToggle>
+        <ToggleLabel>
+          API
+          <ToggleSwitch 
+            checked={useMockData} 
+            onClick={handleToggleDataSource}
+          />
+          Mock
+        </ToggleLabel>
+      </DataSourceToggle>
       
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {error && (
+        <ErrorMessage>{error}</ErrorMessage>
+      )}
       
       {isLoading ? (
         <LoadingIndicator>Ładowanie danych floty...</LoadingIndicator>
       ) : (
         <>
           {renderKPICards()}
-          {renderFleetMap()}
+          
+          <GridContainer>
+            <GridItem span={2}>
+              {renderFleetMap()}
+            </GridItem>
+            <GridItem>
+              {renderFleetStructureByBrandChart()}
+            </GridItem>
+            <GridItem>
+              {renderFleetStructureByAgeChart()}
+            </GridItem>
+            <GridItem>
+              {renderFuelConsumptionTrendsChart()}
+            </GridItem>
+            <GridItem>
+              {renderMaintenanceCostTrendsChart()}
+            </GridItem>
+          </GridContainer>
+          
           {renderVehiclesTable()}
-          {selectedVehicle && renderVehicleDetails()}
-          {renderFleetStatistics()}
+          {renderVehicleDetails()}
         </>
       )}
     </PageContainer>
@@ -844,43 +1068,38 @@ const PageContainer = styled.div`
   padding: 20px;
 `;
 
-const PageHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-`;
-
-const PageTitle = styled.h1`
-  font-size: 24px;
-  font-weight: 500;
-  color: #333;
-  margin: 0;
-`;
-
 const DataSourceToggle = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  margin-bottom: 16px;
 `;
 
-const ToggleLabel = styled.span`
-  font-size: 14px;
-  color: #666;
-`;
-
-const ToggleButton = styled.button`
-  padding: 6px 12px;
-  background-color: ${props => props.active ? '#3f51b5' : '#f5f5f5'};
-  color: ${props => props.active ? 'white' : '#333'};
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
+const ToggleLabel = styled.label`
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  user-select: none;
+`;
+
+const ToggleSwitch = styled.div`
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background-color: ${props => props.checked ? '#3f51b5' : '#ccc'};
+  border-radius: 12px;
+  margin: 0 8px;
+  transition: background-color 0.3s;
   
-  &:hover {
-    background-color: ${props => props.active ? '#303f9f' : '#e0e0e0'};
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: ${props => props.checked ? '26px' : '2px'};
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: left 0.3s;
   }
 `;
 
@@ -903,18 +1122,47 @@ const KPIContainer = styled.div`
   }
 `;
 
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+  
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const GridItem = styled.div`
+  grid-column: span ${props => props.span || 1};
+  
+  @media (max-width: 1200px) {
+    grid-column: span 1;
+  }
+`;
+
 const MapContainer = styled.div`
-  position: relative;
   height: 400px;
   background-color: #f5f5f5;
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
 `;
 
 const MapPlaceholder = styled.div`
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #666;
 `;
 
 const MapImage = styled.img`
@@ -930,19 +1178,22 @@ const MapPoint = styled.div`
   width: 12px;
   height: 12px;
   background-color: ${props => {
-    if (props.status === 'active') return '#4caf50';
-    if (props.status === 'inService') return '#ff9800';
-    return '#f44336';
+    switch (props.status) {
+      case 'active': return '#4caf50';
+      case 'inService': return '#ff9800';
+      case 'inactive': return '#f44336';
+      default: return '#9e9e9e';
+    }
   }};
   border-radius: 50%;
   transform: translate(-50%, -50%);
   cursor: pointer;
-  z-index: 2;
+  z-index: 1;
   
   &:hover {
     width: 16px;
     height: 16px;
-    z-index: 3;
+    z-index: 2;
   }
   
   &:hover > div {
@@ -951,49 +1202,42 @@ const MapPoint = styled.div`
 `;
 
 const MapTooltip = styled.div`
-  display: none;
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   background-color: white;
-  border: 1px solid #e0e0e0;
   border-radius: 4px;
   padding: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 3;
+  display: none;
   width: 150px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 4;
   font-size: 12px;
   
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: white transparent transparent transparent;
+  div {
+    margin-bottom: 4px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 `;
 
 const MapLegend = styled.div`
   position: absolute;
   bottom: 16px;
-  right: 16px;
-  background-color: white;
+  left: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 4px;
   padding: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 2;
+  z-index: 1;
 `;
 
 const LegendItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
   margin-bottom: 4px;
-  font-size: 12px;
   
   &:last-child {
     margin-bottom: 0;
@@ -1001,67 +1245,78 @@ const LegendItem = styled.div`
 `;
 
 const LegendPoint = styled.div`
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  margin-right: 8px;
   background-color: ${props => {
-    if (props.status === 'active') return '#4caf50';
-    if (props.status === 'inService') return '#ff9800';
-    return '#f44336';
+    switch (props.status) {
+      case 'active': return '#4caf50';
+      case 'inService': return '#ff9800';
+      case 'inactive': return '#f44336';
+      default: return '#9e9e9e';
+    }
   }};
+`;
+
+const ChartContainer = styled.div`
+  height: 300px;
+  padding: 16px;
+  position: relative;
 `;
 
 const FilterContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding: 16px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
 `;
 
 const FilterGroup = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const FilterLabel = styled.label`
-  font-size: 14px;
+  margin-right: 8px;
   font-weight: 500;
-  color: #333;
 `;
 
 const FilterSelect = styled.select`
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
-  min-width: 150px;
+  background-color: white;
   
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
+  @media (max-width: 768px) {
+    flex: 1;
   }
 `;
 
 const FilterInput = styled.input`
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
-  min-width: 200px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
   
-  &:focus {
-    outline: none;
-    border-color: #3f51b5;
+  @media (max-width: 768px) {
+    flex: 1;
   }
 `;
 
 const SearchContainer = styled.div`
   display: flex;
-  align-items: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const SearchButton = styled.button`
@@ -1083,24 +1338,17 @@ const ActionsContainer = styled.div`
 `;
 
 const Button = styled.button`
-  padding: 8px 16px;
-  background-color: ${props => props.primary ? '#3f51b5' : 'white'};
-  color: ${props => props.primary ? 'white' : '#3f51b5'};
-  border: 1px solid #3f51b5;
+  padding: ${props => props.small ? '4px 8px' : '8px 16px'};
+  background-color: ${props => props.secondary ? '#f5f5f5' : '#3f51b5'};
+  color: ${props => props.secondary ? '#333' : 'white'};
+  border: none;
   border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.6 : 1};
+  font-size: ${props => props.small ? '12px' : '14px'};
   
   &:hover {
-    background-color: ${props => props.primary ? '#303f9f' : '#f0f0f0'};
-  }
-  
-  &:disabled {
-    background-color: #e0e0e0;
-    color: #9e9e9e;
-    border-color: #e0e0e0;
-    cursor: not-allowed;
+    background-color: ${props => props.secondary ? '#e0e0e0' : '#303f9f'};
   }
 `;
 
@@ -1108,11 +1356,15 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 16px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
 `;
 
 const PaginationInfo = styled.div`
-  font-size: 14px;
   color: #666;
 `;
 
@@ -1123,17 +1375,15 @@ const PaginationButtons = styled.div`
 `;
 
 const PageInfo = styled.div`
-  font-size: 14px;
-  color: #333;
-  padding: 0 8px;
+  padding: 0 16px;
 `;
 
-const Badge = styled.span`
+const StatusBadge = styled.span`
   display: inline-block;
   padding: 4px 8px;
+  border-radius: 4px;
   background-color: ${props => props.color};
   color: white;
-  border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
 `;
@@ -1141,9 +1391,9 @@ const Badge = styled.span`
 const HealthBadge = styled.span`
   display: inline-block;
   padding: 4px 8px;
+  border-radius: 4px;
   background-color: ${props => props.color};
   color: white;
-  border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
 `;
@@ -1151,44 +1401,40 @@ const HealthBadge = styled.span`
 const TabsContainer = styled.div`
   display: flex;
   border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   overflow-x: auto;
   
   &::-webkit-scrollbar {
     height: 4px;
   }
   
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
   &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+    background-color: #ccc;
+    border-radius: 2px;
   }
 `;
 
 const Tab = styled.div`
-  padding: 12px 24px;
+  padding: 12px 16px;
   cursor: pointer;
-  font-weight: ${props => props.active ? '500' : 'normal'};
-  color: ${props => props.active ? '#3f51b5' : '#666'};
-  border-bottom: 2px solid ${props => props.active ? '#3f51b5' : 'transparent'};
-  transition: all 0.3s ease;
   white-space: nowrap;
+  color: ${props => props.active ? '#3f51b5' : '#666'};
+  font-weight: ${props => props.active ? '500' : 'normal'};
+  border-bottom: 2px solid ${props => props.active ? '#3f51b5' : 'transparent'};
   
   &:hover {
-    color: #3f51b5;
     background-color: #f5f5f5;
   }
 `;
 
 const DetailContainer = styled.div`
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 `;
 
 const DetailSection = styled.div`
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   
   &:last-child {
     margin-bottom: 0;
@@ -1198,14 +1444,18 @@ const DetailSection = styled.div`
 const DetailTitle = styled.h3`
   font-size: 16px;
   font-weight: 500;
-  color: #333;
   margin: 0 0 16px 0;
+  color: #333;
 `;
 
 const DetailGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -1219,395 +1469,77 @@ const DetailItem = styled.div`
 `;
 
 const DetailLabel = styled.div`
-  font-size: 14px;
   color: #666;
+  font-size: 14px;
 `;
 
 const DetailValue = styled.div`
-  font-size: 16px;
+  font-weight: 500;
   color: #333;
 `;
 
-const HealthContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+const ComponentsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
   
-  @media (min-width: 768px) {
-    flex-direction: row;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
   }
 `;
 
-const HealthDetails = styled.div`
-  flex: 1;
+const ComponentItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-`;
-
-const ComponentHealth = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 4px;
 `;
 
 const ComponentName = styled.div`
-  width: 120px;
   font-size: 14px;
   color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
-const HealthBar = styled.div`
-  flex: 1;
+const ComponentBar = styled.div`
   height: 8px;
-  background-color: #e0e0e0;
+  background-color: #f0f0f0;
   border-radius: 4px;
   overflow: hidden;
 `;
 
-const HealthBarFill = styled.div`
+const ComponentBarFill = styled.div`
   height: 100%;
-  width: ${props => props.value}%;
-  background-color: ${props => props.color};
+  width: ${props => props.percentage}%;
+  background-color: ${props => {
+    switch (props.status) {
+      case 'good': return '#4caf50';
+      case 'warning': return '#ff9800';
+      case 'critical': return '#f44336';
+      default: return '#9e9e9e';
+    }
+  }};
+  border-radius: 4px;
 `;
 
-const HealthValue = styled.div`
-  width: 40px;
-  font-size: 14px;
-  color: #333;
+const ComponentValue = styled.div`
+  font-size: 12px;
+  color: #666;
   text-align: right;
-`;
-
-const TimelineContainer = styled.div`
-  padding: 16px;
-`;
-
-const TimelineItem = styled.div`
-  display: flex;
-  margin-bottom: 24px;
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 24px;
-    left: 8px;
-    width: 2px;
-    height: calc(100% + 24px);
-    background-color: #e0e0e0;
-    z-index: 1;
-  }
-  
-  &:last-child::before {
-    display: none;
-  }
-`;
-
-const TimelineDot = styled.div`
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: ${props => props.color};
-  margin-right: 16px;
-  margin-top: 4px;
-  z-index: 2;
-`;
-
-const TimelineContent = styled.div`
-  flex: 1;
-`;
-
-const TimelineDate = styled.div`
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 4px;
-`;
-
-const TimelineTitle = styled.div`
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 4px;
-`;
-
-const TimelineDescription = styled.div`
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-`;
-
-const TimelineDetails = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  font-size: 14px;
-  color: #666;
-`;
-
-const ChartContainer = styled.div`
-  height: 300px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-`;
-
-const ChartTitle = styled.h4`
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  margin: 0 0 16px 0;
-`;
-
-const FuelStatsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FuelStatItem = styled.div`
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-`;
-
-const FuelStatLabel = styled.div`
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-`;
-
-const FuelStatValue = styled.div`
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-`;
-
-const MileageStatsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const MileageStatItem = styled.div`
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-`;
-
-const MileageStatLabel = styled.div`
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-`;
-
-const MileageStatValue = styled.div`
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-`;
-
-const DocumentsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const DocumentCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 16px;
-`;
-
-const DocumentIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-`;
-
-const DocumentInfo = styled.div`
-  flex: 1;
-`;
-
-const DocumentTitle = styled.div`
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 4px;
-`;
-
-const DocumentMeta = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-size: 12px;
-  color: #666;
-`;
-
-const DocumentActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const DocumentButton = styled.button`
-  padding: 4px 8px;
-  background-color: white;
-  color: #3f51b5;
-  border: 1px solid #3f51b5;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #f0f0f0;
-  }
-`;
-
-const StatisticsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const LoadingIndicator = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100px;
+  height: 200px;
   color: #666;
 `;
 
 const ErrorMessage = styled.div`
-  color: #d32f2f;
   padding: 16px;
   background-color: #ffebee;
+  color: #d32f2f;
   border-radius: 4px;
-  margin-bottom: 20px;
-`;
-
-const GaugeContainer = styled.div`
-  position: relative;
-  width: 200px;
-  height: 100px;
-  margin: 0 auto;
-  overflow: hidden;
-`;
-
-const GaugeBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200px;
-  height: 200px;
-  border-radius: 100px 100px 0 0;
-  background: linear-gradient(to right, #f44336 0%, #ffeb3b 50%, #4caf50 100%);
-  overflow: hidden;
-`;
-
-const GaugeMask = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200px;
-  height: 200px;
-  background-color: white;
-  transform-origin: center bottom;
-  transform: rotate(${props => 180 - props.value * 1.8}deg);
-`;
-
-const GaugeCenter = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 160px;
-  height: 80px;
-  background-color: white;
-  border-radius: 80px 80px 0 0;
-  transform: translateX(-50%);
-`;
-
-const GaugeValue = styled.div`
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  font-weight: 500;
-  color: #333;
-`;
-
-const GaugeLabel = styled.div`
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  color: #666;
-`;
-
-const GaugeNeedle = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 4px;
-  height: 90px;
-  background-color: #333;
-  transform-origin: bottom center;
-  transform: translateX(-50%) rotate(${props => -90 + props.value * 1.8}deg);
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    background-color: #333;
-    border-radius: 50%;
-    transform: translateX(-50%);
-  }
+  margin-bottom: 16px;
 `;
 
 export default VehiclesOverview;
