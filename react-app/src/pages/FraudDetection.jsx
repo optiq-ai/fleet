@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
-import fraudDetectionService from '../services/api/fraudDetectionService';
+import mockFraudDetectionService from '../services/api/mockFraudDetectionService';
 
 // Nowe importy dla ulepszonych funkcji wykrywania oszustw
 import BiometricAuthModal from '../components/fraud/BiometricAuthModal';
@@ -10,6 +10,7 @@ import CardPresenceVerification from '../components/fraud/CardPresenceVerificati
 import BlockchainLedger from '../components/fraud/BlockchainLedger';
 import FuelQualityTest from '../components/fraud/FuelQualityTest';
 import MultiFactorAuth from '../components/fraud/MultiFactorAuth';
+import SuspiciousTransactionsMap from '../components/fraud/SuspiciousTransactionsMap';
 
 const PageContainer = styled.div`
   display: flex;
@@ -283,11 +284,11 @@ const FraudDetection = () => {
       
       try {
         // Pobieranie alertów
-        const alertsResponse = await fraudDetectionService.getFraudAlerts();
+        const alertsResponse = await mockFraudDetectionService.getFraudAlerts();
         setAlerts(alertsResponse.alerts);
         
         // Pobieranie transakcji
-        const transactionsResponse = await fraudDetectionService.getFraudTransactions({
+        const transactionsResponse = await mockFraudDetectionService.getFraudTransactions({
           dateRange,
           transactionType,
           location: locationFilter,
@@ -316,7 +317,7 @@ const FraudDetection = () => {
       const transaction = transactions.find(t => t.id === transactionId);
       setSelectedTransaction(transaction);
       
-      const result = await fraudDetectionService.verifyCardPresence(transactionId);
+      const result = await mockFraudDetectionService.verifyCardPresence(transactionId);
       setVerificationResults(result);
     } catch (error) {
       console.error('Error verifying card presence:', error);
@@ -339,20 +340,92 @@ const FraudDetection = () => {
   
   // Renderowanie alertów
   const renderAlerts = () => {
+    if (isLoading) {
+      return <div>Ładowanie alertów...</div>;
+    }
+    
+    if (!alerts || alerts.length === 0) {
+      return <div>Brak alertów do wyświetlenia.</div>;
+    }
+    
     return (
       <AlertsContainer>
         {alerts.map(alert => (
           <AlertItem key={alert.id} priority={alert.priority}>
             <AlertTitle>{alert.title}</AlertTitle>
             <AlertDetails>{alert.details}</AlertDetails>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              marginTop: '8px',
+              fontSize: '12px',
+              color: '#666'
+            }}>
+              <div>Data: {alert.date}</div>
+              <div>Pojazd: {alert.vehicle}</div>
+            </div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '8px'
+            }}>
+              <ActionButton onClick={() => handleAlertAction(alert.id, 'investigate')}>
+                Zbadaj
+              </ActionButton>
+              <ActionButton onClick={() => handleAlertAction(alert.id, 'resolve')}>
+                Rozwiąż
+              </ActionButton>
+              <ActionButton onClick={() => handleAlertAction(alert.id, 'dismiss')}>
+                Odrzuć
+              </ActionButton>
+            </div>
           </AlertItem>
         ))}
       </AlertsContainer>
     );
   };
   
+  // Obsługa akcji alertów
+  const handleAlertAction = (alertId, action) => {
+    // W rzeczywistej aplikacji tutaj byłoby wywołanie API
+    console.log(`Alert ${alertId} action: ${action}`);
+    
+    // Aktualizacja statusu alertu w stanie lokalnym
+    const updatedAlerts = alerts.map(alert => {
+      if (alert.id === alertId) {
+        let newStatus;
+        switch (action) {
+          case 'investigate':
+            newStatus = 'investigating';
+            break;
+          case 'resolve':
+            newStatus = 'resolved';
+            break;
+          case 'dismiss':
+            newStatus = 'dismissed';
+            break;
+          default:
+            newStatus = alert.status;
+        }
+        
+        return { ...alert, status: newStatus };
+      }
+      return alert;
+    });
+    
+    setAlerts(updatedAlerts);
+  };
+  
   // Renderowanie transakcji
   const renderTransactions = () => {
+    if (isLoading) {
+      return <div>Ładowanie transakcji...</div>;
+    }
+    
+    if (!transactions || transactions.length === 0) {
+      return <div>Brak transakcji do wyświetlenia.</div>;
+    }
+    
     return (
       <TransactionsTable>
         <thead>
@@ -363,6 +436,7 @@ const FraudDetection = () => {
             <th>Lokalizacja</th>
             <th>Kwota</th>
             <th>Status</th>
+            <th>Anomalie</th>
             <th>Akcje</th>
           </tr>
         </thead>
@@ -380,6 +454,46 @@ const FraudDetection = () => {
                    transaction.status === 'verified' ? 'Zweryfikowana' : 
                    'Oznaczona'}
                 </StatusBadge>
+              </td>
+              <td>
+                {transaction.anomalies && transaction.anomalies.length > 0 ? (
+                  <div style={{ color: '#f44336', fontSize: '12px' }}>
+                    {transaction.anomalies.map(anomaly => {
+                      let anomalyText = '';
+                      switch(anomaly) {
+                        case 'excessive_quantity':
+                          anomalyText = 'Nadmierna ilość';
+                          break;
+                        case 'price_deviation':
+                          anomalyText = 'Odchylenie cenowe';
+                          break;
+                        case 'location_deviation':
+                          anomalyText = 'Poza trasą';
+                          break;
+                        case 'multiple_transactions':
+                          anomalyText = 'Wielokrotne tankowania';
+                          break;
+                        case 'off_hours':
+                          anomalyText = 'Poza godzinami';
+                          break;
+                        case 'fuel_type_mismatch':
+                          anomalyText = 'Niezgodny typ paliwa';
+                          break;
+                        case 'odometer_manipulation':
+                          anomalyText = 'Manipulacja przebiegiem';
+                          break;
+                        case 'consumption_increase':
+                          anomalyText = 'Wzrost zużycia';
+                          break;
+                        default:
+                          anomalyText = anomaly;
+                      }
+                      return <div key={anomaly}>{anomalyText}</div>;
+                    })}
+                  </div>
+                ) : (
+                  <span style={{ color: '#4caf50' }}>Brak</span>
+                )}
               </td>
               <td>
                 <ActionButton onClick={() => handleCardVerification(transaction.id)}>
@@ -401,11 +515,292 @@ const FraudDetection = () => {
   
   // Renderowanie analizy wzorców
   const renderPatternAnalysis = () => {
+    if (isLoading) {
+      return <div>Ładowanie danych analizy wzorców...</div>;
+    }
+    
+    if (!transactions || transactions.length === 0) {
+      return <div>Brak danych do analizy wzorców.</div>;
+    }
+    
+    const [patternData, setPatternData] = useState(null);
+    
+    useEffect(() => {
+      const fetchPatternData = async () => {
+        try {
+          const data = await mockFraudDetectionService.getTransactionPatterns();
+          setPatternData(data);
+        } catch (error) {
+          console.error('Error fetching pattern data:', error);
+        }
+      };
+      
+      fetchPatternData();
+    }, []);
+    
+    if (!patternData) {
+      return <div>Ładowanie analizy wzorców...</div>;
+    }
+    
     return (
-      <TransactionPatternAnalysis 
-        transactions={transactions} 
-        onAnomalyDetected={(anomalies) => console.log('Anomalies detected:', anomalies)} 
-      />
+      <div>
+        <div style={{ marginBottom: '20px' }}>
+          <h3>Wynik analizy ryzyka</h3>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            marginBottom: '16px' 
+          }}>
+            <div style={{ 
+              width: '80px', 
+              height: '80px', 
+              borderRadius: '50%', 
+              backgroundColor: patternData.riskScores.overall > 70 ? '#f44336' : 
+                              patternData.riskScores.overall > 50 ? '#ff9800' : '#4caf50',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '24px',
+              fontWeight: 'bold',
+              marginRight: '20px'
+            }}>
+              {patternData.riskScores.overall}
+            </div>
+            <div>
+              <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                Ogólny wskaźnik ryzyka: {patternData.riskScores.overall}/100
+              </div>
+              <div>
+                {patternData.riskScores.overall > 70 ? 'Wysokie ryzyko oszustwa' : 
+                 patternData.riskScores.overall > 50 ? 'Średnie ryzyko oszustwa' : 
+                 'Niskie ryzyko oszustwa'}
+              </div>
+            </div>
+          </div>
+          
+          <h4>Wskaźniki ryzyka według kategorii</h4>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+            {patternData.riskScores.byCategory.map((category, index) => (
+              <div key={index} style={{ 
+                padding: '12px', 
+                borderRadius: '4px', 
+                backgroundColor: '#f5f5f5',
+                minWidth: '150px'
+              }}>
+                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{category.category}</div>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center' 
+                }}>
+                  <div style={{ 
+                    width: '100%', 
+                    height: '8px', 
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    marginRight: '8px'
+                  }}>
+                    <div style={{ 
+                      width: `${category.score}%`, 
+                      height: '100%', 
+                      backgroundColor: category.color
+                    }} />
+                  </div>
+                  <div>{category.score}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <h3>Wykryte wzorce</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+            {[...patternData.timePatterns, ...patternData.locationPatterns, ...patternData.amountPatterns].map((pattern, index) => (
+              <div key={index} style={{ 
+                border: '1px solid #e0e0e0', 
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                <div style={{ 
+                  padding: '12px 16px',
+                  backgroundColor: pattern.riskLevel === 'high' ? '#ffebee' : 
+                                  pattern.riskLevel === 'medium' ? '#fff8e1' : '#e8f5e9',
+                  color: pattern.riskLevel === 'high' ? '#c62828' : 
+                         pattern.riskLevel === 'medium' ? '#f57f17' : '#2e7d32',
+                  fontWeight: '500'
+                }}>
+                  {pattern.title}
+                </div>
+                <div style={{ padding: '16px' }}>
+                  <div style={{ marginBottom: '12px' }}>{pattern.description}</div>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    marginBottom: '12px',
+                    fontSize: '14px',
+                    color: '#666'
+                  }}>
+                    <div>Wystąpienia: {pattern.count}</div>
+                    <div>Procent: {pattern.percentage}%</div>
+                  </div>
+                  <div style={{ 
+                    height: '100px', 
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    padding: '8px',
+                    marginBottom: '12px'
+                  }}>
+                    {pattern.chart.data.map((value, i) => (
+                      <div key={i} style={{ 
+                        height: `${(value / Math.max(...pattern.chart.data)) * 80}%`,
+                        width: `${100 / pattern.chart.data.length}%`,
+                        backgroundColor: pattern.chart.colors[i] || '#3f51b5',
+                        margin: '0 2px',
+                        borderTopLeftRadius: '2px',
+                        borderTopRightRadius: '2px',
+                        position: 'relative'
+                      }}>
+                        <div style={{ 
+                          position: 'absolute',
+                          top: '-20px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          fontSize: '10px'
+                        }}>
+                          {value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    fontSize: '10px',
+                    color: '#666',
+                    marginBottom: '12px'
+                  }}>
+                    {pattern.chart.labels.map((label, i) => (
+                      <div key={i}>{label}</div>
+                    ))}
+                  </div>
+                  <button style={{ 
+                    padding: '8px 16px',
+                    backgroundColor: '#3f51b5',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}>
+                    Szczegóły
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div>
+          <h3>Kierowcy wysokiego ryzyka</h3>
+          <div style={{ marginBottom: '20px' }}>
+            {patternData.driverPatterns.map((pattern, index) => (
+              <div key={index} style={{ 
+                border: '1px solid #e0e0e0', 
+                borderRadius: '8px',
+                overflow: 'hidden',
+                marginBottom: '16px'
+              }}>
+                <div style={{ 
+                  padding: '12px 16px',
+                  backgroundColor: pattern.riskLevel === 'high' ? '#ffebee' : 
+                                  pattern.riskLevel === 'medium' ? '#fff8e1' : '#e8f5e9',
+                  color: pattern.riskLevel === 'high' ? '#c62828' : 
+                         pattern.riskLevel === 'medium' ? '#f57f17' : '#2e7d32',
+                  fontWeight: '500'
+                }}>
+                  {pattern.title}
+                </div>
+                <div style={{ padding: '16px' }}>
+                  <div style={{ marginBottom: '12px' }}>{pattern.description}</div>
+                  <div style={{ 
+                    display: 'flex', 
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    marginBottom: '12px'
+                  }}>
+                    {pattern.drivers.map((driver, i) => (
+                      <div key={i} style={{ 
+                        padding: '4px 8px',
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: '4px',
+                        fontSize: '14px'
+                      }}>
+                        {driver}
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ 
+                    height: '100px', 
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    padding: '8px',
+                    marginBottom: '12px'
+                  }}>
+                    {pattern.chart.data.map((value, i) => (
+                      <div key={i} style={{ 
+                        height: `${(value / Math.max(...pattern.chart.data)) * 80}%`,
+                        width: `${100 / pattern.chart.data.length}%`,
+                        backgroundColor: pattern.chart.colors[i] || '#3f51b5',
+                        margin: '0 2px',
+                        borderTopLeftRadius: '2px',
+                        borderTopRightRadius: '2px',
+                        position: 'relative'
+                      }}>
+                        <div style={{ 
+                          position: 'absolute',
+                          top: '-20px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          fontSize: '10px'
+                        }}>
+                          {value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    fontSize: '10px',
+                    color: '#666',
+                    marginBottom: '12px'
+                  }}>
+                    {pattern.chart.labels.map((label, i) => (
+                      <div key={i}>{label}</div>
+                    ))}
+                  </div>
+                  <button style={{ 
+                    padding: '8px 16px',
+                    backgroundColor: '#3f51b5',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}>
+                    Szczegóły
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     );
   };
   
@@ -421,11 +816,322 @@ const FraudDetection = () => {
   
   // Renderowanie testów jakości paliwa
   const renderFuelQualityTests = () => {
+    if (isLoading) {
+      return <div>Ładowanie danych testów jakości paliwa...</div>;
+    }
+    
+    if (!transactions || transactions.length === 0) {
+      return <div>Brak danych do testów jakości paliwa.</div>;
+    }
+    
+    const [fuelTestsData, setFuelTestsData] = useState(null);
+    
+    useEffect(() => {
+      const fetchFuelTestsData = async () => {
+        try {
+          const data = await mockFraudDetectionService.getFuelQualityTests();
+          setFuelTestsData(data);
+        } catch (error) {
+          console.error('Error fetching fuel quality tests data:', error);
+        }
+      };
+      
+      fetchFuelTestsData();
+    }, []);
+    
+    if (!fuelTestsData) {
+      return <div>Ładowanie testów jakości paliwa...</div>;
+    }
+    
     return (
-      <FuelQualityTest 
-        transactions={transactions} 
-        onTestResults={(results) => console.log('Fuel quality test results:', results)} 
-      />
+      <div>
+        <div style={{ marginBottom: '20px' }}>
+          <h3>Podsumowanie testów jakości paliwa</h3>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '16px',
+            marginBottom: '20px'
+          }}>
+            <div style={{ 
+              padding: '16px', 
+              backgroundColor: '#e8f5e9', 
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '4px' }}>
+                {fuelTestsData.tests.filter(test => test.result === 'passed').length}
+              </div>
+              <div>Testy zaliczone</div>
+            </div>
+            <div style={{ 
+              padding: '16px', 
+              backgroundColor: '#fff8e1', 
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '4px' }}>
+                {fuelTestsData.tests.filter(test => test.result === 'suspicious').length}
+              </div>
+              <div>Testy podejrzane</div>
+            </div>
+            <div style={{ 
+              padding: '16px', 
+              backgroundColor: '#ffebee', 
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '4px' }}>
+                {fuelTestsData.tests.filter(test => test.result === 'failed').length}
+              </div>
+              <div>Testy niezaliczone</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <h3>Wyniki testów</h3>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
+            gap: '16px'
+          }}>
+            {fuelTestsData.tests.map(test => (
+              <div key={test.id} style={{ 
+                border: '1px solid #e0e0e0', 
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                <div style={{ 
+                  padding: '12px 16px',
+                  backgroundColor: test.result === 'passed' ? '#e8f5e9' : 
+                                  test.result === 'suspicious' ? '#fff8e1' : '#ffebee',
+                  color: test.result === 'passed' ? '#2e7d32' : 
+                         test.result === 'suspicious' ? '#f57f17' : '#c62828',
+                  fontWeight: '500',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>Test #{test.id} - {test.fuelType}</div>
+                  <div>
+                    {test.result === 'passed' && '✓ Zgodne'}
+                    {test.result === 'suspicious' && '⚠️ Podejrzane'}
+                    {test.result === 'failed' && '✗ Niezgodne'}
+                  </div>
+                </div>
+                <div style={{ padding: '16px' }}>
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', marginBottom: '8px' }}>
+                      <div style={{ width: '120px', fontWeight: '500' }}>Data:</div>
+                      <div>{test.date}</div>
+                    </div>
+                    <div style={{ display: 'flex', marginBottom: '8px' }}>
+                      <div style={{ width: '120px', fontWeight: '500' }}>Lokalizacja:</div>
+                      <div>{test.location}</div>
+                    </div>
+                    <div style={{ display: 'flex', marginBottom: '8px' }}>
+                      <div style={{ width: '120px', fontWeight: '500' }}>Pojazd:</div>
+                      <div>{test.vehicle}</div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ fontWeight: '500', marginBottom: '8px' }}>Wyniki parametrów:</div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                      <thead>
+                        <tr>
+                          <th style={{ 
+                            padding: '8px', 
+                            textAlign: 'left', 
+                            borderBottom: '1px solid #e0e0e0',
+                            backgroundColor: '#f5f5f5'
+                          }}>
+                            Parametr
+                          </th>
+                          <th style={{ 
+                            padding: '8px', 
+                            textAlign: 'left', 
+                            borderBottom: '1px solid #e0e0e0',
+                            backgroundColor: '#f5f5f5'
+                          }}>
+                            Wartość
+                          </th>
+                          <th style={{ 
+                            padding: '8px', 
+                            textAlign: 'left', 
+                            borderBottom: '1px solid #e0e0e0',
+                            backgroundColor: '#f5f5f5'
+                          }}>
+                            Norma
+                          </th>
+                          <th style={{ 
+                            padding: '8px', 
+                            textAlign: 'left', 
+                            borderBottom: '1px solid #e0e0e0',
+                            backgroundColor: '#f5f5f5'
+                          }}>
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(test.parameters).map(([key, param]) => {
+                          if (key === 'additives') return null;
+                          
+                          let paramName = '';
+                          let normText = '';
+                          
+                          switch(key) {
+                            case 'cetaneNumber':
+                              paramName = 'Liczba cetanowa';
+                              normText = `min ${param.min}`;
+                              break;
+                            case 'octaneNumber':
+                              paramName = 'Liczba oktanowa';
+                              normText = `min ${param.min}`;
+                              break;
+                            case 'density':
+                              paramName = 'Gęstość';
+                              normText = `${param.min} - ${param.max} ${param.unit}`;
+                              break;
+                            case 'waterContent':
+                              paramName = 'Zawartość wody';
+                              normText = `max ${param.max} ${param.unit}`;
+                              break;
+                            case 'sulfurContent':
+                              paramName = 'Zawartość siarki';
+                              normText = `max ${param.max} ${param.unit}`;
+                              break;
+                            case 'particulates':
+                              paramName = 'Cząstki stałe';
+                              normText = `max ${param.max} ${param.unit}`;
+                              break;
+                            case 'oxygenates':
+                              paramName = 'Związki tlenowe';
+                              normText = `max ${param.max} ${param.unit}`;
+                              break;
+                            case 'aromatics':
+                              paramName = 'Węglowodory aromatyczne';
+                              normText = `max ${param.max} ${param.unit}`;
+                              break;
+                            default:
+                              paramName = key;
+                              normText = param.min && param.max ? `${param.min} - ${param.max}` : 
+                                        param.min ? `min ${param.min}` : 
+                                        param.max ? `max ${param.max}` : '';
+                          }
+                          
+                          return (
+                            <tr key={key}>
+                              <td style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                                {paramName}
+                              </td>
+                              <td style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                                {typeof param.value === 'number' ? param.value.toFixed(3) : param.value} {param.unit}
+                              </td>
+                              <td style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                                {normText}
+                              </td>
+                              <td style={{ 
+                                padding: '8px', 
+                                borderBottom: '1px solid #e0e0e0',
+                                color: param.status === 'ok' ? '#2e7d32' : 
+                                      param.status === 'warning' ? '#f57f17' : '#c62828',
+                                fontWeight: param.status !== 'ok' ? '500' : 'normal'
+                              }}>
+                                {param.status === 'ok' ? 'OK' : 
+                                 param.status === 'warning' ? 'Ostrzeżenie' : 
+                                 'Niezgodne'}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {test.parameters.additives && (
+                          <tr>
+                            <td style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                              Dodatki
+                            </td>
+                            <td style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                              {test.parameters.additives.value}
+                            </td>
+                            <td style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                              -
+                            </td>
+                            <td style={{ 
+                              padding: '8px', 
+                              borderBottom: '1px solid #e0e0e0',
+                              color: '#f57f17',
+                              fontWeight: '500'
+                            }}>
+                              Podejrzane
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ fontWeight: '500', marginBottom: '8px' }}>Historia testów:</div>
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '8px',
+                      overflowX: 'auto',
+                      paddingBottom: '8px'
+                    }}>
+                      {test.history.map((historyItem, index) => (
+                        <div key={index} style={{ 
+                          padding: '8px', 
+                          borderRadius: '4px',
+                          backgroundColor: historyItem.result === 'passed' ? '#e8f5e9' : 
+                                          historyItem.result === 'suspicious' ? '#fff8e1' : '#ffebee',
+                          minWidth: '120px',
+                          fontSize: '12px'
+                        }}>
+                          <div style={{ fontWeight: '500', marginBottom: '4px' }}>{historyItem.date}</div>
+                          <div style={{ marginBottom: '4px' }}>{historyItem.location}</div>
+                          <div style={{ 
+                            color: historyItem.result === 'passed' ? '#2e7d32' : 
+                                  historyItem.result === 'suspicious' ? '#f57f17' : '#c62828'
+                          }}>
+                            {historyItem.result === 'passed' ? 'Zaliczony' : 
+                             historyItem.result === 'suspicious' ? 'Podejrzany' : 
+                             'Niezaliczony'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button style={{ 
+                      padding: '8px 16px',
+                      backgroundColor: '#3f51b5',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}>
+                      Szczegóły
+                    </button>
+                    <button style={{ 
+                      padding: '8px 16px',
+                      backgroundColor: 'white',
+                      color: '#3f51b5',
+                      border: '1px solid #3f51b5',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}>
+                      Eksportuj raport
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     );
   };
   
@@ -497,11 +1203,13 @@ const FraudDetection = () => {
       <GridSection>
         <Card title="Mapa podejrzanych transakcji">
           <MapContainer>
-            {/* Tutaj będzie mapa z Google Maps lub innej biblioteki */}
-            <MapOverlay>
-              <div>Podejrzane transakcje: {transactions.filter(t => t.status === 'suspicious').length}</div>
-              <div>Zweryfikowane transakcje: {transactions.filter(t => t.status === 'verified').length}</div>
-            </MapOverlay>
+            <SuspiciousTransactionsMap 
+              transactions={transactions}
+              onMarkerClick={(transaction) => {
+                setSelectedTransaction(transaction);
+                handleCardVerification(transaction.id);
+              }}
+            />
           </MapContainer>
         </Card>
         
