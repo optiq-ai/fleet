@@ -144,7 +144,7 @@ const mockFraudAlerts = [
 ];
 
 // Mock fraud transactions with coordinates for map
-const mockFraudTransactions = [
+export const mockFraudTransactions = [
   {
     id: "tx1",
     date: "2025-04-17 08:23:15",
@@ -440,109 +440,119 @@ const mockPatternAnalysis = {
 };
 
 // Mock fuel quality tests
-const mockFuelQualityTests = [
-  {
-    id: "test1",
-    date: "2025-04-17",
-    location: "Warszawa, Stacja Orlen S.A.",
-    vehicle: "WA12345",
-    fuelType: "Diesel",
-    result: "failed",
-    parameters: {
-      cetaneNumber: { value: 48.5, min: 51.0, max: null, status: "failed" },
-      sulfurContent: { value: 12, min: null, max: 10, status: "failed" },
-      density: { value: 0.845, min: 0.820, max: 0.845, status: "ok" },
-      waterContent: { value: 220, min: null, max: 200, status: "failed" },
-      particulates: { value: 18, min: null, max: 24, status: "ok" }
+const mockFuelQualityTests = {
+  tests: [
+    {
+      id: "test1",
+      date: "2025-04-17",
+      location: "Warszawa, Stacja Orlen S.A.",
+      vehicle: "WA12345",
+      fuelType: "Diesel",
+      result: "failed",
+      parameters: {
+        cetaneNumber: { value: 48.5, min: 51.0, max: null, status: "failed" },
+        sulfurContent: { value: 12, min: null, max: 10, status: "failed" },
+        density: { value: 0.845, min: 0.820, max: 0.845, status: "ok" },
+        waterContent: { value: 220, min: null, max: 200, status: "failed" },
+        particulates: { value: 18, min: null, max: 24, status: "ok" }
+      },
+      history: [
+        { date: "2025-03-15", result: "passed", location: "Warszawa, BP" },
+        { date: "2025-02-10", result: "passed", location: "Warszawa, Shell" },
+        { date: "2025-01-05", result: "passed", location: "Warszawa, Orlen" }
+      ]
     },
-    history: [
-      { date: "2025-03-15", result: "passed", location: "Warszawa, BP" },
-      { date: "2025-02-10", result: "passed", location: "Warszawa, Shell" },
-      { date: "2025-01-05", result: "passed", location: "Warszawa, Orlen" }
-    ]
-  },
-  {
-    id: "test2",
-    date: "2025-04-16",
-    location: "Radom, BP Station",
-    vehicle: "WA54321",
-    fuelType: "Diesel",
-    result: "passed",
-    parameters: {
-      cetaneNumber: { value: 52.5, min: 51.0, max: null, status: "ok" },
-      sulfurContent: { value: 8, min: null, max: 10, status: "ok" },
-      density: { value: 0.835, min: 0.820, max: 0.845, status: "ok" },
-      waterContent: { value: 180, min: null, max: 200, status: "ok" },
-      particulates: { value: 20, min: null, max: 24, status: "ok" }
+    {
+      id: "test2",
+      date: "2025-04-16",
+      location: "Radom, BP Station",
+      vehicle: "WA54321",
+      fuelType: "Diesel",
+      result: "passed",
+      parameters: {
+        cetaneNumber: { value: 52.5, min: 51.0, max: null, status: "ok" },
+        sulfurContent: { value: 8, min: null, max: 10, status: "ok" },
+        density: { value: 0.835, min: 0.820, max: 0.845, status: "ok" },
+        waterContent: { value: 180, min: null, max: 200, status: "ok" },
+        particulates: { value: 20, min: null, max: 24, status: "ok" }
+      },
+      history: [
+        { date: "2025-03-20", result: "passed", location: "Warszawa, Orlen" },
+        { date: "2025-02-15", result: "passed", location: "Radom, BP" },
+        { date: "2025-01-10", result: "failed", location: "Kielce, Shell" }
+      ]
     },
-    history: [
-      { date: "2025-03-20", result: "passed", location: "Warszawa, Orlen" },
-      { date: "2025-02-15", result: "passed", location: "Radom, BP" },
-      { date: "2025-01-10", result: "failed", location: "Kielce, Shell" }
-    ]
-  },
-  {
-    id: "test3",
-    date: "2025-04-14",
-    location: "Kraków, Stacja Circle K",
-    vehicle: "WA13579",
-    fuelType: "Gasoline 95",
-    result: "failed",
-    parameters: {
-      octaneNumber: { value: 93.5, min: 95.0, max: null, status: "failed" },
-      sulfurContent: { value: 12, min: null, max: 10, status: "failed" },
-      density: { value: 0.755, min: 0.720, max: 0.775, status: "ok" },
-      oxygenates: { value: 3.8, min: null, max: 2.7, status: "failed" },
-      aromatics: { value: 32, min: null, max: 35, status: "ok" }
+    {
+      id: "test3",
+      date: "2025-04-14",
+      location: "Kraków, Stacja Circle K",
+      vehicle: "WA13579",
+      fuelType: "Gasoline 95",
+      result: "failed",
+      parameters: {
+        octaneNumber: { value: 93.5, min: 95.0, max: null, status: "failed" },
+        sulfurContent: { value: 12, min: null, max: 10, status: "failed" },
+        density: { value: 0.755, min: 0.720, max: 0.775, status: "ok" },
+        oxygenates: { value: 3.8, min: null, max: 2.7, status: "failed" },
+        aromatics: { value: 32, min: null, max: 35, status: "ok" }
+      },
+      history: [
+        { date: "2025-03-10", result: "passed", location: "Kraków, BP" },
+        { date: "2025-02-05", result: "passed", location: "Kraków, Orlen" },
+        { date: "2025-01-01", result: "passed", location: "Kraków, Shell" }
+      ]
     },
-    history: [
-      { date: "2025-03-10", result: "passed", location: "Kraków, BP" },
-      { date: "2025-02-05", result: "passed", location: "Kraków, Orlen" },
-      { date: "2025-01-01", result: "passed", location: "Kraków, Shell" }
-    ]
-  },
-  {
-    id: "test4",
-    date: "2025-04-12",
-    location: "Gdańsk, Stacja Lotos",
-    vehicle: "WA75319",
-    fuelType: "Diesel",
-    result: "suspicious",
-    parameters: {
-      cetaneNumber: { value: 51.2, min: 51.0, max: null, status: "ok" },
-      sulfurContent: { value: 9, min: null, max: 10, status: "ok" },
-      density: { value: 0.842, min: 0.820, max: 0.845, status: "ok" },
-      waterContent: { value: 195, min: null, max: 200, status: "ok" },
-      particulates: { value: 23, min: null, max: 24, status: "ok" },
-      additives: { value: "detected", status: "suspicious" }
+    {
+      id: "test4",
+      date: "2025-04-12",
+      location: "Gdańsk, Stacja Lotos",
+      vehicle: "WA75319",
+      fuelType: "Diesel",
+      result: "suspicious",
+      parameters: {
+        cetaneNumber: { value: 51.2, min: 51.0, max: null, status: "ok" },
+        sulfurContent: { value: 9, min: null, max: 10, status: "ok" },
+        density: { value: 0.842, min: 0.820, max: 0.845, status: "ok" },
+        waterContent: { value: 195, min: null, max: 200, status: "ok" },
+        particulates: { value: 23, min: null, max: 24, status: "ok" },
+        additives: { value: "detected", status: "suspicious" }
+      },
+      history: [
+        { date: "2025-03-05", result: "passed", location: "Gdańsk, Shell" },
+        { date: "2025-02-01", result: "passed", location: "Gdańsk, Orlen" },
+        { date: "2025-01-15", result: "passed", location: "Gdańsk, BP" }
+      ]
     },
-    history: [
-      { date: "2025-03-05", result: "passed", location: "Gdańsk, Shell" },
-      { date: "2025-02-01", result: "passed", location: "Gdańsk, Orlen" },
-      { date: "2025-01-15", result: "passed", location: "Gdańsk, BP" }
-    ]
-  },
-  {
-    id: "test5",
-    date: "2025-04-10",
-    location: "Szczecin, Shell Station",
-    vehicle: "WA87654",
-    fuelType: "Diesel",
-    result: "passed",
-    parameters: {
-      cetaneNumber: { value: 53.0, min: 51.0, max: null, status: "ok" },
-      sulfurContent: { value: 7, min: null, max: 10, status: "ok" },
-      density: { value: 0.830, min: 0.820, max: 0.845, status: "ok" },
-      waterContent: { value: 150, min: null, max: 200, status: "ok" },
-      particulates: { value: 18, min: null, max: 24, status: "ok" }
-    },
-    history: [
-      { date: "2025-03-25", result: "passed", location: "Szczecin, BP" },
-      { date: "2025-02-20", result: "passed", location: "Szczecin, Shell" },
-      { date: "2025-01-20", result: "passed", location: "Szczecin, Orlen" }
-    ]
+    {
+      id: "test5",
+      date: "2025-04-10",
+      location: "Szczecin, Shell Station",
+      vehicle: "WA87654",
+      fuelType: "Diesel",
+      result: "passed",
+      parameters: {
+        cetaneNumber: { value: 53.0, min: 51.0, max: null, status: "ok" },
+        sulfurContent: { value: 7, min: null, max: 10, status: "ok" },
+        density: { value: 0.830, min: 0.820, max: 0.845, status: "ok" },
+        waterContent: { value: 150, min: null, max: 200, status: "ok" },
+        particulates: { value: 18, min: null, max: 24, status: "ok" }
+      },
+      history: [
+        { date: "2025-03-01", result: "passed", location: "Szczecin, BP" },
+        { date: "2025-02-01", result: "passed", location: "Szczecin, Shell" },
+        { date: "2025-01-01", result: "passed", location: "Szczecin, Orlen" }
+      ]
+    }
+  ],
+  summary: {
+    total: 5,
+    passed: 2,
+    failed: 2,
+    suspicious: 1,
+    failureRate: 40,
+    mostCommonIssue: "sulfurContent"
   }
-];
+};
 
 /**
  * Mock fraud detection service class
@@ -550,18 +560,17 @@ const mockFuelQualityTests = [
 class MockFraudDetectionService {
   /**
    * Get fraud alerts
-   * @returns {Promise<Object>} Fraud alerts response
+   * @param {Object} filters - Filter parameters
+   * @returns {Promise<Object>} Alerts response
    */
-  async getFraudAlerts() {
+  async getFraudAlerts(filters = {}) {
     return new Promise(resolve => {
       setTimeout(() => {
         resolve({
-          total: mockFraudAlerts.length,
-          page: 1,
-          limit: 10,
-          alerts: mockFraudAlerts
+          alerts: mockFraudAlerts,
+          total: mockFraudAlerts.length
         });
-      }, 500); // Simulate network delay
+      }, 500); // Symulacja opóźnienia sieciowego
     });
   }
   
@@ -570,86 +579,58 @@ class MockFraudDetectionService {
    * @param {Object} filters - Filter parameters
    * @returns {Promise<Object>} Transactions response
    */
-  async getFraudTransactions(filters) {
+  async getFraudTransactions(filters = {}) {
     return new Promise(resolve => {
       setTimeout(() => {
-        // In a real implementation, we would filter based on the provided filters
         resolve({
-          total: mockFraudTransactions.length,
-          page: 1,
-          limit: 20,
-          transactions: mockFraudTransactions
+          transactions: mockFraudTransactions,
+          total: mockFraudTransactions.length
         });
-      }, 500); // Simulate network delay
+      }, 500); // Symulacja opóźnienia sieciowego
     });
   }
   
   /**
-   * Get transaction patterns analysis
-   * @returns {Promise<Object>} Pattern analysis response
+   * Get pattern analysis
+   * @returns {Promise<Object>} Pattern analysis data
    */
-  async getTransactionPatterns() {
+  async getPatternAnalysis() {
     return new Promise(resolve => {
       setTimeout(() => {
         resolve(mockPatternAnalysis);
-      }, 500); // Simulate network delay
+      }, 700); // Symulacja opóźnienia sieciowego
     });
   }
   
   /**
    * Get fuel quality tests
-   * @returns {Promise<Object>} Fuel quality tests response
+   * @param {Object} filters - Filter parameters
+   * @returns {Promise<Object>} Fuel quality tests data
    */
-  async getFuelQualityTests() {
-    console.log('Mock fuel quality tests:', mockFuelQualityTests);
+  async getFuelQualityTests(filters = {}) {
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve({
-          total: mockFuelQualityTests.length,
-          page: 1,
-          limit: 10,
-          tests: mockFuelQualityTests
-        });
-      }, 500); // Simulate network delay
+        resolve(mockFuelQualityTests);
+      }, 600); // Symulacja opóźnienia sieciowego
     });
   }
   
   /**
-   * Verify card presence
-   * @param {string} transactionId - Transaction ID
-   * @returns {Promise<Object>} Verification results
+   * Update alert status
+   * @param {string} alertId - Alert ID
+   * @param {string} status - New status
+   * @returns {Promise<Object>} Update result
    */
-  async verifyCardPresence(transactionId) {
+  async updateAlertStatus(alertId, status) {
     return new Promise(resolve => {
       setTimeout(() => {
-        const transaction = mockFraudTransactions.find(t => t.id === transactionId);
-        
-        if (transaction) {
-          // Simulate verification result based on transaction status
-          const verified = transaction.status === 'verified';
-          
-          resolve({
-            transactionId,
-            verified,
-            distance: verified ? 0.2 : 45.8,
-            timestamp: new Date().toISOString(),
-            cardLocation: {
-              lat: verified ? transaction.coordinates.lat : transaction.coordinates.lat + 0.4,
-              lng: verified ? transaction.coordinates.lng : transaction.coordinates.lng - 0.3
-            },
-            vehicleLocation: {
-              lat: transaction.coordinates.lat,
-              lng: transaction.coordinates.lng
-            }
-          });
-        } else {
-          resolve({
-            transactionId,
-            verified: false,
-            error: "Transaction not found"
-          });
-        }
-      }, 800); // Simulate network delay
+        resolve({
+          success: true,
+          alertId,
+          status,
+          timestamp: new Date().toISOString()
+        });
+      }, 300); // Symulacja opóźnienia sieciowego
     });
   }
 }

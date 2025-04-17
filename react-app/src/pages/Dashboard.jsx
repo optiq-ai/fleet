@@ -8,6 +8,8 @@ import { Line, Bar, Pie } from 'react-chartjs-2';
 import dashboardService from '../services/api/dashboardService';
 import mockDashboardService from '../services/api/mockDashboardService';
 import mockDashboardChartsService from '../services/api/mockDashboardChartsService';
+import mockDashboardMapService from '../services/api/mockDashboardMapService';
+import SuspiciousTransactionsMap from '../components/fraud/SuspiciousTransactionsMap';
 
 /**
  * @typedef {Object} KPIData
@@ -293,6 +295,10 @@ const Dashboard = () => {
   const [fuelConsumptionData, setFuelConsumptionData] = useState(null);
   const [operationalCostsData, setOperationalCostsData] = useState(null);
   
+  // Stan dla danych mapy fraudów
+  const [fraudMapTransactions, setFraudMapTransactions] = useState([]);
+  const [isLoadingFraudMap, setIsLoadingFraudMap] = useState(true);
+  
   // Stany ładowania i błędów
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -345,6 +351,11 @@ const Dashboard = () => {
         
         const operationalCostsResponse = await mockDashboardChartsService.getOperationalCostsData();
         setOperationalCostsData(operationalCostsResponse);
+        
+        // Pobieranie danych mapy fraudów
+        const fraudMapResponse = await mockDashboardMapService.getFraudTransactionsForMap();
+        setFraudMapTransactions(fraudMapResponse);
+        setIsLoadingFraudMap(false);
         
         // Pobieranie statystyk floty (symulacja - w rzeczywistości byłoby to z API)
         setFleetStats({
@@ -423,6 +434,12 @@ const Dashboard = () => {
   // Obsługa przełączania źródła danych
   const handleToggleDataSource = () => {
     setUseMockData(!useMockData);
+  };
+  
+  // Obsługa kliknięcia markera na mapie fraudów
+  const handleFraudMarkerClick = (transaction) => {
+    console.log('Clicked fraud transaction:', transaction);
+    // Tutaj można dodać dodatkową logikę, np. wyświetlenie szczegółów transakcji
   };
   
   // Renderowanie sekcji KPI
@@ -547,8 +564,15 @@ const Dashboard = () => {
         
         <GridSection>
           <Card title="Mapa fraudów">
-            <MapContainer style={{ height: '200px' }}>
-              <MapPlaceholder>Mapa Polski z oznaczeniami fraudów</MapPlaceholder>
+            <MapContainer style={{ height: '300px' }}>
+              {isLoadingFraudMap ? (
+                <MapPlaceholder>Ładowanie mapy fraudów...</MapPlaceholder>
+              ) : (
+                <SuspiciousTransactionsMap 
+                  transactions={fraudMapTransactions}
+                  onMarkerClick={handleFraudMarkerClick}
+                />
+              )}
             </MapContainer>
           </Card>
           
@@ -575,12 +599,12 @@ const Dashboard = () => {
                         borderColor: '#f44336',
                         backgroundColor: 'rgba(244, 67, 54, 0.1)',
                         borderWidth: 2,
+                        tension: 0.3,
                         fill: true,
-                        tension: 0.4,
                         pointBackgroundColor: fraudRiskData.trend.map(item => {
-                          if (item.value < fraudRiskData.categories.low.max) return fraudRiskData.categories.low.color;
-                          if (item.value < fraudRiskData.categories.medium.max) return fraudRiskData.categories.medium.color;
-                          return fraudRiskData.categories.high.color;
+                          if (item.value < 30) return '#4caf50';
+                          if (item.value < 70) return '#ff9800';
+                          return '#f44336';
                         }),
                         pointRadius: 4,
                         pointHoverRadius: 6
@@ -598,10 +622,10 @@ const Dashboard = () => {
                         callbacks: {
                           label: (context) => {
                             const value = context.raw;
-                            let category = 'Niskie';
-                            if (value >= fraudRiskData.categories.medium.min) category = 'Średnie';
-                            if (value >= fraudRiskData.categories.high.min) category = 'Wysokie';
-                            return `Poziom ryzyka: ${value} (${category})`;
+                            let riskLevel = 'Niski';
+                            if (value >= 70) riskLevel = 'Wysoki';
+                            else if (value >= 30) riskLevel = 'Średni';
+                            return `Poziom ryzyka: ${value} (${riskLevel})`;
                           }
                         }
                       }
@@ -610,16 +634,146 @@ const Dashboard = () => {
                       y: {
                         beginAtZero: true,
                         max: 100,
+                        ticks: {
+                          stepSize: 20
+                        },
                         grid: {
                           color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                          callback: (value) => `${value}%`
                         }
                       },
                       x: {
                         grid: {
                           display: false
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
+          </Card>
+          
+          <Card title="Zużycie paliwa">
+            <div>
+              <strong>Aktualne zużycie: </strong> 
+              {fuelConsumptionData?.current} l/100km
+              <span style={{ 
+                color: fuelConsumptionData?.change < 0 ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {fuelConsumptionData?.change < 0 ? '↓' : '↑'} {Math.abs(fuelConsumptionData?.change).toFixed(1)}%
+              </span>
+            </div>
+            <ChartContainer>
+              {fuelConsumptionData && (
+                <Line
+                  data={{
+                    labels: fuelConsumptionData.trend.map(item => item.date),
+                    datasets: [
+                      {
+                        label: 'Zużycie paliwa',
+                        data: fuelConsumptionData.trend.map(item => item.value),
+                        borderColor: '#3f51b5',
+                        backgroundColor: 'rgba(63, 81, 181, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                      },
+                      {
+                        label: 'Cel',
+                        data: fuelConsumptionData.trend.map(() => fuelConsumptionData.target),
+                        borderColor: '#4caf50',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            const datasetLabel = context.dataset.label;
+                            const value = context.raw;
+                            if (datasetLabel === 'Cel') {
+                              return `Cel: ${value} l/100km`;
+                            }
+                            return `Zużycie: ${value} l/100km`;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: false,
+                        grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                      },
+                      x: {
+                        grid: {
+                          display: false
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
+          </Card>
+          
+          <Card title="Koszty operacyjne">
+            <div>
+              <strong>Całkowite koszty: </strong> 
+              {operationalCostsData?.total.toLocaleString()} zł
+              <span style={{ 
+                color: operationalCostsData?.change < 0 ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {operationalCostsData?.change < 0 ? '↓' : '↑'} {Math.abs(operationalCostsData?.change).toFixed(1)}%
+              </span>
+            </div>
+            <ChartContainer>
+              {operationalCostsData && (
+                <Pie
+                  data={{
+                    labels: operationalCostsData.breakdown.map(item => item.category),
+                    datasets: [
+                      {
+                        data: operationalCostsData.breakdown.map(item => item.value),
+                        backgroundColor: operationalCostsData.breakdown.map(item => item.color),
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'right',
+                        labels: {
+                          boxWidth: 12,
+                          padding: 15
+                        }
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            const label = context.label;
+                            const value = context.raw;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value.toLocaleString()} zł (${percentage}%)`;
+                          }
                         }
                       }
                     }
@@ -641,191 +795,54 @@ const Dashboard = () => {
       <>
         <SectionTitle>STATYSTYKI FLOTY</SectionTitle>
         <GridSection>
-          <Card title="Zużycie paliwa">
-            <div>
-              <strong>Średnie zużycie: </strong> 
-              {fleetStats?.fuelConsumption?.current} {fuelConsumptionData?.unit}
-              <span style={{ 
-                color: fuelConsumptionData?.change < 0 ? '#4caf50' : '#f44336',
-                marginLeft: '8px'
-              }}>
-                {fuelConsumptionData?.change < 0 ? '↓' : '↑'} {Math.abs(fuelConsumptionData?.change).toFixed(1)}%
-              </span>
-            </div>
-            <ChartContainer>
-              {fuelConsumptionData && (
-                <Line
-                  data={{
-                    labels: fuelConsumptionData.trend.map(item => item.date),
-                    datasets: [
-                      {
-                        label: 'Zużycie paliwa',
-                        data: fuelConsumptionData.trend.map(item => item.value),
-                        borderColor: '#2196f3',
-                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#2196f3',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                      },
-                      {
-                        label: 'Cel',
-                        data: Array(fuelConsumptionData.trend.length).fill(fuelConsumptionData.target),
-                        borderColor: '#4caf50',
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        fill: false,
-                        pointRadius: 0
-                      }
-                    ]
-                  }}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                          boxWidth: 12,
-                          usePointStyle: true
-                        }
-                      },
-                      tooltip: {
-                        callbacks: {
-                          label: (context) => {
-                            if (context.dataset.label === 'Cel') {
-                              return `Cel: ${context.raw} ${fuelConsumptionData.unit}`;
-                            }
-                            return `Zużycie: ${context.raw} ${fuelConsumptionData.unit}`;
-                          }
-                        }
-                      }
-                    },
-                    scales: {
-                      y: {
-                        beginAtZero: false,
-                        min: Math.min(fuelConsumptionData.target * 0.9, ...fuelConsumptionData.trend.map(item => item.value)) * 0.95,
-                        max: Math.max(fuelConsumptionData.target * 1.1, ...fuelConsumptionData.trend.map(item => item.value)) * 1.05,
-                        grid: {
-                          color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                          callback: (value) => `${value} ${fuelConsumptionData.unit}`
-                        }
-                      },
-                      x: {
-                        grid: {
-                          display: false
-                        }
-                      }
-                    }
-                  }}
-                />
-              )}
-            </ChartContainer>
-          </Card>
-          
           <Card title="Efektywność kierowców">
             <RankingContainer>
-              {fleetStats.driverEfficiency.drivers.map((driver, index) => (
+              {fleetStats.driverEfficiency.drivers.map(driver => (
                 <RankingItem key={driver.id}>
-                  <RankingName highlighted={index < 3}>
-                    {index + 1}. {driver.name}
-                  </RankingName>
+                  <RankingName highlighted={driver.score > 85}>{driver.name}</RankingName>
                   <RankingValue positive={driver.trend === 'up'} negative={driver.trend === 'down'}>
-                    {driver.score} {driver.trend === 'up' ? '↑' : driver.trend === 'down' ? '↓' : ''}
+                    {driver.score}
+                    {driver.trend === 'up' ? ' ↑' : driver.trend === 'down' ? ' ↓' : ''}
                   </RankingValue>
                 </RankingItem>
               ))}
             </RankingContainer>
           </Card>
           
-          <Card title="Koszty operacyjne">
-            <div>
-              <strong>Całkowite koszty: </strong> 
-              {operationalCostsData?.total.toLocaleString()} {operationalCostsData?.unit}
-              <span style={{ 
-                color: operationalCostsData?.change < 0 ? '#4caf50' : '#f44336',
-                marginLeft: '8px'
-              }}>
-                {operationalCostsData?.change < 0 ? '↓' : '↑'} {Math.abs(operationalCostsData?.change).toFixed(1)}%
-              </span>
+          <Card title="Realizacja tras">
+            <div style={{ marginTop: '12px' }}>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Ukończone: </strong> 
+                <span style={{ color: '#4caf50' }}>{fleetStats.routeCompletion.completed}%</span>
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Na czas: </strong> 
+                <span style={{ color: '#4caf50' }}>{fleetStats.routeCompletion.onTime}%</span>
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Opóźnione: </strong> 
+                <span style={{ color: '#ff9800' }}>{fleetStats.routeCompletion.delayed}%</span>
+              </div>
+              <div>
+                <strong>Anulowane: </strong> 
+                <span style={{ color: '#f44336' }}>{fleetStats.routeCompletion.cancelled}%</span>
+              </div>
             </div>
-            <ChartContainer>
-              {operationalCostsData && (
-                <Pie
-                  data={{
-                    labels: operationalCostsData.breakdown.map(item => item.category),
-                    datasets: [
-                      {
-                        data: operationalCostsData.breakdown.map(item => item.value),
-                        backgroundColor: operationalCostsData.breakdown.map(item => item.color),
-                        borderColor: 'white',
-                        borderWidth: 2,
-                        hoverOffset: 10
-                      }
-                    ]
-                  }}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        position: 'right',
-                        labels: {
-                          boxWidth: 12,
-                          padding: 15,
-                          font: {
-                            size: 11
-                          }
-                        }
-                      },
-                      tooltip: {
-                        callbacks: {
-                          label: (context) => {
-                            const value = context.raw;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return `${context.label}: ${value.toLocaleString()} ${operationalCostsData.unit} (${percentage}%)`;
-                          }
-                        }
-                      }
-                    }
-                  }}
-                />
-              )}
-            </ChartContainer>
           </Card>
           
-          <Card title="Realizacja tras">
-            <div style={{ marginBottom: '12px' }}>
-              <strong>Ukończone trasy: </strong> 
-              {fleetStats.routeCompletion.completed}%
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                <div style={{ width: '100px' }}>Na czas:</div>
-                <div style={{ flex: 1, height: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
-                  <div style={{ width: `${fleetStats.routeCompletion.onTime}%`, height: '100%', backgroundColor: '#4caf50' }}></div>
-                </div>
-                <div style={{ marginLeft: '8px' }}>{fleetStats.routeCompletion.onTime}%</div>
+          <Card title="Prognoza konserwacji">
+            <div style={{ marginTop: '12px' }}>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Pojazdy wymagające przeglądu: </strong> 
+                <span>12</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                <div style={{ width: '100px' }}>Opóźnione:</div>
-                <div style={{ flex: 1, height: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
-                  <div style={{ width: `${fleetStats.routeCompletion.delayed}%`, height: '100%', backgroundColor: '#ff9800' }}></div>
-                </div>
-                <div style={{ marginLeft: '8px' }}>{fleetStats.routeCompletion.delayed}%</div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Pojazdy wymagające naprawy: </strong> 
+                <span style={{ color: '#f44336' }}>3</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ width: '100px' }}>Anulowane:</div>
-                <div style={{ flex: 1, height: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
-                  <div style={{ width: `${fleetStats.routeCompletion.cancelled}%`, height: '100%', backgroundColor: '#f44336' }}></div>
-                </div>
-                <div style={{ marginLeft: '8px' }}>{fleetStats.routeCompletion.cancelled}%</div>
+              <div>
+                <strong>Szacowany koszt: </strong> 
+                <span>15 000 zł</span>
               </div>
             </div>
           </Card>
@@ -834,135 +851,31 @@ const Dashboard = () => {
     );
   };
   
-  // Renderowanie sekcji mapy
-  const renderMapSection = () => {
-    if (!mapData) return null;
-    
-    // Funkcja do generowania pseudolosowych współrzędnych na podstawie id punktu
-    const getCoordinates = (id) => {
-      const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      return {
-        x: (hash % 80) + 10, // 10-90%
-        y: ((hash * 13) % 80) + 10 // 10-90%
-      };
-    };
-    
-    // Funkcja do określania koloru punktu na podstawie typu
-    const getPointColor = (type) => {
-      switch (type) {
-        case 'vehicle':
-          return '#4caf50';
-        case 'fraud':
-          return '#f44336';
-        case 'safety':
-          return '#ff9800';
-        default:
-          return '#2196f3';
-      }
-    };
-    
-    return (
-      <>
-        <SectionTitle>MONITORING POJAZDÓW</SectionTitle>
-        <Card fullWidth>
-          <TabsContainer>
-            <Tab 
-              active={activeMapTab === 'vehicles'} 
-              onClick={() => handleMapTypeChange('vehicles')}
-            >
-              Pojazdy
-            </Tab>
-            <Tab 
-              active={activeMapTab === 'fraud'} 
-              onClick={() => handleMapTypeChange('fraud')}
-            >
-              Oszustwa
-            </Tab>
-            <Tab 
-              active={activeMapTab === 'safety'} 
-              onClick={() => handleMapTypeChange('safety')}
-            >
-              Bezpieczeństwo
-            </Tab>
-          </TabsContainer>
-          
-          <MapContainer>
-            {mapData.points.length === 0 ? (
-              <MapPlaceholder>Brak danych do wyświetlenia na mapie</MapPlaceholder>
-            ) : (
-              <>
-                {mapData.points.map(point => {
-                  const coords = getCoordinates(point.id);
-                  return (
-                    <MapPoint 
-                      key={point.id}
-                      x={coords.x}
-                      y={coords.y}
-                      color={getPointColor(point.type)}
-                      onMouseEnter={(e) => handleMapPointHover(point, e)}
-                      onMouseLeave={handleMapPointLeave}
-                    />
-                  );
-                })}
-                <MapTooltip 
-                  visible={tooltip.visible}
-                  style={{ top: tooltip.y, left: tooltip.x }}
-                >
-                  {tooltip.content}
-                </MapTooltip>
-              </>
-            )}
-          </MapContainer>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
-              <div style={{ fontWeight: 500 }}>W trasie</div>
-              <div style={{ fontSize: '20px', marginTop: '4px' }}>78</div>
-            </div>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
-              <div style={{ fontWeight: 500 }}>Postój</div>
-              <div style={{ fontSize: '20px', marginTop: '4px' }}>32</div>
-            </div>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
-              <div style={{ fontWeight: 500 }}>Serwis</div>
-              <div style={{ fontSize: '20px', marginTop: '4px' }}>12</div>
-            </div>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px', margin: '0 8px' }}>
-              <div style={{ fontWeight: 500 }}>Inne</div>
-              <div style={{ fontSize: '20px', marginTop: '4px' }}>3</div>
-            </div>
-          </div>
-        </Card>
-      </>
-    );
-  };
-  
-  if (isLoading) {
-    return (
-      <PageContainer>
-        <LoadingIndicator>Ładowanie danych dashboardu...</LoadingIndicator>
-      </PageContainer>
-    );
-  }
-  
+  // Renderowanie głównego komponentu
   return (
     <PageContainer>
       <DataSourceToggle>
         <ToggleLabel>
           API
-          <ToggleSwitch checked={useMockData} onClick={handleToggleDataSource} />
-          Dane mockowe
+          <ToggleSwitch 
+            checked={useMockData} 
+            onClick={handleToggleDataSource}
+          />
+          Mock
         </ToggleLabel>
       </DataSourceToggle>
       
-      {error ? (
+      {error && (
         <ErrorMessage>{error}</ErrorMessage>
+      )}
+      
+      {isLoading ? (
+        <LoadingIndicator>Ładowanie danych dashboardu...</LoadingIndicator>
       ) : (
         <>
           {renderKPISection()}
           {renderAlertsSection()}
           {renderFleetStatsSection()}
-          {renderMapSection()}
         </>
       )}
     </PageContainer>

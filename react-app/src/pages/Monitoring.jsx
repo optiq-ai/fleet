@@ -9,6 +9,8 @@ import { Line, Bar, Pie } from 'react-chartjs-2';
 import monitoringService from '../services/api/monitoringService';
 import mockMonitoringService from '../services/api/mockMonitoringService';
 import mockMonitoringChartsService from '../services/api/mockMonitoringChartsService';
+import mockMonitoringMapService from '../services/api/mockMonitoringMapService';
+import SuspiciousTransactionsMap from '../components/fraud/SuspiciousTransactionsMap';
 
 // Styled components
 const PageContainer = styled.div`
@@ -321,6 +323,10 @@ const Monitoring = () => {
   const [kilometersTrendChart, setKilometersTrendChart] = useState(null);
   const [alertsTrendChart, setAlertsTrendChart] = useState(null);
   
+  // States for map data
+  const [vehicleMapData, setVehicleMapData] = useState([]);
+  const [isLoadingVehicleMap, setIsLoadingVehicleMap] = useState(true);
+  
   // State for map tooltip
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -400,6 +406,11 @@ const Monitoring = () => {
         
         const alertsTrendChartResponse = await mockMonitoringChartsService.getAlertsTrendChart();
         setAlertsTrendChart(alertsTrendChartResponse);
+        
+        // Fetch map data
+        const vehicleMapResponse = await mockMonitoringMapService.getVehicleLocationsForMapComponent();
+        setVehicleMapData(vehicleMapResponse);
+        setIsLoadingVehicleMap(false);
       } catch (err) {
         console.error('Error fetching monitoring data:', err);
         setError('Nie udało się pobrać danych monitoringu. Spróbuj odświeżyć stronę.');
@@ -453,6 +464,16 @@ const Monitoring = () => {
       ...tooltip,
       visible: false
     });
+  };
+  
+  // Handle marker click on the map
+  const handleMarkerClick = (transaction) => {
+    console.log('Clicked vehicle on map:', transaction);
+    // Find the corresponding vehicle and select it
+    const vehicleId = transaction.id;
+    if (vehicleId) {
+      handleVehicleSelect(vehicleId);
+    }
   };
   
   // Handle data source toggle
@@ -534,70 +555,19 @@ const Monitoring = () => {
   const renderVehicleMapSection = () => {
     if (!vehicles.length) return null;
     
-    // Convert Poland coordinates to percentage values for the map
-    const convertCoordinatesToPercentage = (lat, lng) => {
-      // Approximate bounds for Poland
-      const minLat = 49.0; // South
-      const maxLat = 55.0; // North
-      const minLng = 14.0; // West
-      const maxLng = 24.0; // East
-      
-      const latRange = maxLat - minLat;
-      const lngRange = maxLng - minLng;
-      
-      // Convert to percentage (y is inverted because 0% is at the top)
-      const x = ((lng - minLng) / lngRange) * 100;
-      const y = 100 - ((lat - minLat) / latRange) * 100;
-      
-      return { x, y };
-    };
-    
-    // Get color based on vehicle status
-    const getVehicleStatusColor = (status) => {
-      switch (status.toLowerCase()) {
-        case 'active': return '#4caf50'; // Green
-        case 'maintenance': return '#ff9800'; // Orange
-        case 'inactive': return '#f44336'; // Red
-        default: return '#3f51b5'; // Blue
-      }
-    };
-    
     return (
       <>
         <SectionTitle>ŚLEDZENIE LOKALIZACJI GPS</SectionTitle>
         <Card fullWidth>
           <MapContainer>
-            <MapPlaceholder>Mapa Polski z lokalizacjami pojazdów</MapPlaceholder>
-            
-            {vehicles.map(vehicle => {
-              const { x, y } = convertCoordinatesToPercentage(
-                vehicle.location.lat, 
-                vehicle.location.lng
-              );
-              const color = getVehicleStatusColor(vehicle.status);
-              
-              return (
-                <MapPoint 
-                  key={vehicle.id}
-                  x={x}
-                  y={y}
-                  color={color}
-                  onClick={() => handleVehicleSelect(vehicle.id)}
-                  onMouseEnter={(e) => handleMapPointHover(vehicle, e)}
-                  onMouseLeave={handleMapPointLeave}
-                />
-              );
-            })}
-            
-            <MapTooltip 
-              visible={tooltip.visible}
-              style={{ 
-                top: `${tooltip.y}px`, 
-                left: `${tooltip.x}px` 
-              }}
-            >
-              {tooltip.content}
-            </MapTooltip>
+            {isLoadingVehicleMap ? (
+              <MapPlaceholder>Ładowanie mapy pojazdów...</MapPlaceholder>
+            ) : (
+              <SuspiciousTransactionsMap 
+                transactions={vehicleMapData}
+                onMarkerClick={handleMarkerClick}
+              />
+            )}
           </MapContainer>
         </Card>
       </>
@@ -612,7 +582,7 @@ const Monitoring = () => {
     
     return (
       <>
-        <SectionTitle>MONITOROWANIE STANU POJAZDÓW</SectionTitle>
+        <SectionTitle>MONITOROWANIE POJAZDÓW</SectionTitle>
         <Card fullWidth>
           <TabsContainer>
             <Tab 
@@ -622,16 +592,16 @@ const Monitoring = () => {
               Pojazdy
             </Tab>
             <Tab 
-              active={activeTab === 'alerts'} 
-              onClick={() => setActiveTab('alerts')}
-            >
-              Alerty ({alerts.length})
-            </Tab>
-            <Tab 
               active={activeTab === 'fuel'} 
               onClick={() => setActiveTab('fuel')}
             >
               Zużycie paliwa
+            </Tab>
+            <Tab 
+              active={activeTab === 'alerts'} 
+              onClick={() => setActiveTab('alerts')}
+            >
+              Alerty
             </Tab>
           </TabsContainer>
           
@@ -653,69 +623,55 @@ const Monitoring = () => {
               </VehicleStatusContainer>
               
               <Table 
-                headers={['ID', 'Nazwa', 'Typ', 'Status', 'Kierowca']}
-                data={vehicles.map(vehicle => [
+                headers={['ID', 'Status', 'Kierowca', 'Lokalizacja', 'Ostatnia aktualizacja']}
+                data={vehicles.slice(0, 5).map(vehicle => [
                   vehicle.id,
-                  vehicle.name,
-                  vehicle.type,
                   vehicle.status,
-                  vehicle.driver
+                  vehicle.driver,
+                  `${vehicle.location.city}, ${vehicle.location.street}`,
+                  vehicle.lastUpdate
                 ])}
                 onRowClick={(index) => handleVehicleSelect(vehicles[index].id)}
               />
+              
+              <ViewAllButton onClick={() => console.log('View all vehicles')}>
+                Zobacz wszystkie pojazdy
+              </ViewAllButton>
             </>
           )}
           
-          {activeTab === 'alerts' && (
-            <Table 
-              headers={['Pojazd', 'Typ', 'Priorytet', 'Wiadomość', 'Czas', 'Status']}
-              data={alerts.map(alert => [
-                alert.vehicleId,
-                alert.type,
-                alert.severity,
-                alert.message,
-                alert.timestamp,
-                alert.acknowledged ? 'Potwierdzony' : 'Nowy'
-              ])}
-              onRowClick={(index) => handleAcknowledgeAlert(alerts[index].id)}
-            />
-          )}
-          
-          {activeTab === 'fuel' && fuelData && (
+          {activeTab === 'fuel' && (
             <>
-              <DetailRow>
-                <DetailLabel>Średnie zużycie:</DetailLabel>
-                <DetailValue>{fuelData.averageConsumption.toFixed(1)} l/100km</DetailValue>
-              </DetailRow>
-              <DetailRow>
-                <DetailLabel>Całkowite zużycie:</DetailLabel>
-                <DetailValue>{fuelData.totalConsumption.toFixed(1)} l</DetailValue>
-              </DetailRow>
-              <DetailRow>
-                <DetailLabel>Koszt paliwa:</DetailLabel>
-                <DetailValue>{fuelData.totalCost.toLocaleString()} zł</DetailValue>
-              </DetailRow>
-              <ChartContainer>
+              <MapContainer style={{ height: '300px' }}>
+                {isLoadingVehicleMap ? (
+                  <MapPlaceholder>Ładowanie mapy zużycia paliwa...</MapPlaceholder>
+                ) : (
+                  <SuspiciousTransactionsMap 
+                    transactions={vehicleMapData}
+                    onMarkerClick={handleMarkerClick}
+                  />
+                )}
+              </MapContainer>
+              
+              <ChartContainer style={{ marginTop: '20px', height: '300px' }}>
                 {vehicleFuelConsumptionChart && (
                   <Line
                     data={{
-                      labels: vehicleFuelConsumptionChart.data.map(item => item.date.substring(5)), // Show only MM-DD
+                      labels: vehicleFuelConsumptionChart.labels,
                       datasets: [
                         {
                           label: 'Zużycie paliwa',
-                          data: vehicleFuelConsumptionChart.data.map(item => item.consumption),
-                          borderColor: vehicleFuelConsumptionChart.colors.line,
-                          backgroundColor: vehicleFuelConsumptionChart.colors.area,
+                          data: vehicleFuelConsumptionChart.data,
+                          borderColor: '#3f51b5',
+                          backgroundColor: 'rgba(63, 81, 181, 0.1)',
                           borderWidth: 2,
-                          fill: true,
-                          tension: 0.4,
-                          pointRadius: 3,
-                          pointHoverRadius: 5
+                          tension: 0.3,
+                          fill: true
                         },
                         {
-                          label: vehicleFuelConsumptionChart.target.label,
-                          data: Array(vehicleFuelConsumptionChart.data.length).fill(vehicleFuelConsumptionChart.target.value),
-                          borderColor: vehicleFuelConsumptionChart.colors.target,
+                          label: 'Cel',
+                          data: vehicleFuelConsumptionChart.target,
+                          borderColor: '#4caf50',
                           borderWidth: 2,
                           borderDash: [5, 5],
                           fill: false,
@@ -728,23 +684,14 @@ const Monitoring = () => {
                       maintainAspectRatio: false,
                       plugins: {
                         legend: {
-                          display: true,
                           position: 'top',
-                          labels: {
-                            boxWidth: 12,
-                            usePointStyle: true,
-                            font: {
-                              size: 11
-                            }
-                          }
                         },
                         tooltip: {
                           callbacks: {
                             label: (context) => {
-                              if (context.dataset.label === vehicleFuelConsumptionChart.target.label) {
-                                return `${context.dataset.label}: ${context.raw} ${vehicleFuelConsumptionChart.unit}`;
-                              }
-                              return `${context.dataset.label}: ${context.raw} ${vehicleFuelConsumptionChart.unit}`;
+                              const datasetLabel = context.dataset.label;
+                              const value = context.raw;
+                              return `${datasetLabel}: ${value} l/100km`;
                             }
                           }
                         }
@@ -752,23 +699,13 @@ const Monitoring = () => {
                       scales: {
                         y: {
                           beginAtZero: false,
-                          min: Math.min(vehicleFuelConsumptionChart.target.value * 0.9, ...vehicleFuelConsumptionChart.data.map(item => item.consumption)) * 0.95,
-                          max: Math.max(vehicleFuelConsumptionChart.target.value * 1.1, ...vehicleFuelConsumptionChart.data.map(item => item.consumption)) * 1.05,
                           grid: {
                             color: 'rgba(0, 0, 0, 0.05)'
-                          },
-                          ticks: {
-                            callback: (value) => `${value} ${vehicleFuelConsumptionChart.unit}`
                           }
                         },
                         x: {
                           grid: {
                             display: false
-                          },
-                          ticks: {
-                            maxRotation: 0,
-                            autoSkip: true,
-                            maxTicksLimit: 10
                           }
                         }
                       }
@@ -776,6 +713,26 @@ const Monitoring = () => {
                   />
                 )}
               </ChartContainer>
+            </>
+          )}
+          
+          {activeTab === 'alerts' && (
+            <>
+              <Table 
+                headers={['Priorytet', 'Pojazd', 'Opis', 'Data', 'Status']}
+                data={alerts.slice(0, 5).map(alert => [
+                  alert.priority,
+                  alert.vehicle,
+                  alert.description,
+                  alert.date,
+                  alert.acknowledged ? 'Potwierdzony' : 'Nowy'
+                ])}
+                onRowClick={(index) => handleAcknowledgeAlert(alerts[index].id)}
+              />
+              
+              <ViewAllButton onClick={() => console.log('View all alerts')}>
+                Zobacz wszystkie alerty
+              </ViewAllButton>
             </>
           )}
         </Card>
@@ -788,60 +745,40 @@ const Monitoring = () => {
     if (!selectedVehicle) return null;
     
     return (
-      <>
-        <SectionTitle>SZCZEGÓŁY POJAZDU</SectionTitle>
-        <VehicleDetailsCard title={`${selectedVehicle.name} (${selectedVehicle.id})`}>
-          <DetailRow>
-            <DetailLabel>Status:</DetailLabel>
-            <DetailValue>{selectedVehicle.status}</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Typ:</DetailLabel>
-            <DetailValue>{selectedVehicle.type}</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Kierowca:</DetailLabel>
-            <DetailValue>{selectedVehicle.driver}</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Poziom paliwa:</DetailLabel>
-            <DetailValue>{selectedVehicle.fuelData.level}%</DetailValue>
-          </DetailRow>
-          
-          <GaugeContainer>
-            <GaugeBackground />
-            <GaugeFill percentage={selectedVehicle.fuelData.level} />
-            <GaugeLabel percentage={selectedVehicle.fuelData.level}>
-              {selectedVehicle.fuelData.level}%
-            </GaugeLabel>
-          </GaugeContainer>
-          
-          <DetailRow>
-            <DetailLabel>Średnie zużycie:</DetailLabel>
-            <DetailValue>{selectedVehicle.fuelData.consumption} l/100km</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Zasięg:</DetailLabel>
-            <DetailValue>{selectedVehicle.fuelData.range} km</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Prędkość:</DetailLabel>
-            <DetailValue>{selectedVehicle.performance.speed} km/h</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Temperatura silnika:</DetailLabel>
-            <DetailValue>{selectedVehicle.performance.engineTemp}°C</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Ciśnienie oleju:</DetailLabel>
-            <DetailValue>{selectedVehicle.performance.oilPressure} bar</DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel>Napięcie akumulatora:</DetailLabel>
-            <DetailValue>{selectedVehicle.performance.batteryVoltage} V</DetailValue>
-          </DetailRow>
-        </VehicleDetailsCard>
-      </>
+      <VehicleDetailsCard title={`Szczegóły pojazdu: ${selectedVehicle.name}`}>
+        <DetailRow>
+          <DetailLabel>Status:</DetailLabel>
+          <DetailValue>{selectedVehicle.status}</DetailValue>
+        </DetailRow>
+        <DetailRow>
+          <DetailLabel>Kierowca:</DetailLabel>
+          <DetailValue>{selectedVehicle.driver}</DetailValue>
+        </DetailRow>
+        <DetailRow>
+          <DetailLabel>Lokalizacja:</DetailLabel>
+          <DetailValue>{`${selectedVehicle.location.city}, ${selectedVehicle.location.street}`}</DetailValue>
+        </DetailRow>
+        <DetailRow>
+          <DetailLabel>Ostatnia aktualizacja:</DetailLabel>
+          <DetailValue>{selectedVehicle.lastUpdate}</DetailValue>
+        </DetailRow>
+        <DetailRow>
+          <DetailLabel>Przebieg:</DetailLabel>
+          <DetailValue>{`${selectedVehicle.mileage.toLocaleString()} km`}</DetailValue>
+        </DetailRow>
+        <DetailRow>
+          <DetailLabel>Poziom paliwa:</DetailLabel>
+          <DetailValue>{`${selectedVehicle.fuelLevel}%`}</DetailValue>
+        </DetailRow>
+        
+        <GaugeContainer>
+          <GaugeBackground />
+          <GaugeFill percentage={selectedVehicle.fuelLevel} />
+          <GaugeLabel percentage={selectedVehicle.fuelLevel}>
+            {selectedVehicle.fuelLevel}%
+          </GaugeLabel>
+        </GaugeContainer>
+      </VehicleDetailsCard>
     );
   };
   
@@ -855,11 +792,10 @@ const Monitoring = () => {
         <GridSection>
           <Card title="Trend zużycia paliwa">
             <div>
-              <strong>Aktualne zużycie: </strong> 
-              {fuelConsumptionTrendChart?.current} {fuelConsumptionTrendChart?.unit}
+              <strong>Zmiana w stosunku do poprzedniego miesiąca: </strong> 
               <span style={{ 
                 color: fuelConsumptionTrendChart?.change < 0 ? '#4caf50' : '#f44336',
-                marginLeft: '8px'
+                fontWeight: '500'
               }}>
                 {fuelConsumptionTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(fuelConsumptionTrendChart?.change).toFixed(1)}%
               </span>
@@ -868,16 +804,13 @@ const Monitoring = () => {
               {fuelConsumptionTrendChart && (
                 <Bar
                   data={{
-                    labels: fuelConsumptionTrendChart.data.map(item => item.date),
+                    labels: fuelConsumptionTrendChart.labels,
                     datasets: [
                       {
-                        label: 'Zużycie paliwa',
-                        data: fuelConsumptionTrendChart.data.map(item => item.value),
-                        backgroundColor: fuelConsumptionTrendChart.colors.primary,
-                        borderColor: fuelConsumptionTrendChart.colors.primary,
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        barThickness: 20
+                        label: 'Zużycie paliwa (l/100km)',
+                        data: fuelConsumptionTrendChart.data,
+                        backgroundColor: '#3f51b5',
+                        borderRadius: 5
                       }
                     ]
                   }}
@@ -887,13 +820,6 @@ const Monitoring = () => {
                     plugins: {
                       legend: {
                         display: false
-                      },
-                      tooltip: {
-                        callbacks: {
-                          label: (context) => {
-                            return `Zużycie: ${context.raw} ${fuelConsumptionTrendChart.unit}`;
-                          }
-                        }
                       }
                     },
                     scales: {
@@ -901,9 +827,6 @@ const Monitoring = () => {
                         beginAtZero: false,
                         grid: {
                           color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                          callback: (value) => `${value} ${fuelConsumptionTrendChart.unit}`
                         }
                       },
                       x: {
@@ -920,11 +843,10 @@ const Monitoring = () => {
           
           <Card title="Trend przejechanych kilometrów">
             <div>
-              <strong>Aktualny przebieg: </strong> 
-              {kilometersTrendChart?.current.toLocaleString()} {kilometersTrendChart?.unit}
+              <strong>Zmiana w stosunku do poprzedniego miesiąca: </strong> 
               <span style={{ 
                 color: kilometersTrendChart?.change > 0 ? '#4caf50' : '#f44336',
-                marginLeft: '8px'
+                fontWeight: '500'
               }}>
                 {kilometersTrendChart?.change > 0 ? '↑' : '↓'} {Math.abs(kilometersTrendChart?.change).toFixed(1)}%
               </span>
@@ -933,16 +855,13 @@ const Monitoring = () => {
               {kilometersTrendChart && (
                 <Bar
                   data={{
-                    labels: kilometersTrendChart.data.map(item => item.date),
+                    labels: kilometersTrendChart.labels,
                     datasets: [
                       {
                         label: 'Przejechane kilometry',
-                        data: kilometersTrendChart.data.map(item => item.value),
-                        backgroundColor: kilometersTrendChart.colors.primary,
-                        borderColor: kilometersTrendChart.colors.primary,
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        barThickness: 20
+                        data: kilometersTrendChart.data,
+                        backgroundColor: '#4caf50',
+                        borderRadius: 5
                       }
                     ]
                   }}
@@ -956,7 +875,8 @@ const Monitoring = () => {
                       tooltip: {
                         callbacks: {
                           label: (context) => {
-                            return `Przebieg: ${context.raw.toLocaleString()} ${kilometersTrendChart.unit}`;
+                            const value = context.raw;
+                            return `Przejechane kilometry: ${value.toLocaleString()} km`;
                           }
                         }
                       }
@@ -968,7 +888,7 @@ const Monitoring = () => {
                           color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                          callback: (value) => `${value.toLocaleString()} ${kilometersTrendChart.unit}`
+                          callback: (value) => value.toLocaleString()
                         }
                       },
                       x: {
@@ -985,11 +905,10 @@ const Monitoring = () => {
           
           <Card title="Trend alertów">
             <div>
-              <strong>Aktualna liczba alertów: </strong> 
-              {alertsTrendChart?.current}
+              <strong>Zmiana w stosunku do poprzedniego miesiąca: </strong> 
               <span style={{ 
                 color: alertsTrendChart?.change < 0 ? '#4caf50' : '#f44336',
-                marginLeft: '8px'
+                fontWeight: '500'
               }}>
                 {alertsTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(alertsTrendChart?.change).toFixed(1)}%
               </span>
@@ -998,19 +917,16 @@ const Monitoring = () => {
               {alertsTrendChart && (
                 <Line
                   data={{
-                    labels: alertsTrendChart.data.map(item => item.date),
+                    labels: alertsTrendChart.labels,
                     datasets: [
                       {
                         label: 'Liczba alertów',
-                        data: alertsTrendChart.data.map(item => item.value),
-                        borderColor: alertsTrendChart.colors.primary,
-                        backgroundColor: alertsTrendChart.colors.background,
+                        data: alertsTrendChart.data,
+                        borderColor: '#f44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
                         borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: alertsTrendChart.colors.primary,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        tension: 0.3,
+                        fill: true
                       }
                     ]
                   }}
@@ -1020,13 +936,6 @@ const Monitoring = () => {
                     plugins: {
                       legend: {
                         display: false
-                      },
-                      tooltip: {
-                        callbacks: {
-                          label: (context) => {
-                            return `Liczba alertów: ${context.raw}`;
-                          }
-                        }
                       }
                     },
                     scales: {
@@ -1036,8 +945,7 @@ const Monitoring = () => {
                           color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                          stepSize: 1,
-                          precision: 0
+                          stepSize: 1
                         }
                       },
                       x: {
@@ -1056,9 +964,9 @@ const Monitoring = () => {
     );
   };
   
+  // Render main component
   return (
     <PageContainer>
-      {/* Data source toggle */}
       <DataSourceToggle>
         <ToggleLabel>
           API
@@ -1066,16 +974,17 @@ const Monitoring = () => {
             checked={useMockData} 
             onClick={handleToggleDataSource}
           />
-          Dane testowe
+          Mock
         </ToggleLabel>
       </DataSourceToggle>
       
-      {/* Loading and error states */}
-      {isLoading && <LoadingIndicator>Ładowanie danych monitoringu...</LoadingIndicator>}
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {error && (
+        <ErrorMessage>{error}</ErrorMessage>
+      )}
       
-      {/* Main content */}
-      {!isLoading && !error && (
+      {isLoading ? (
+        <LoadingIndicator>Ładowanie danych monitoringu...</LoadingIndicator>
+      ) : (
         <>
           {renderKPISection()}
           {renderVehicleMapSection()}
