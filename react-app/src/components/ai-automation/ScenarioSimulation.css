@@ -1,0 +1,341 @@
+.scenario-simulation-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scenario-header {
+  margin-bottom: 20px;
+}
+
+.scenario-header h2 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.scenario-header p {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.scenario-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.scenario-tabs button {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.scenario-tabs button.active {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.scenario-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #3498db;
+}
+
+.tab-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.fleet-icon::before {
+  content: '🚚';
+}
+
+.assignment-icon::before {
+  content: '👤';
+}
+
+.external-icon::before {
+  content: '🌦️';
+}
+
+.contingency-icon::before {
+  content: '🔄';
+}
+
+.scenario-content {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.scenario-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 992px) {
+  .scenario-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scenario-list-container {
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.scenario-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.scenario-card {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scenario-card:hover {
+  border-color: #3498db;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scenario-card.selected {
+  border-color: #3498db;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.scenario-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.scenario-status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.scenario-status.ready {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.scenario-status.completed {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.scenario-status.in-progress {
+  background-color: #fff8e1;
+  color: #f57c00;
+}
+
+.scenario-description {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.scenario-parameters {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.scenario-parameters h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.scenario-parameters ul {
+  margin: 0;
+  padding: 0 0 0 20px;
+  font-size: 13px;
+}
+
+.scenario-parameters li {
+  margin-bottom: 5px;
+}
+
+.parameter-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-right: 5px;
+}
+
+.parameter-value {
+  color: #555;
+}
+
+.scenario-detail-container {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.select-scenario-message {
+  text-align: center;
+  padding: 40px 0;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.scenario-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.scenario-detail-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #2c3e50;
+}
+
+.run-simulation-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.run-simulation-button:hover {
+  background-color: #2980b9;
+}
+
+.run-simulation-button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.scenario-detail-description {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.scenario-detail-parameters {
+  margin-bottom: 20px;
+}
+
+.scenario-detail-parameters h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.parameters-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.parameters-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.parameters-table tr:last-child td {
+  border-bottom: none;
+}
+
+.simulation-results {
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.simulation-results h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.results-timestamp {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+}
+
+.results-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.result-metric {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-name {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: #7f8c8d;
+}
+
+.error-message {
+  color: #e74c3c;
+  padding: 20px;
+  text-align: center;
+  background-color: #ffebee;
+  border-radius: 4px;
+}

@@ -1,0 +1,216 @@
+.anomaly-detection-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.anomaly-header {
+  margin-bottom: 20px;
+}
+
+.anomaly-header h2 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.anomaly-header p {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.anomaly-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.anomaly-tabs button {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.anomaly-tabs button.active {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.anomaly-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #3498db;
+}
+
+.tab-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.driver-behavior-icon::before {
+  content: '👤';
+}
+
+.fuel-usage-icon::before {
+  content: '⛽';
+}
+
+.route-deviation-icon::before {
+  content: '🗺️';
+}
+
+.financial-icon::before {
+  content: '💰';
+}
+
+.anomaly-content {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.anomaly-table-container {
+  overflow-x: auto;
+}
+
+.anomaly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.anomaly-table th {
+  background-color: #f8f9fa;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #ddd;
+}
+
+.anomaly-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.anomaly-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.severity-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.severity-badge.low {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.severity-badge.medium {
+  background-color: #fff8e1;
+  color: #f57c00;
+}
+
+.severity-badge.high {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status-badge.investigating,
+.status-badge.in-progress {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-badge.resolved,
+.status-badge.justified {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.status-badge.under-review,
+.status-badge.monitoring {
+  background-color: #fff8e1;
+  color: #f57c00;
+}
+
+.status-badge.addressed {
+  background-color: #e0f2f1;
+  color: #00897b;
+}
+
+.status-badge.scheduled-maintenance {
+  background-color: #f3e5f5;
+  color: #8e24aa;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+}
+
+.view-button {
+  background-color: #f8f9fa;
+  color: #2c3e50;
+  border: 1px solid #ddd !important;
+}
+
+.resolve-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: #7f8c8d;
+}
+
+.error-message {
+  color: #e74c3c;
+  padding: 20px;
+  text-align: center;
+  background-color: #ffebee;
+  border-radius: 4px;
+}

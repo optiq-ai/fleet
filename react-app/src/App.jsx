@@ -22,6 +22,7 @@ import DocumentManagement from './pages/DocumentManagement';
 import AssetManagement from './pages/AssetManagement';
 import Communication from './pages/Communication';
 import Integrations from './pages/Integrations';
+import AIAutomation from './pages/AIAutomation';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -138,6 +139,11 @@ function App() {
               <Integrations />
             </Layout>
           } key="integrations-route" />
+          <Route path="/ai-automation" element={
+            <Layout>
+              <AIAutomation />
+            </Layout>
+          } key="ai-automation-route" />
           {/* Fallback route for any unmatched paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

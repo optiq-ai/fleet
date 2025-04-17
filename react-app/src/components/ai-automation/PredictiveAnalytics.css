@@ -1,0 +1,168 @@
+.predictive-analytics-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.predictive-header {
+  margin-bottom: 20px;
+}
+
+.predictive-header h2 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.predictive-header p {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.predictive-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.predictive-tabs button {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.predictive-tabs button.active {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.predictive-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #3498db;
+}
+
+.tab-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.vehicle-icon::before {
+  content: '🚗';
+}
+
+.delay-icon::before {
+  content: '⏱️';
+}
+
+.fuel-icon::before {
+  content: '⛽';
+}
+
+.maintenance-icon::before {
+  content: '🔧';
+}
+
+.predictive-content {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.predictive-table-container {
+  overflow-x: auto;
+}
+
+.predictive-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.predictive-table th {
+  background-color: #f8f9fa;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #ddd;
+}
+
+.predictive-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.predictive-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.severity-indicator {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.severity-indicator.low {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.severity-indicator.medium {
+  background-color: #fff8e1;
+  color: #f57c00;
+}
+
+.severity-indicator.high {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.severity-indicator.critical {
+  background-color: #b71c1c;
+  color: white;
+}
+
+tr.severity-critical {
+  background-color: rgba(183, 28, 28, 0.05);
+}
+
+tr.severity-high {
+  background-color: rgba(211, 47, 47, 0.05);
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: #7f8c8d;
+}
+
+.error-message {
+  color: #e74c3c;
+  padding: 20px;
+  text-align: center;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
