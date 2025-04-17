@@ -200,178 +200,98 @@ const ChartContainer = styled.div`
   position: relative;
 `;
 
-const Badge = styled.span`
-  display: inline-block;
-  padding: 4px 8px;
-  background-color: ${props => {
-    switch(props.status) {
-      case 'available': return '#4caf50';
-      case 'low': return '#ff9800';
-      case 'ordered': return '#2196f3';
-      case 'out_of_stock': return '#f44336';
-      case 'pending': return '#ff9800';
-      case 'processing': return '#2196f3';
-      case 'shipped': return '#9c27b0';
-      case 'delivered': return '#4caf50';
-      case 'cancelled': return '#f44336';
-      default: return '#9e9e9e';
-    }
-  }};
-  color: white;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
+const LoadingIndicator = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+  font-size: 16px;
+`;
+
+const ErrorMessage = styled.div`
+  padding: 16px;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 8px;
+  margin-bottom: 20px;
 `;
 
 const DetailContainer = styled.div`
-  padding: 16px;
-  background-color: #f5f5f5;
+  background-color: #f9f9f9;
   border-radius: 8px;
+  padding: 20px;
   margin-top: 20px;
 `;
 
 const DetailTitle = styled.h3`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
   color: #333;
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
 `;
 
 const DetailRow = styled.div`
   display: flex;
-  margin-bottom: 8px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
+  margin-bottom: 12px;
 `;
 
 const DetailLabel = styled.div`
-  font-weight: 500;
   width: 200px;
+  font-weight: 500;
   color: #666;
 `;
 
 const DetailValue = styled.div`
   flex: 1;
+  color: #333;
 `;
 
-const LoadingIndicator = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100px;
-  color: #666;
-`;
-
-const ErrorMessage = styled.div`
-  color: #d32f2f;
-  padding: 16px;
-  background-color: #ffebee;
+const Badge = styled.span`
+  display: inline-block;
+  padding: 4px 8px;
   border-radius: 4px;
-  margin-bottom: 20px;
-`;
-
-const CompatibilityList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-`;
-
-const CompatibilityItem = styled.li`
-  padding: 8px 0;
-  border-bottom: 1px solid #e0e0e0;
-  
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const DataSourceToggle = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-`;
-
-const ToggleLabel = styled.label`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-`;
-
-const ToggleSwitch = styled.div`
-  position: relative;
-  width: 50px;
-  height: 24px;
-  background-color: ${props => props.checked ? '#3f51b5' : '#ccc'};
-  border-radius: 12px;
-  margin: 0 8px;
-  transition: background-color 0.3s;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: ${props => props.checked ? '26px' : '2px'};
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
-    transition: left 0.3s;
-  }
-`;
-
-const OrderItemsTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  
-  th, td {
-    padding: 8px 12px;
-    text-align: left;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  th {
-    font-weight: 500;
-    color: #666;
-    background-color: #f0f0f0;
-  }
-  
-  tr:last-child td {
-    border-bottom: none;
-  }
-`;
-
-const OrderSummary = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
+  font-size: 12px;
   font-weight: 500;
-`;
-
-const ProgressBar = styled.div`
-  height: 8px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 4px;
-`;
-
-const ProgressFill = styled.div`
-  height: 100%;
-  width: ${props => props.percentage}%;
-  background-color: ${props => props.color || '#3f51b5'};
-  border-radius: 4px;
+  
+  background-color: ${props => {
+    switch(props.status) {
+      case 'available': return '#e8f5e9';
+      case 'low': return '#fff8e1';
+      case 'ordered': return '#e3f2fd';
+      case 'out_of_stock': return '#ffebee';
+      case 'pending': return '#fff8e1';
+      case 'processing': return '#e3f2fd';
+      case 'shipped': return '#e8f5e9';
+      case 'delivered': return '#e0f2f1';
+      case 'cancelled': return '#ffebee';
+      default: return '#f5f5f5';
+    }
+  }};
+  
+  color: ${props => {
+    switch(props.status) {
+      case 'available': return '#2e7d32';
+      case 'low': return '#ff9800';
+      case 'ordered': return '#1976d2';
+      case 'out_of_stock': return '#c62828';
+      case 'pending': return '#ff9800';
+      case 'processing': return '#1976d2';
+      case 'shipped': return '#2e7d32';
+      case 'delivered': return '#00897b';
+      case 'cancelled': return '#c62828';
+      default: return '#757575';
+    }
+  }};
 `;
 
 const SupplierCard = styled.div`
-  padding: 16px;
-  border-radius: 8px;
   background-color: white;
+  border-radius: 8px;
+  padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   
@@ -381,25 +301,23 @@ const SupplierCard = styled.div`
   }
 `;
 
-const SupplierHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-`;
-
 const SupplierName = styled.h3`
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
-  margin: 0;
   color: #333;
+  margin: 0 0 8px 0;
 `;
 
 const SupplierRating = styled.div`
   display: flex;
   align-items: center;
-  color: #ff9800;
-  font-weight: 500;
+  gap: 4px;
+  margin-bottom: 8px;
+  
+  span {
+    color: #ff9800;
+    font-weight: 500;
+  }
 `;
 
 const SupplierInfo = styled.div`
@@ -562,10 +480,11 @@ const VehicleParts = () => {
   }, [activeTab, filters, vehicleModel, useMockData]);
   
   // Get part details
-  const handlePartSelect = async (part) => {
+  const handlePartSelect = async (index) => {
     try {
       const service = useMockData ? mockPartsService : partsService;
-      const partDetails = await service.getPartDetails(part.id);
+      const partId = parts.data[index].id;
+      const partDetails = await service.getPartDetails(partId);
       setSelectedPart(partDetails);
     } catch (err) {
       console.error('Error fetching part details:', err);
@@ -574,10 +493,11 @@ const VehicleParts = () => {
   };
   
   // Get order details
-  const handleOrderSelect = async (order) => {
+  const handleOrderSelect = async (index) => {
     try {
       const service = useMockData ? mockPartsService : partsService;
-      const orderDetails = await service.getOrderDetails(order.id);
+      const orderId = orders.data[index].id;
+      const orderDetails = await service.getOrderDetails(orderId);
       setSelectedOrder(orderDetails);
     } catch (err) {
       console.error('Error fetching order details:', err);
@@ -586,10 +506,11 @@ const VehicleParts = () => {
   };
   
   // Get supplier details
-  const handleSupplierSelect = async (supplier) => {
+  const handleSupplierSelect = async (index) => {
     try {
       const service = useMockData ? mockPartsService : partsService;
-      const supplierDetails = await service.getSupplierDetails(supplier.id);
+      const supplierId = suppliers.data[index].id;
+      const supplierDetails = await service.getSupplierDetails(supplierId);
       setSelectedSupplier(supplierDetails);
     } catch (err) {
       console.error('Error fetching supplier details:', err);
@@ -669,47 +590,27 @@ const VehicleParts = () => {
       return <div>Brak danych inwentarza do wyświetlenia.</div>;
     }
     
-    const columns = [
-      { id: 'id', label: 'ID' },
-      { id: 'name', label: 'Nazwa' },
-      { id: 'catalogNumber', label: 'Numer katalogowy' },
-      { id: 'quantity', label: 'Ilość' },
-      { id: 'minLevel', label: 'Min. poziom' },
-      { id: 'price', label: 'Cena jedn.', format: (value) => `${value.toFixed(2)} zł` },
-      { id: 'supplier', label: 'Dostawca' },
-      { 
-        id: 'status', 
-        label: 'Status',
-        format: (value) => {
-          let label = '';
-          let status = '';
-          
-          switch(value) {
-            case 'available':
-              label = 'Dostępna';
-              status = 'available';
-              break;
-            case 'low':
-              label = 'Niski stan';
-              status = 'low';
-              break;
-            case 'ordered':
-              label = 'Zamówiona';
-              status = 'ordered';
-              break;
-            case 'out_of_stock':
-              label = 'Brak w magazynie';
-              status = 'out_of_stock';
-              break;
-            default:
-              label = value;
-              status = 'default';
-          }
-          
-          return <Badge status={status}>{label}</Badge>;
-        }
-      }
+    const headers = [
+      'ID', 'Nazwa', 'Numer katalogowy', 'Ilość', 'Min. poziom', 
+      'Cena jedn.', 'Dostawca', 'Status'
     ];
+    
+    const formattedData = parts.data.map(part => [
+      part.id,
+      part.name,
+      part.catalogNumber,
+      part.quantity,
+      part.minLevel,
+      `${part.price.toFixed(2)} zł`,
+      part.supplier,
+      <Badge status={part.status}>
+        {part.status === 'available' ? 'Dostępna' : 
+         part.status === 'low' ? 'Niski stan' : 
+         part.status === 'ordered' ? 'Zamówiona' : 
+         part.status === 'out_of_stock' ? 'Brak w magazynie' : 
+         part.status}
+      </Badge>
+    ]);
     
     return (
       <>
@@ -787,8 +688,8 @@ const VehicleParts = () => {
         </FilterContainer>
         
         <Table 
-          columns={columns}
-          data={parts.data}
+          headers={headers}
+          data={formattedData}
           onRowClick={handlePartSelect}
           emptyMessage="Brak części spełniających kryteria wyszukiwania."
         />
@@ -902,50 +803,27 @@ const VehicleParts = () => {
       return <div>Brak danych zamówień do wyświetlenia.</div>;
     }
     
-    const columns = [
-      { id: 'id', label: 'ID zamówienia' },
-      { id: 'date', label: 'Data zamówienia' },
-      { id: 'supplier', label: 'Dostawca' },
-      { id: 'itemCount', label: 'Liczba pozycji' },
-      { id: 'totalCost', label: 'Wartość', format: (value) => `${value.toFixed(2)} zł` },
-      { 
-        id: 'status', 
-        label: 'Status',
-        format: (value) => {
-          let label = '';
-          let status = '';
-          
-          switch(value) {
-            case 'pending':
-              label = 'Oczekujące';
-              status = 'pending';
-              break;
-            case 'processing':
-              label = 'W realizacji';
-              status = 'processing';
-              break;
-            case 'shipped':
-              label = 'Wysłane';
-              status = 'shipped';
-              break;
-            case 'delivered':
-              label = 'Dostarczone';
-              status = 'delivered';
-              break;
-            case 'cancelled':
-              label = 'Anulowane';
-              status = 'cancelled';
-              break;
-            default:
-              label = value;
-              status = 'default';
-          }
-          
-          return <Badge status={status}>{label}</Badge>;
-        }
-      },
-      { id: 'estimatedDelivery', label: 'Przewidywana dostawa' }
+    const headers = [
+      'ID zamówienia', 'Data zamówienia', 'Dostawca', 'Liczba pozycji', 
+      'Wartość', 'Status', 'Przewidywana dostawa'
     ];
+    
+    const formattedData = orders.data.map(order => [
+      order.id,
+      order.date,
+      order.supplier,
+      order.itemCount,
+      `${order.totalCost.toFixed(2)} zł`,
+      <Badge status={order.status}>
+        {order.status === 'pending' ? 'Oczekujące' : 
+         order.status === 'processing' ? 'W realizacji' : 
+         order.status === 'shipped' ? 'Wysłane' : 
+         order.status === 'delivered' ? 'Dostarczone' : 
+         order.status === 'cancelled' ? 'Anulowane' : 
+         order.status}
+      </Badge>,
+      order.estimatedDelivery
+    ]);
     
     return (
       <>
@@ -999,13 +877,13 @@ const VehicleParts = () => {
           
           <ButtonGroup>
             <Button onClick={handleSearch}>Szukaj</Button>
-            <Button primary>Nowe zamówienie</Button>
+            <Button onClick={handleExportCSV}>Eksport CSV</Button>
           </ButtonGroup>
         </FilterContainer>
         
         <Table 
-          columns={columns}
-          data={orders.data}
+          headers={headers}
+          data={formattedData}
           onRowClick={handleOrderSelect}
           emptyMessage="Brak zamówień spełniających kryteria wyszukiwania."
         />
@@ -1048,49 +926,33 @@ const VehicleParts = () => {
               <DetailValue>{selectedOrder.estimatedDelivery}</DetailValue>
             </DetailRow>
             
-            {selectedOrder.notes && (
-              <DetailRow>
-                <DetailLabel>Uwagi:</DetailLabel>
-                <DetailValue>{selectedOrder.notes}</DetailValue>
-              </DetailRow>
-            )}
+            <DetailRow>
+              <DetailLabel>Uwagi:</DetailLabel>
+              <DetailValue>{selectedOrder.notes || 'Brak uwag'}</DetailValue>
+            </DetailRow>
             
-            <DetailTitle style={{ marginTop: '20px' }}>Pozycje zamówienia</DetailTitle>
+            <SectionTitle style={{ marginTop: '24px' }}>Pozycje zamówienia</SectionTitle>
             
-            <OrderItemsTable>
-              <thead>
-                <tr>
-                  <th>ID części</th>
-                  <th>Nazwa</th>
-                  <th>Ilość</th>
-                  <th>Cena jedn.</th>
-                  <th>Wartość</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedOrder.items.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.partId}</td>
-                    <td>{item.name}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.unitPrice.toFixed(2)} zł</td>
-                    <td>{item.totalPrice.toFixed(2)} zł</td>
-                  </tr>
-                ))}
-              </tbody>
-            </OrderItemsTable>
+            <Table 
+              headers={['ID części', 'Nazwa', 'Ilość', 'Cena jedn.', 'Wartość']}
+              data={selectedOrder.items.map(item => [
+                item.partId,
+                item.name,
+                item.quantity,
+                `${item.unitPrice.toFixed(2)} zł`,
+                `${item.totalPrice.toFixed(2)} zł`
+              ])}
+              emptyMessage="Brak pozycji w zamówieniu."
+            />
             
-            <OrderSummary>
-              Wartość całkowita: <span style={{ marginLeft: '8px', fontWeight: 'bold' }}>{selectedOrder.totalCost.toFixed(2)} zł</span>
-            </OrderSummary>
+            <DetailRow style={{ marginTop: '16px', justifyContent: 'flex-end' }}>
+              <DetailLabel>Wartość całkowita:</DetailLabel>
+              <DetailValue style={{ fontWeight: '500' }}>{selectedOrder.totalCost.toFixed(2)} zł</DetailValue>
+            </DetailRow>
             
             <ButtonGroup style={{ marginTop: '16px' }}>
-              {selectedOrder.status === 'pending' && (
-                <>
-                  <Button>Edytuj</Button>
-                  <Button>Anuluj</Button>
-                </>
-              )}
+              <Button>Edytuj</Button>
+              <Button>Drukuj</Button>
               <Button onClick={() => setSelectedOrder(null)}>Zamknij</Button>
             </ButtonGroup>
           </DetailContainer>
@@ -1113,73 +975,58 @@ const VehicleParts = () => {
       return <div>Brak danych analizy zużycia do wyświetlenia.</div>;
     }
     
-    // Prepare data for most used parts chart
+    // Prepare chart data
     const mostUsedPartsData = {
       labels: usageAnalysis.mostUsedParts.map(part => part.name),
       datasets: [
         {
-          data: usageAnalysis.mostUsedParts.map(part => part.count),
+          data: usageAnalysis.mostUsedParts.map(part => part.percentage),
           backgroundColor: [
-            '#3f51b5',
-            '#2196f3',
-            '#03a9f4',
-            '#00bcd4',
-            '#009688'
+            '#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0',
+            '#00bcd4', '#ffeb3b', '#795548', '#607d8b', '#e91e63'
           ],
           borderWidth: 1
         }
       ]
     };
     
-    // Prepare data for cost by category chart
     const costByCategoryData = {
       labels: usageAnalysis.costByCategory.map(category => category.category),
       datasets: [
         {
-          data: usageAnalysis.costByCategory.map(category => category.cost),
+          data: usageAnalysis.costByCategory.map(category => category.percentage),
           backgroundColor: [
-            '#f44336',
-            '#e91e63',
-            '#9c27b0',
-            '#673ab7',
-            '#3f51b5',
-            '#2196f3',
-            '#03a9f4'
+            '#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0',
+            '#00bcd4', '#ffeb3b', '#795548', '#607d8b', '#e91e63'
           ],
           borderWidth: 1
         }
       ]
     };
     
-    // Prepare data for usage trends chart
     const usageTrendsData = {
       labels: usageAnalysis.usageTrends.map(trend => trend.month),
       datasets: [
         {
           label: 'Liczba użytych części',
           data: usageAnalysis.usageTrends.map(trend => trend.count),
-          borderColor: '#3f51b5',
-          backgroundColor: 'rgba(63, 81, 181, 0.1)',
-          tension: 0.4,
-          fill: true
+          borderColor: '#2196f3',
+          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
         }
       ]
     };
     
-    // Prepare data for parts by supplier chart
     const partsBySupplierData = {
       labels: usageAnalysis.partsBySupplier.map(supplier => supplier.supplier),
       datasets: [
         {
-          data: usageAnalysis.partsBySupplier.map(supplier => supplier.partCount),
+          data: usageAnalysis.partsBySupplier.map(supplier => supplier.percentage),
           backgroundColor: [
-            '#ff9800',
-            '#ff5722',
-            '#795548',
-            '#607d8b',
-            '#9e9e9e',
-            '#4caf50',
-            '#8bc34a'
+            '#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0',
+            '#00bcd4', '#ffeb3b', '#795548', '#607d8b', '#e91e63'
           ],
           borderWidth: 1
         }
@@ -1187,7 +1034,7 @@ const VehicleParts = () => {
     };
     
     // Chart options
-    const pieChartOptions = {
+    const pieOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -1200,19 +1047,15 @@ const VehicleParts = () => {
         },
         tooltip: {
           callbacks: {
-            label: (context) => {
-              const label = context.label || '';
-              const value = context.raw || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${label}: ${value} (${percentage}%)`;
+            label: function(context) {
+              return `${context.label}: ${context.raw}%`;
             }
           }
         }
       }
     };
     
-    const lineChartOptions = {
+    const lineOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -1222,15 +1065,7 @@ const VehicleParts = () => {
       },
       scales: {
         y: {
-          beginAtZero: true,
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        },
-        x: {
-          grid: {
-            display: false
-          }
+          beginAtZero: true
         }
       }
     };
@@ -1240,38 +1075,38 @@ const VehicleParts = () => {
         <GridSection>
           <Card title="Najczęściej używane części">
             <ChartContainer>
-              <Pie data={mostUsedPartsData} options={pieChartOptions} />
+              <Pie data={mostUsedPartsData} options={pieOptions} />
             </ChartContainer>
           </Card>
           
           <Card title="Koszty według kategorii">
             <ChartContainer>
-              <Pie data={costByCategoryData} options={pieChartOptions} />
-            </ChartContainer>
-          </Card>
-          
-          <Card title="Trendy zużycia części">
-            <ChartContainer>
-              <Line data={usageTrendsData} options={lineChartOptions} />
-            </ChartContainer>
-          </Card>
-          
-          <Card title="Części według dostawcy">
-            <ChartContainer>
-              <Pie data={partsBySupplierData} options={pieChartOptions} />
+              <Pie data={costByCategoryData} options={pieOptions} />
             </ChartContainer>
           </Card>
         </GridSection>
         
+        <Card title="Trendy zużycia części w czasie">
+          <ChartContainer>
+            <Line data={usageTrendsData} options={lineOptions} />
+          </ChartContainer>
+        </Card>
+        
+        <Card title="Podział części według dostawcy">
+          <ChartContainer>
+            <Pie data={partsBySupplierData} options={pieOptions} />
+          </ChartContainer>
+        </Card>
+        
         <Card title="Szczegółowe dane zużycia części">
           <Table 
-            columns={[
-              { id: 'name', label: 'Nazwa części' },
-              { id: 'count', label: 'Liczba użyć' },
-              { id: 'percentage', label: 'Udział procentowy', format: (value) => `${value}%` }
-            ]}
-            data={usageAnalysis.mostUsedParts}
-            emptyMessage="Brak danych o zużyciu części."
+            headers={['Nazwa części', 'Liczba użyć', 'Udział procentowy']}
+            data={usageAnalysis.mostUsedParts.map(part => [
+              part.name,
+              part.count,
+              `${part.percentage}%`
+            ])}
+            emptyMessage="Brak danych szczegółowych."
           />
         </Card>
       </>
@@ -1280,14 +1115,6 @@ const VehicleParts = () => {
   
   // Render compatibility tab content
   const renderCompatibilityTab = () => {
-    if (isLoading && vehicleModel) {
-      return <LoadingIndicator>Ładowanie danych kompatybilności...</LoadingIndicator>;
-    }
-    
-    if (error) {
-      return <ErrorMessage>{error}</ErrorMessage>;
-    }
-    
     return (
       <>
         <FilterContainer>
@@ -1315,7 +1142,11 @@ const VehicleParts = () => {
           </ButtonGroup>
         </FilterContainer>
         
-        {!vehicleModel ? (
+        {isLoading ? (
+          <LoadingIndicator>Ładowanie kompatybilnych części...</LoadingIndicator>
+        ) : error ? (
+          <ErrorMessage>{error}</ErrorMessage>
+        ) : !vehicleModel ? (
           <div>Wybierz model pojazdu, aby wyświetlić kompatybilne części.</div>
         ) : !compatibleParts ? (
           <div>Brak danych kompatybilności dla wybranego modelu.</div>
@@ -1323,46 +1154,21 @@ const VehicleParts = () => {
           <>
             <Card title={`Kompatybilne części dla ${vehicleModel}`}>
               <Table 
-                columns={[
-                  { id: 'id', label: 'ID' },
-                  { id: 'name', label: 'Nazwa' },
-                  { id: 'catalogNumber', label: 'Numer katalogowy' },
-                  { id: 'category', label: 'Kategoria' },
-                  { id: 'price', label: 'Cena', format: (value) => `${value.toFixed(2)} zł` },
-                  { 
-                    id: 'status', 
-                    label: 'Status',
-                    format: (value) => {
-                      let label = '';
-                      let status = '';
-                      
-                      switch(value) {
-                        case 'available':
-                          label = 'Dostępna';
-                          status = 'available';
-                          break;
-                        case 'low':
-                          label = 'Niski stan';
-                          status = 'low';
-                          break;
-                        case 'ordered':
-                          label = 'Zamówiona';
-                          status = 'ordered';
-                          break;
-                        case 'out_of_stock':
-                          label = 'Brak w magazynie';
-                          status = 'out_of_stock';
-                          break;
-                        default:
-                          label = value;
-                          status = 'default';
-                      }
-                      
-                      return <Badge status={status}>{label}</Badge>;
-                    }
-                  }
-                ]}
-                data={compatibleParts.parts}
+                headers={['ID', 'Nazwa', 'Numer katalogowy', 'Kategoria', 'Cena', 'Status']}
+                data={compatibleParts.parts.map(part => [
+                  part.id,
+                  part.name,
+                  part.catalogNumber,
+                  part.category,
+                  `${part.price.toFixed(2)} zł`,
+                  <Badge status={part.status}>
+                    {part.status === 'available' ? 'Dostępna' : 
+                     part.status === 'low' ? 'Niski stan' : 
+                     part.status === 'ordered' ? 'Zamówiona' : 
+                     part.status === 'out_of_stock' ? 'Brak w magazynie' : 
+                     part.status}
+                  </Badge>
+                ])}
                 emptyMessage={`Brak kompatybilnych części dla ${vehicleModel}.`}
               />
             </Card>
@@ -1370,48 +1176,23 @@ const VehicleParts = () => {
             {compatibleParts.alternativeParts && compatibleParts.alternativeParts.length > 0 && (
               <Card title="Części alternatywne" style={{ marginTop: '20px' }}>
                 <Table 
-                  columns={[
-                    { id: 'id', label: 'ID' },
-                    { id: 'name', label: 'Nazwa' },
-                    { id: 'catalogNumber', label: 'Numer katalogowy' },
-                    { id: 'category', label: 'Kategoria' },
-                    { id: 'compatibility', label: 'Kompatybilność', format: (value) => `${value}%` },
-                    { id: 'price', label: 'Cena', format: (value) => `${value.toFixed(2)} zł` },
-                    { 
-                      id: 'status', 
-                      label: 'Status',
-                      format: (value) => {
-                        let label = '';
-                        let status = '';
-                        
-                        switch(value) {
-                          case 'available':
-                            label = 'Dostępna';
-                            status = 'available';
-                            break;
-                          case 'low':
-                            label = 'Niski stan';
-                            status = 'low';
-                            break;
-                          case 'ordered':
-                            label = 'Zamówiona';
-                            status = 'ordered';
-                            break;
-                          case 'out_of_stock':
-                            label = 'Brak w magazynie';
-                            status = 'out_of_stock';
-                            break;
-                          default:
-                            label = value;
-                            status = 'default';
-                        }
-                        
-                        return <Badge status={status}>{label}</Badge>;
-                      }
-                    }
-                  ]}
-                  data={compatibleParts.alternativeParts}
-                  emptyMessage="Brak alternatywnych części."
+                  headers={['ID', 'Nazwa', 'Numer katalogowy', 'Kategoria', 'Kompatybilność', 'Cena', 'Status']}
+                  data={compatibleParts.alternativeParts.map(part => [
+                    part.id,
+                    part.name,
+                    part.catalogNumber,
+                    part.category,
+                    `${part.compatibility}%`,
+                    `${part.price.toFixed(2)} zł`,
+                    <Badge status={part.status}>
+                      {part.status === 'available' ? 'Dostępna' : 
+                       part.status === 'low' ? 'Niski stan' : 
+                       part.status === 'ordered' ? 'Zamówiona' : 
+                       part.status === 'out_of_stock' ? 'Brak w magazynie' : 
+                       part.status}
+                    </Badge>
+                  ])}
+                  emptyMessage="Brak części alternatywnych."
                 />
               </Card>
             )}
@@ -1439,7 +1220,7 @@ const VehicleParts = () => {
       <>
         <FilterContainer>
           <FilterGroup>
-            <FilterLabel htmlFor="supplierSearch">Wyszukaj</FilterLabel>
+            <FilterLabel htmlFor="supplierSearch">Wyszukaj dostawcę</FilterLabel>
             <FilterInput 
               type="text" 
               id="supplierSearch" 
@@ -1452,44 +1233,39 @@ const VehicleParts = () => {
           
           <ButtonGroup>
             <Button onClick={handleSearch}>Szukaj</Button>
-            <Button primary>Dodaj dostawcę</Button>
+            <Button>Dodaj dostawcę</Button>
           </ButtonGroup>
         </FilterContainer>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-          {suppliers.data.map(supplier => (
-            <SupplierCard key={supplier.id} onClick={() => handleSupplierSelect(supplier)}>
-              <SupplierHeader>
-                <SupplierName>{supplier.name}</SupplierName>
-                <SupplierRating>
-                  {supplier.rating} ★
-                </SupplierRating>
-              </SupplierHeader>
+        <GridSection>
+          {suppliers.data.map((supplier, index) => (
+            <SupplierCard key={supplier.id} onClick={() => handleSupplierSelect(index)}>
+              <SupplierName>{supplier.name}</SupplierName>
+              
+              <SupplierRating>
+                <span>{supplier.rating}</span> / 5.0
+              </SupplierRating>
               
               <SupplierInfo>
                 <SupplierContact>
-                  <span>Kontakt:</span>
-                  <span>{supplier.contactPerson}</span>
+                  <span>Kontakt:</span> {supplier.contactPerson}
                 </SupplierContact>
                 
                 <SupplierContact>
-                  <span>Email:</span>
-                  <span>{supplier.email}</span>
+                  <span>Email:</span> {supplier.email}
                 </SupplierContact>
                 
                 <SupplierContact>
-                  <span>Telefon:</span>
-                  <span>{supplier.phone}</span>
+                  <span>Telefon:</span> {supplier.phone}
                 </SupplierContact>
                 
                 <SupplierContact>
-                  <span>Liczba kategorii:</span>
-                  <span>{supplier.categoryCount}</span>
+                  <span>Liczba kategorii:</span> {supplier.categoryCount}
                 </SupplierContact>
               </SupplierInfo>
             </SupplierCard>
           ))}
-        </div>
+        </GridSection>
         
         {selectedSupplier && (
           <DetailContainer>
@@ -1538,109 +1314,102 @@ const VehicleParts = () => {
             
             <DetailRow>
               <DetailLabel>Ocena ogólna:</DetailLabel>
-              <DetailValue>{selectedSupplier.rating} / 5</DetailValue>
+              <DetailValue>{selectedSupplier.rating} / 5.0</DetailValue>
             </DetailRow>
             
-            <DetailTitle style={{ marginTop: '20px' }}>Ocena wydajności</DetailTitle>
+            <SectionTitle style={{ marginTop: '24px' }}>Oceny wydajności</SectionTitle>
             
             <PerformanceMetric>
               <MetricLabel>
-                <span>Terminowość</span>
-                <span>{selectedSupplier.performance.timeliness} / 5</span>
+                <span>Terminowość dostaw:</span>
+                <span>{selectedSupplier.performance.timeliness} / 5.0</span>
               </MetricLabel>
-              <ProgressBar>
-                <ProgressFill 
-                  percentage={(selectedSupplier.performance.timeliness / 5) * 100} 
-                  color="#4caf50"
-                />
-              </ProgressBar>
+              <div style={{ 
+                height: '8px', 
+                backgroundColor: '#e0e0e0', 
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}>
+                <div style={{ 
+                  width: `${(selectedSupplier.performance.timeliness / 5) * 100}%`, 
+                  height: '100%', 
+                  backgroundColor: '#2196f3',
+                  borderRadius: '4px'
+                }} />
+              </div>
             </PerformanceMetric>
             
             <PerformanceMetric>
               <MetricLabel>
-                <span>Jakość</span>
-                <span>{selectedSupplier.performance.quality} / 5</span>
+                <span>Jakość produktów:</span>
+                <span>{selectedSupplier.performance.quality} / 5.0</span>
               </MetricLabel>
-              <ProgressBar>
-                <ProgressFill 
-                  percentage={(selectedSupplier.performance.quality / 5) * 100} 
-                  color="#2196f3"
-                />
-              </ProgressBar>
+              <div style={{ 
+                height: '8px', 
+                backgroundColor: '#e0e0e0', 
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}>
+                <div style={{ 
+                  width: `${(selectedSupplier.performance.quality / 5) * 100}%`, 
+                  height: '100%', 
+                  backgroundColor: '#4caf50',
+                  borderRadius: '4px'
+                }} />
+              </div>
             </PerformanceMetric>
             
             <PerformanceMetric>
               <MetricLabel>
-                <span>Ceny</span>
-                <span>{selectedSupplier.performance.pricing} / 5</span>
+                <span>Konkurencyjność cenowa:</span>
+                <span>{selectedSupplier.performance.pricing} / 5.0</span>
               </MetricLabel>
-              <ProgressBar>
-                <ProgressFill 
-                  percentage={(selectedSupplier.performance.pricing / 5) * 100} 
-                  color="#ff9800"
-                />
-              </ProgressBar>
+              <div style={{ 
+                height: '8px', 
+                backgroundColor: '#e0e0e0', 
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}>
+                <div style={{ 
+                  width: `${(selectedSupplier.performance.pricing / 5) * 100}%`, 
+                  height: '100%', 
+                  backgroundColor: '#ff9800',
+                  borderRadius: '4px'
+                }} />
+              </div>
             </PerformanceMetric>
+            
+            <SectionTitle style={{ marginTop: '24px' }}>Historia zamówień</SectionTitle>
+            
+            <Table 
+              headers={['Data', 'ID zamówienia', 'Liczba pozycji', 'Wartość', 'Status']}
+              data={selectedSupplier.orderHistory.map(order => [
+                order.date,
+                order.orderId,
+                order.itemCount,
+                `${order.totalCost.toFixed(2)} zł`,
+                <Badge status={order.status}>
+                  {order.status === 'pending' ? 'Oczekujące' : 
+                   order.status === 'processing' ? 'W realizacji' : 
+                   order.status === 'shipped' ? 'Wysłane' : 
+                   order.status === 'delivered' ? 'Dostarczone' : 
+                   order.status === 'cancelled' ? 'Anulowane' : 
+                   order.status}
+                </Badge>
+              ])}
+              emptyMessage="Brak historii zamówień."
+            />
             
             {selectedSupplier.notes && (
-              <DetailRow>
+              <DetailRow style={{ marginTop: '16px' }}>
                 <DetailLabel>Uwagi:</DetailLabel>
                 <DetailValue>{selectedSupplier.notes}</DetailValue>
               </DetailRow>
             )}
             
-            <DetailTitle style={{ marginTop: '20px' }}>Historia zamówień</DetailTitle>
-            
-            <Table 
-              columns={[
-                { id: 'date', label: 'Data' },
-                { id: 'orderId', label: 'ID zamówienia' },
-                { id: 'itemCount', label: 'Liczba pozycji' },
-                { id: 'totalCost', label: 'Wartość', format: (value) => `${value.toFixed(2)} zł` },
-                { 
-                  id: 'status', 
-                  label: 'Status',
-                  format: (value) => {
-                    let label = '';
-                    let status = '';
-                    
-                    switch(value) {
-                      case 'pending':
-                        label = 'Oczekujące';
-                        status = 'pending';
-                        break;
-                      case 'processing':
-                        label = 'W realizacji';
-                        status = 'processing';
-                        break;
-                      case 'shipped':
-                        label = 'Wysłane';
-                        status = 'shipped';
-                        break;
-                      case 'delivered':
-                        label = 'Dostarczone';
-                        status = 'delivered';
-                        break;
-                      case 'cancelled':
-                        label = 'Anulowane';
-                        status = 'cancelled';
-                        break;
-                      default:
-                        label = value;
-                        status = 'default';
-                    }
-                    
-                    return <Badge status={status}>{label}</Badge>;
-                  }
-                }
-              ]}
-              data={selectedSupplier.orderHistory}
-              emptyMessage="Brak historii zamówień."
-            />
-            
             <ButtonGroup style={{ marginTop: '16px' }}>
-              <Button primary>Nowe zamówienie</Button>
               <Button>Edytuj</Button>
+              <Button>Nowe zamówienie</Button>
               <Button onClick={() => setSelectedSupplier(null)}>Zamknij</Button>
             </ButtonGroup>
           </DetailContainer>
@@ -1651,16 +1420,13 @@ const VehicleParts = () => {
   
   return (
     <PageContainer>
-      <DataSourceToggle>
-        <ToggleLabel>
-          API
-          <ToggleSwitch 
-            checked={useMockData} 
-            onClick={handleToggleDataSource}
-          />
-          Mock
-        </ToggleLabel>
-      </DataSourceToggle>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <SectionTitle>Zarządzanie częściami</SectionTitle>
+        
+        <Button onClick={handleToggleDataSource}>
+          {useMockData ? 'Używam danych mockowych' : 'Używam danych API'}
+        </Button>
+      </div>
       
       <TabsContainer>
         <Tab 
@@ -1669,24 +1435,28 @@ const VehicleParts = () => {
         >
           Inwentarz części
         </Tab>
+        
         <Tab 
           active={activeTab === 'orders'} 
           onClick={() => setActiveTab('orders')}
         >
           Zarządzanie zamówieniami
         </Tab>
+        
         <Tab 
           active={activeTab === 'usage'} 
           onClick={() => setActiveTab('usage')}
         >
           Analiza zużycia
         </Tab>
+        
         <Tab 
           active={activeTab === 'compatibility'} 
           onClick={() => setActiveTab('compatibility')}
         >
           Kompatybilne części
         </Tab>
+        
         <Tab 
           active={activeTab === 'suppliers'} 
           onClick={() => setActiveTab('suppliers')}

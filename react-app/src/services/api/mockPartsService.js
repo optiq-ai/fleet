@@ -1236,6 +1236,145 @@ class MockPartsService {
             status: 'delivered'
           }
         ]
+      },
+      'SUP-003': {
+        id: 'SUP-003',
+        name: 'Valeo',
+        contactPerson: 'Pierre Dupont',
+        email: 'p.dupont@valeo.com',
+        phone: '+33 123 456 789',
+        address: '43 Rue Bayen, 75017 Paris, Francja',
+        categories: ['Sprzęgła', 'Alternatory', 'Rozruszniki', 'Wycieraczki'],
+        rating: 4.2,
+        performance: {
+          timeliness: 4.0,
+          quality: 4.5,
+          pricing: 4.1
+        },
+        notes: 'Dobry dostawca części do układu napędowego.',
+        orderHistory: [
+          {
+            date: '2025-03-15',
+            orderId: 'ORD-003',
+            itemCount: 1,
+            totalCost: 6400.00,
+            status: 'shipped'
+          },
+          {
+            date: '2025-01-20',
+            orderId: 'ORD-015',
+            itemCount: 2,
+            totalCost: 9200.00,
+            status: 'delivered'
+          }
+        ]
+      },
+      'SUP-004': {
+        id: 'SUP-004',
+        name: 'Sachs',
+        contactPerson: 'Thomas Müller',
+        email: 't.muller@sachs.com',
+        phone: '+49 345 678 901',
+        address: 'Sachsstraße 62, 97424 Schweinfurt, Niemcy',
+        categories: ['Amortyzatory', 'Zawieszenie'],
+        rating: 4.4,
+        performance: {
+          timeliness: 4.3,
+          quality: 4.6,
+          pricing: 4.3
+        },
+        notes: 'Specjalista w zakresie układów zawieszenia.',
+        orderHistory: [
+          {
+            date: '2025-03-10',
+            orderId: 'ORD-004',
+            itemCount: 2,
+            totalCost: 7150.00,
+            status: 'delivered'
+          }
+        ]
+      },
+      'SUP-005': {
+        id: 'SUP-005',
+        name: 'Continental',
+        contactPerson: 'Markus Bauer',
+        email: 'm.bauer@continental.com',
+        phone: '+49 456 789 012',
+        address: 'Vahrenwalder Straße 9, 30165 Hannover, Niemcy',
+        categories: ['Opony', 'Paski napędowe', 'Elektronika'],
+        rating: 4.6,
+        performance: {
+          timeliness: 4.5,
+          quality: 4.8,
+          pricing: 4.4
+        },
+        notes: 'Niezawodny dostawca części do układu napędowego.',
+        orderHistory: [
+          {
+            date: '2025-03-01',
+            orderId: 'ORD-006',
+            itemCount: 1,
+            totalCost: 1200.00,
+            status: 'cancelled'
+          },
+          {
+            date: '2025-02-10',
+            orderId: 'ORD-011',
+            itemCount: 3,
+            totalCost: 5600.00,
+            status: 'delivered'
+          }
+        ]
+      },
+      'SUP-006': {
+        id: 'SUP-006',
+        name: 'Varta',
+        contactPerson: 'Stefan Krause',
+        email: 's.krause@varta.com',
+        phone: '+49 567 890 123',
+        address: 'Am Leineufer 51, 30419 Hannover, Niemcy',
+        categories: ['Akumulatory'],
+        rating: 4.3,
+        performance: {
+          timeliness: 4.2,
+          quality: 4.5,
+          pricing: 4.1
+        },
+        notes: 'Specjalista w zakresie akumulatorów do pojazdów ciężarowych.',
+        orderHistory: [
+          {
+            date: '2025-03-05',
+            orderId: 'ORD-005',
+            itemCount: 1,
+            totalCost: 7500.00,
+            status: 'delivered'
+          }
+        ]
+      },
+      'SUP-007': {
+        id: 'SUP-007',
+        name: 'Brembo',
+        contactPerson: 'Marco Rossi',
+        email: 'm.rossi@brembo.com',
+        phone: '+39 123 456 789',
+        address: 'Via Brembo 25, 24035 Curno, Włochy',
+        categories: ['Hamulce'],
+        rating: 4.7,
+        performance: {
+          timeliness: 4.5,
+          quality: 4.9,
+          pricing: 4.6
+        },
+        notes: 'Wysokiej jakości systemy hamulcowe.',
+        orderHistory: [
+          {
+            date: '2025-02-20',
+            orderId: 'ORD-008',
+            itemCount: 2,
+            totalCost: 12000.00,
+            status: 'delivered'
+          }
+        ]
       }
     };
     
