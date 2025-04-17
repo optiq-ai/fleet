@@ -327,14 +327,6 @@ const Monitoring = () => {
   const [vehicleMapData, setVehicleMapData] = useState([]);
   const [isLoadingVehicleMap, setIsLoadingVehicleMap] = useState(true);
   
-  // State for map tooltip
-  const [tooltip, setTooltip] = useState({
-    visible: false,
-    content: '',
-    x: 0,
-    y: 0
-  });
-  
   // State for active tab
   const [activeTab, setActiveTab] = useState('vehicles');
   
@@ -475,6 +467,29 @@ const Monitoring = () => {
     }, { active: 0, maintenance: 0, inactive: 0 });
   };
   
+  // Format location for display
+  const formatLocation = (location) => {
+    if (!location) return "Brak danych";
+    
+    // If location is an object with lat/lng properties
+    if (location.lat !== undefined && location.lng !== undefined) {
+      return `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`;
+    }
+    
+    // If location is a string
+    if (typeof location === 'string') {
+      return location;
+    }
+    
+    // If location has city and street properties
+    if (location.city && location.street) {
+      return `${location.city}, ${location.street}`;
+    }
+    
+    // Fallback
+    return JSON.stringify(location);
+  };
+  
   // Render KPI section
   const renderKPISection = () => {
     if (!kpiData) return null;
@@ -609,7 +624,7 @@ const Monitoring = () => {
                   vehicle.id,
                   vehicle.status,
                   vehicle.driver,
-                  `${vehicle.location.city}, ${vehicle.location.street}`,
+                  formatLocation(vehicle.location),
                   vehicle.lastUpdate
                 ])}
                 onRowClick={(index) => handleVehicleSelect(vehicles[index].id)}
@@ -741,10 +756,7 @@ const Monitoring = () => {
         <DetailRow>
           <DetailLabel>Lokalizacja:</DetailLabel>
           <DetailValue>
-            {isMapVehicle 
-              ? selectedVehicle.location 
-              : `${selectedVehicle.location.city}, ${selectedVehicle.location.street}`
-            }
+            {formatLocation(selectedVehicle.location)}
           </DetailValue>
         </DetailRow>
         <DetailRow>
