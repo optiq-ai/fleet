@@ -1,5 +1,5 @@
 import React from 'react';
-import StatisticsDashboard from '../../components/statistics/StatisticsDashboard/StatisticsDashboard';
+import { StatisticsDashboard } from '../../components/statistics/StatisticsDashboard/StatisticsDashboard';
 import './Statistics.css';
 
 /**
