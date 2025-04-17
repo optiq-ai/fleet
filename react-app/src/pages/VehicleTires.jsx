@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Pie, Bar, Line } from 'react-chartjs-2';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
 import tiresService from '../services/api/tiresService';
 import mockTiresService from '../services/api/mockTiresService';
+import mockTireAnalytics from '../services/api/mockTiresAnalyticsService';
+
+// Register ChartJS components
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 /**
  * @typedef {Object} Tire
@@ -185,6 +201,7 @@ const ChartContainer = styled.div`
   border-radius: 8px;
   padding: 16px;
   margin-top: 16px;
+  position: relative;
 `;
 
 const Badge = styled.span`
@@ -351,6 +368,100 @@ const ToggleSwitch = styled.label`
   input:checked + span:before {
     transform: translateX(30px);
   }
+`;
+
+// New styled component for recommendations list
+const RecommendationsList = styled.div`
+  height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+  }
+`;
+
+const RecommendationItem = styled.div`
+  padding: 12px;
+  margin-bottom: 10px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid ${props => {
+    switch(props.priority) {
+      case 'high': return '#f44336';
+      case 'medium': return '#ff9800';
+      case 'low': return '#4caf50';
+      default: return '#9e9e9e';
+    }
+  }};
+`;
+
+const RecommendationTitle = styled.h4`
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+`;
+
+const RecommendationDescription = styled.p`
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: #666;
+`;
+
+const RecommendationMetrics = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+`;
+
+const RecommendationMetric = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  span:first-child {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  span:last-child {
+    font-size: 11px;
+  }
+`;
+
+const PriorityBadge = styled.span`
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  color: white;
+  background-color: ${props => {
+    switch(props.priority) {
+      case 'high': return '#f44336';
+      case 'medium': return '#ff9800';
+      case 'low': return '#4caf50';
+      default: return '#9e9e9e';
+    }
+  }};
 `;
 
 /**
@@ -610,7 +721,7 @@ const VehicleTires = () => {
         )
       },
       { id: 'manufactureDate', label: 'Data produkcji' },
-      { id: 'mileage', label: 'Przebieg', format: (value) => `${value} km` },
+      { id: 'mileage', label: 'Przebieg (km)' },
       { 
         id: 'status', 
         label: 'Status',
@@ -638,9 +749,7 @@ const VehicleTires = () => {
           
           return <Badge status={status}>{label}</Badge>;
         }
-      },
-      { id: 'vehicleId', label: 'Pojazd' },
-      { id: 'position', label: 'Pozycja' }
+      }
     ];
     
     return (
@@ -655,12 +764,11 @@ const VehicleTires = () => {
               onChange={handleFilterChange}
             >
               <option value="all">Wszystkie</option>
-              <option value="michelin">Michelin</option>
-              <option value="continental">Continental</option>
-              <option value="bridgestone">Bridgestone</option>
-              <option value="goodyear">Goodyear</option>
-              <option value="pirelli">Pirelli</option>
-              <option value="other">Inne</option>
+              <option value="Michelin">Michelin</option>
+              <option value="Continental">Continental</option>
+              <option value="Bridgestone">Bridgestone</option>
+              <option value="Goodyear">Goodyear</option>
+              <option value="Pirelli">Pirelli</option>
             </FilterSelect>
           </FilterGroup>
           
@@ -713,21 +821,19 @@ const VehicleTires = () => {
           
           <FilterGroup>
             <FilterLabel htmlFor="search">Wyszukaj</FilterLabel>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <FilterInput 
-                id="search" 
-                name="search" 
-                value={filters.search} 
-                onChange={handleFilterChange}
-                placeholder="ID, marka, model..."
-              />
-              <Button onClick={handleSearch}>Szukaj</Button>
-            </div>
+            <FilterInput 
+              type="text" 
+              id="search" 
+              name="search" 
+              value={filters.search} 
+              onChange={handleFilterChange} 
+              placeholder="ID, model..."
+            />
           </FilterGroup>
           
           <ButtonGroup>
+            <Button onClick={handleSearch}>Szukaj</Button>
             <Button onClick={handleExportCSV}>Eksport CSV</Button>
-            <Button onClick={handleExportPDF}>Eksport PDF</Button>
           </ButtonGroup>
         </FilterContainer>
         
@@ -742,7 +848,7 @@ const VehicleTires = () => {
         
         {selectedTire && (
           <DetailContainer>
-            <DetailTitle>Szczegóły opony {selectedTire.brand} {selectedTire.model}</DetailTitle>
+            <DetailTitle>Szczegóły opony {selectedTire.id}</DetailTitle>
             
             <DetailRow>
               <DetailLabel>ID:</DetailLabel>
@@ -750,8 +856,13 @@ const VehicleTires = () => {
             </DetailRow>
             
             <DetailRow>
-              <DetailLabel>Marka i model:</DetailLabel>
-              <DetailValue>{selectedTire.brand} {selectedTire.model}</DetailValue>
+              <DetailLabel>Marka:</DetailLabel>
+              <DetailValue>{selectedTire.brand}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Model:</DetailLabel>
+              <DetailValue>{selectedTire.model}</DetailValue>
             </DetailRow>
             
             <DetailRow>
@@ -1040,6 +1151,7 @@ const VehicleTires = () => {
       { id: 'vehicleName', label: 'Nazwa Pojazdu' },
       { id: 'lastRotationDate', label: 'Ostatnia rotacja' },
       { id: 'nextRotationDate', label: 'Następna rotacja' },
+      { id: 'mileageSinceRotation', label: 'Przebieg od rotacji (km)' },
       { 
         id: 'status', 
         label: 'Status',
@@ -1067,8 +1179,7 @@ const VehicleTires = () => {
           
           return <Badge status={status}>{label}</Badge>;
         }
-      },
-      { id: 'mileageSinceRotation', label: 'Przebieg od rotacji', format: (value) => `${value} km` }
+      }
     ];
     
     return (
@@ -1100,8 +1211,8 @@ const VehicleTires = () => {
         
         <Table 
           headers={columns.map(col => col.label)}
-          data={rotationSchedules.data.map(schedule => columns.map(col => {
-            const value = schedule[col.id];
+          data={rotationSchedules.data.map(rotation => columns.map(col => {
+            const value = rotation[col.id];
             return col.format && typeof col.format === 'function' ? col.format(value) : value;
           }))}
           onRowClick={(rowIndex) => handleRotationSelect(rotationSchedules.data[rowIndex])}
@@ -1132,6 +1243,11 @@ const VehicleTires = () => {
             </DetailRow>
             
             <DetailRow>
+              <DetailLabel>Przebieg od rotacji:</DetailLabel>
+              <DetailValue>{selectedRotation.mileageSinceRotation} km</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
               <DetailLabel>Status:</DetailLabel>
               <DetailValue>
                 <Badge status={selectedRotation.status}>
@@ -1142,19 +1258,14 @@ const VehicleTires = () => {
               </DetailValue>
             </DetailRow>
             
-            <DetailRow>
-              <DetailLabel>Przebieg od rotacji:</DetailLabel>
-              <DetailValue>{selectedRotation.mileageSinceRotation} km</DetailValue>
-            </DetailRow>
-            
             <DetailTitle style={{ marginTop: '20px' }}>Historia rotacji</DetailTitle>
             
             {selectedRotation.history && selectedRotation.history.length > 0 ? (
               selectedRotation.history.map((item, index) => (
                 <div key={index} style={{ marginBottom: '12px', padding: '8px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}>
                   <div><strong>Data:</strong> {item.date}</div>
-                  <div><strong>Wykonawca:</strong> {item.technician}</div>
-                  <div><strong>Schemat rotacji:</strong> {item.pattern}</div>
+                  <div><strong>Technik:</strong> {item.technician}</div>
+                  <div><strong>Wzór rotacji:</strong> {item.pattern}</div>
                   <div><strong>Notatki:</strong> {item.notes}</div>
                 </div>
               ))
@@ -1172,7 +1283,7 @@ const VehicleTires = () => {
     );
   };
   
-  // Render seasonal tab content
+  // Render seasonal change tab content
   const renderSeasonalTab = () => {
     if (isLoading) {
       return <LoadingIndicator>Ładowanie danych wymiany sezonowej...</LoadingIndicator>;
@@ -1359,6 +1470,132 @@ const VehicleTires = () => {
       return <div>Brak danych analityki opon do wyświetlenia.</div>;
     }
     
+    // Prepare chart data for tire lifespan by brand
+    const lifespanData = {
+      labels: mockTireAnalytics.lifespanByBrand.map(item => item.brand),
+      datasets: [
+        {
+          label: 'Średnia żywotność (km)',
+          data: mockTireAnalytics.lifespanByBrand.map(item => item.lifespan),
+          backgroundColor: mockTireAnalytics.lifespanByBrand.map(item => item.color),
+          borderColor: mockTireAnalytics.lifespanByBrand.map(item => item.color),
+          borderWidth: 1
+        }
+      ]
+    };
+    
+    // Prepare chart data for tire costs
+    const costData = {
+      labels: mockTireAnalytics.costAnalysis.costBreakdown.map(item => item.category),
+      datasets: [
+        {
+          label: 'Koszty',
+          data: mockTireAnalytics.costAnalysis.costBreakdown.map(item => item.percentage),
+          backgroundColor: mockTireAnalytics.costAnalysis.costBreakdown.map(item => item.color),
+          borderWidth: 1
+        }
+      ]
+    };
+    
+    // Prepare chart data for fuel efficiency
+    const fuelEfficiencyData = {
+      labels: mockTireAnalytics.fuelEfficiency.savingsOverTime.map(item => `${item.month} ${item.year}`),
+      datasets: [
+        {
+          label: 'Opony premium',
+          data: mockTireAnalytics.fuelEfficiency.savingsOverTime.map(item => item.premium),
+          borderColor: '#4caf50',
+          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: 'Opony standardowe',
+          data: mockTireAnalytics.fuelEfficiency.savingsOverTime.map(item => item.standard),
+          borderColor: '#f44336',
+          backgroundColor: 'rgba(244, 67, 54, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    };
+    
+    // Chart options
+    const barOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `${context.label}: ${context.raw.toLocaleString()} km`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Żywotność (km)'
+          }
+        }
+      }
+    };
+    
+    const pieOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 15,
+            padding: 15
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `${context.label}: ${context.raw}%`;
+            }
+          }
+        }
+      }
+    };
+    
+    const lineOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `${context.dataset.label}: ${context.raw.toLocaleString()} l`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          title: {
+            display: true,
+            text: 'Zużycie paliwa (l)'
+          }
+        }
+      }
+    };
+    
     return (
       <>
         <ButtonGroup style={{ marginBottom: '20px' }}>
@@ -1369,19 +1606,13 @@ const VehicleTires = () => {
         <GridSection>
           <Card title="Średnia żywotność opon według marki">
             <ChartContainer>
-              {/* Placeholder for chart */}
-              <div style={{ textAlign: 'center', paddingTop: '120px' }}>
-                Wykres średniej żywotności opon według marki
-              </div>
+              <Bar data={lifespanData} options={barOptions} />
             </ChartContainer>
           </Card>
           
           <Card title="Koszty związane z oponami">
             <ChartContainer>
-              {/* Placeholder for chart */}
-              <div style={{ textAlign: 'center', paddingTop: '120px' }}>
-                Wykres kosztów związanych z oponami
-              </div>
+              <Pie data={costData} options={pieOptions} />
             </ChartContainer>
           </Card>
         </GridSection>
@@ -1389,32 +1620,41 @@ const VehicleTires = () => {
         <GridSection>
           <Card title="Wpływ opon na zużycie paliwa">
             <ChartContainer>
-              {/* Placeholder for chart */}
-              <div style={{ textAlign: 'center', paddingTop: '120px' }}>
-                Wykres wpływu opon na zużycie paliwa
-              </div>
+              <Line data={fuelEfficiencyData} options={lineOptions} />
             </ChartContainer>
           </Card>
           
           <Card title="Rekomendacje opon">
-            <div style={{ padding: '16px' }}>
-              <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>Top 5 rekomendowanych opon</h3>
-              
-              {analytics.recommendations && analytics.recommendations.length > 0 ? (
-                <div>
-                  {analytics.recommendations.map((item, index) => (
-                    <div key={index} style={{ marginBottom: '12px', padding: '8px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}>
-                      <div><strong>{item.brand} {item.model}</strong> - {item.size}</div>
-                      <div>Ocena: {item.rating}/5</div>
-                      <div>Średnia żywotność: {item.averageLifespan} km</div>
-                      <div>Wpływ na zużycie paliwa: {item.fuelEfficiencyImpact}%</div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div>Brak rekomendacji</div>
-              )}
-            </div>
+            <RecommendationsList>
+              {mockTireAnalytics.recommendations.map(rec => (
+                <RecommendationItem key={rec.id} priority={rec.priority}>
+                  <RecommendationTitle>{rec.title}</RecommendationTitle>
+                  <RecommendationDescription>{rec.description}</RecommendationDescription>
+                  <RecommendationMetrics>
+                    <RecommendationMetric>
+                      <span>{rec.potentialSavings.toLocaleString()} zł</span>
+                      <span>Potencjalne oszczędności</span>
+                    </RecommendationMetric>
+                    <RecommendationMetric>
+                      <span>{rec.implementationCost.toLocaleString()} zł</span>
+                      <span>Koszt wdrożenia</span>
+                    </RecommendationMetric>
+                    <RecommendationMetric>
+                      <span>{typeof rec.roi === 'string' ? rec.roi : rec.roi.toFixed(1)}</span>
+                      <span>ROI</span>
+                    </RecommendationMetric>
+                    <RecommendationMetric>
+                      <PriorityBadge priority={rec.priority}>
+                        {rec.priority === 'high' ? 'Wysoki' : 
+                         rec.priority === 'medium' ? 'Średni' : 
+                         rec.priority === 'low' ? 'Niski' : rec.priority}
+                      </PriorityBadge>
+                      <span>Priorytet</span>
+                    </RecommendationMetric>
+                  </RecommendationMetrics>
+                </RecommendationItem>
+              ))}
+            </RecommendationsList>
           </Card>
         </GridSection>
       </>
@@ -1423,20 +1663,22 @@ const VehicleTires = () => {
   
   return (
     <PageContainer>
-      <SectionTitle>Zarządzanie oponami</SectionTitle>
-      
-      <DataSourceToggle>
-        <ToggleLabel>Użyj API</ToggleLabel>
-        <ToggleSwitch>
-          <input 
-            type="checkbox" 
-            checked={useMockData} 
-            onChange={handleToggleDataSource}
-          />
-          <span />
-        </ToggleSwitch>
-        <ToggleLabel>Użyj danych testowych</ToggleLabel>
-      </DataSourceToggle>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <SectionTitle>Zarządzanie oponami</SectionTitle>
+        
+        <DataSourceToggle>
+          <ToggleLabel>API</ToggleLabel>
+          <ToggleSwitch>
+            <input 
+              type="checkbox" 
+              checked={useMockData} 
+              onChange={handleToggleDataSource}
+            />
+            <span></span>
+          </ToggleSwitch>
+          <ToggleLabel>Mock</ToggleLabel>
+        </DataSourceToggle>
+      </div>
       
       <TabsContainer>
         <Tab 
@@ -1445,24 +1687,28 @@ const VehicleTires = () => {
         >
           Inwentarz opon
         </Tab>
+        
         <Tab 
           active={activeTab === 'condition'} 
           onClick={() => setActiveTab('condition')}
         >
-          Monitorowanie stanu
+          Stan opon
         </Tab>
+        
         <Tab 
           active={activeTab === 'rotation'} 
           onClick={() => setActiveTab('rotation')}
         >
           Harmonogram rotacji
         </Tab>
+        
         <Tab 
           active={activeTab === 'seasonal'} 
           onClick={() => setActiveTab('seasonal')}
         >
           Wymiana sezonowa
         </Tab>
+        
         <Tab 
           active={activeTab === 'analytics'} 
           onClick={() => setActiveTab('analytics')}
