@@ -1,0 +1,32 @@
+.statistics-page {
+  padding: 20px;
+}
+
+.statistics-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.statistics-description {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+  max-width: 800px;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .statistics-page {
+    padding: 15px;
+  }
+  
+  .statistics-title {
+    font-size: 20px;
+  }
+  
+  .statistics-description {
+    font-size: 14px;
+  }
+}

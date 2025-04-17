@@ -1,0 +1,74 @@
+.statistics-chart {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 300px;
+  position: relative;
+}
+
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+}
+
+.chart-info {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.chart-type {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.chart-data {
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.chart-data ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 5px 0;
+}
+
+.chart-data li {
+  padding: 3px 0;
+}
+
+.chart-axes {
+  color: #666;
+}
+
+.chart-message {
+  color: #999;
+  font-style: italic;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Styles for different chart types */
+.chart-type-line .chart-placeholder {
+  background-color: rgba(33, 150, 243, 0.05);
+}
+
+.chart-type-bar .chart-placeholder {
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+.chart-type-pie .chart-placeholder {
+  background-color: rgba(156, 39, 176, 0.05);
+}
+
+.chart-type-multiLine .chart-placeholder {
+  background-color: rgba(255, 152, 0, 0.05);
+}

@@ -1,0 +1,142 @@
+.statistics-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.statistics-table th,
+.statistics-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.statistics-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  position: sticky;
+  top: 0;
+}
+
+.statistics-table tr:last-child td {
+  border-bottom: none;
+}
+
+.statistics-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.statistics-table .sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.statistics-table .sortable:hover {
+  background-color: #e0e0e0;
+}
+
+.statistics-table .sort-icon {
+  margin-left: 5px;
+  display: inline-block;
+}
+
+.statistics-table .status-cell {
+  display: flex;
+  align-items: center;
+}
+
+.statistics-table .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.statistics-table .status-good {
+  background-color: #4CAF50;
+}
+
+.statistics-table .status-warning {
+  background-color: #FFC107;
+}
+
+.statistics-table .status-critical {
+  background-color: #F44336;
+}
+
+.statistics-table .status-neutral {
+  background-color: #9E9E9E;
+}
+
+.statistics-table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.statistics-table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+}
+
+.pagination-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin: 0 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pagination-button:hover {
+  background-color: #e0e0e0;
+}
+
+.pagination-button:disabled {
+  background-color: #f5f5f5;
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+.pagination-current {
+  padding: 0 8px;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .statistics-table-container {
+    overflow-x: auto;
+  }
+  
+  .statistics-table th,
+  .statistics-table td {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .statistics-table-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .pagination-info {
+    margin-bottom: 8px;
+  }
+}

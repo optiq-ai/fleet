@@ -1,0 +1,76 @@
+.statistics-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.card-title {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: baseline;
+}
+
+.card-unit {
+  font-size: 14px;
+  color: #666;
+  margin-left: 4px;
+}
+
+.card-trend {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.trend-icon {
+  margin-right: 4px;
+  font-weight: bold;
+}
+
+.trend-positive {
+  color: #4CAF50;
+}
+
+.trend-negative {
+  color: #F44336;
+}
+
+.trend-neutral {
+  color: #9E9E9E;
+}
+
+.trend-up {
+  color: inherit;
+}
+
+.trend-down {
+  color: inherit;
+}
+
+.status-good {
+  border-left: 4px solid #4CAF50;
+}
+
+.status-warning {
+  border-left: 4px solid #FFC107;
+}
+
+.status-critical {
+  border-left: 4px solid #F44336;
+}
+
+.status-neutral {
+  border-left: 4px solid #9E9E9E;
+}

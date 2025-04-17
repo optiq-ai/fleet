@@ -1,0 +1,70 @@
+.statistics-export {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.export-label {
+  margin-right: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.export-buttons {
+  display: flex;
+}
+
+.export-button {
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.export-button:not(:last-child) {
+  margin-right: 8px;
+}
+
+.export-button:hover {
+  background-color: #e0e0e0;
+}
+
+.export-icon {
+  margin-right: 6px;
+}
+
+.export-csv {
+  color: #4CAF50;
+}
+
+.export-pdf {
+  color: #F44336;
+}
+
+.export-excel {
+  color: #2196F3;
+}
+
+@media (max-width: 768px) {
+  .statistics-export {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .export-label {
+    margin-bottom: 8px;
+  }
+  
+  .export-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .export-button {
+    margin-bottom: 8px;
+  }
+}

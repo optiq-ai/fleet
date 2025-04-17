@@ -20,6 +20,114 @@ Projekt składa się z trzech głównych komponentów:
 
 ## Komponenty aplikacji
 
+### Statistics
+
+Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących floty pojazdów, zużycia paliwa, kosztów operacyjnych i wydajności kierowców. Komponenty te umożliwiają analizę trendów czasowych, porównywanie wydajności różnych elementów floty oraz generowanie raportów i eksportowanie danych.
+
+#### Komponenty:
+- **StatisticsDashboard** - główny dashboard z kluczowymi wskaźnikami wydajności (KPI) i wykresami trendów dla najważniejszych metryk
+- **TrendAnalysis** - zaawansowana analiza trendów czasowych dla różnych metryk z możliwością nakładania wielu metryk na jeden wykres
+- **ComparativeAnalysis** - porównywanie wydajności pojazdów, kierowców i tras pod względem różnych metryk
+- **StatisticsCard** - komponent prezentujący pojedynczy wskaźnik KPI z wartością, jednostką, trendem i statusem
+- **StatisticsChart** - komponent wyświetlający różne typy wykresów (liniowe, słupkowe, kołowe)
+- **StatisticsTable** - komponent wyświetlający dane tabelaryczne z sortowaniem i paginacją
+- **StatisticsFilter** - komponent umożliwiający filtrowanie danych według zakresu czasu
+- **StatisticsExport** - komponent umożliwiający eksport danych do różnych formatów (CSV, PDF, Excel)
+
+#### Funkcje i metody:
+- `getKPIData()` - pobiera dane kluczowych wskaźników wydajności
+- `getTrendData()` - pobiera dane trendów czasowych dla różnych metryk
+- `getComparisonData()` - pobiera dane porównawcze dla pojazdów, kierowców lub tras
+- `getAnomalyData()` - pobiera dane o wykrytych anomaliach
+- `getForecastData()` - pobiera dane prognozowane
+- `getCostAnalysisData()` - pobiera dane analizy kosztów
+- `exportTrendData()` - eksportuje dane trendów do wybranego formatu
+- `exportComparisonData()` - eksportuje dane porównawcze do wybranego formatu
+- `handleTimeRangeChange()` - obsługuje zmianę zakresu czasu
+- `handleMetricChange()` - obsługuje zmianę wybranej metryki
+- `handleComparisonTypeChange()` - obsługuje zmianę typu porównania
+- `handleTabChange()` - obsługuje zmianę aktywnej zakładki
+- `handleExport()` - obsługuje eksport danych
+- `generateInsights()` - generuje wnioski na podstawie danych trendów
+- `generateSummary()` - generuje podsumowanie na podstawie danych porównawczych
+- `prepareChartData()` - przygotowuje dane do wyświetlenia na wykresie
+- `prepareTableData()` - przygotowuje dane do wyświetlenia w tabeli
+
+#### Stany (hooks):
+- `kpiData` - dane kluczowych wskaźników wydajności
+- `trendData` - dane trendów czasowych
+- `comparisonData` - dane porównawcze
+- `isLoading` - stan ładowania danych
+- `error` - stan błędu
+- `timeRange` - wybrany zakres czasu
+- `selectedMetrics` - wybrane metryki
+- `comparisonType` - wybrany typ porównania
+- `activeTab` - aktywna zakładka
+- `isMultiMetric` - tryb wielu metryk
+
+#### Źródła danych:
+- **API Service**: `statisticsService.js` - zawiera metody do komunikacji z backendem
+- **Mock Service**: `mockStatisticsService.js` - zawiera dane testowe używane podczas developmentu
+
+#### Struktury danych:
+- **KPIData** - struktura danych KPI zawierająca pola:
+  - `id` - identyfikator KPI
+  - `name` - nazwa KPI
+  - `value` - wartość KPI
+  - `unit` - jednostka miary
+  - `trend` - zmiana procentowa
+  - `trendPeriod` - okres trendu
+  - `status` - status (good, warning, critical)
+
+- **TrendData** - struktura danych trendu zawierająca tablicę punktów danych:
+  - `date` - data punktu danych
+  - `value` - wartość w danym punkcie
+
+- **ComparisonData** - struktura danych porównawczych:
+  - `id` - identyfikator elementu
+  - `name` - nazwa elementu
+  - `value` - wartość metryki
+  - `change` - zmiana procentowa
+  - `status` - status (good, warning, critical)
+  - `rank` - pozycja w rankingu
+
+#### Techniczne aspekty:
+- Wszystkie komponenty używają czystego CSS do stylowania i ikon
+- Brak zależności od zewnętrznych bibliotek ikon
+- Komponenty są zintegrowane z API poprzez statisticsService
+- Dostępne są również mocki danych w mockStatisticsService
+- Komponenty używają React Hooks do zarządzania stanem
+- Routing do sekcji Statistics jest zdefiniowany w App.jsx
+- Architektura komponentów oparta na wzorcu "matrioszki" z separacją logiki biznesowej od prezentacji
+
+#### Korzyści biznesowe:
+1. **Kompleksowy wgląd w dane**
+   - Wszystkie istotne statystyki w jednym miejscu
+   - Możliwość analizy trendów czasowych
+   - Porównywanie wydajności różnych elementów floty
+
+2. **Identyfikacja obszarów do optymalizacji**
+   - Wykrywanie nieefektywności
+   - Identyfikacja potencjalnych oszczędności
+   - Analiza anomalii i odchyleń
+
+3. **Podejmowanie decyzji w oparciu o dane**
+   - Dostęp do zaawansowanych analiz
+   - Generowanie raportów
+   - Eksport danych do dalszej analizy
+
+4. **Uniwersalność rozwiązania**
+   - Modułowa struktura
+   - Konfigurowalne widoki
+   - Elastyczne filtry
+   - Skalowalność dla różnych rozmiarów flot
+
+#### Integracja z innymi modułami:
+- **Fleet Management** - wykorzystuje dane statystyczne do optymalizacji zarządzania flotą
+- **Fuel Analysis** - dostarcza dane o zużyciu paliwa do analizy statystycznej
+- **Driver Safety** - dostarcza dane o bezpieczeństwie kierowców do analizy statystycznej
+- **Predictive Maintenance** - wykorzystuje analizy statystyczne do prognozowania konserwacji
+
 ### AI & Automation
 
 Sekcja AI & Automation dostarcza zaawansowane funkcje sztucznej inteligencji i automatyzacji, które optymalizują zarządzanie flotą pojazdów. Komponenty te wykorzystują uczenie maszynowe, przetwarzanie języka naturalnego, analizę szeregów czasowych i inne technologie AI do przewidywania problemów, automatyzacji procesów, wykrywania anomalii i optymalizacji operacji.
@@ -207,81 +315,3 @@ Sekcja Asset Management (Zarządzanie Aktywami) umożliwia kompleksowe zarządza
 - **AssetDisposal** - zarządza procesem wycofywania aktywów z eksploatacji, śledzi wartość odsprzedaży, rejestruje informacje o nabywcach, monitoruje zgodność z przepisami dotyczącymi utylizacji
 - **AssetUtilization** - analizuje wykorzystanie aktywów, identyfikuje nieefektywnie wykorzystywane aktywa, generuje raporty wykorzystania, sugeruje optymalizacje w przydziale aktywów
 - **AssetReporting** - generuje raporty dotyczące aktywów, umożliwia eksport danych do różnych formatów, tworzy niestandardowe widoki raportów, automatyzuje dystrybucję raportów
-
-#### Funkcje i metody:
-- `fetchAssetDashboard()` - pobiera dane KPI, alerty i statystyki aktywów
-- `fetchAssets()` - pobiera listę aktywów z możliwością filtrowania
-- `fetchAssetDetails()` - pobiera szczegółowe informacje o wybranym aktywie
-- `createAsset()` - tworzy nowy rekord aktywa
-- `updateAsset()` - aktualizuje informacje o aktywie
-- `deleteAsset()` - usuwa aktywo z systemu
-- `assignAsset()` - przypisuje aktywo do pojazdu, kierowcy lub lokalizacji
-- `unassignAsset()` - usuwa przypisanie aktywa
-- `scheduleAssetMaintenance()` - planuje konserwację aktywa
-- `recordAssetMaintenance()` - rejestruje wykonaną konserwację
-- `calculateAssetDepreciation()` - oblicza amortyzację aktywa
-- `generateAssetReport()` - generuje raport dotyczący aktywów
-- `exportAssetData()` - eksportuje dane aktywów do CSV/PDF/XLSX
-- `importAssetData()` - importuje dane aktywów z pliku
-- `trackAssetLocation()` - śledzi lokalizację aktywa (dla aktywów z GPS)
-- `calculateAssetTCO()` - oblicza całkowity koszt posiadania aktywa
-- `forecastAssetReplacement()` - prognozuje optymalny czas wymiany aktywa
-- `handleTabChange()` - obsługuje zmianę głównej zakładki
-- `handleFilterChange()` - obsługuje zmianę filtrów aktywów
-- `handleSearch()` - obsługuje wyszukiwanie aktywów
-- `handlePageChange()` - obsługuje zmianę strony w paginacji aktywów
-- `handleToggleDataSource()` - przełącza między danymi z API a danymi mockowymi
-
-#### Stany (hooks):
-- `activeTab` - aktywna zakładka główna
-- `assets` - lista aktywów
-- `selectedAsset` - wybrane aktywo
-- `assetCategories` - kategorie aktywów
-- `assetLocations` - lokalizacje aktywów
-- `maintenanceSchedules` - harmonogramy konserwacji
-- `maintenanceHistory` - historia konserwacji
-- `assignmentHistory` - historia przypisań
-- `dashboardData` - dane dashboardu aktywów
-- `utilizationData` - dane wykorzystania aktywów
-- `depreciationData` - dane amortyzacji
-- `costData` - dane kosztów
-- `filters` - filtry dla aktywów (typ, kategoria, status, lokalizacja, wyszukiwanie, strona)
-- `pagination` - dane paginacji (strona, limit, total, pages)
-- `isLoading` - stan ładowania
-- `isDetailLoading` - stan ładowania szczegółów
-- `error` - stan błędu
-- `useMockData` - przełącznik źródła danych (API vs Mock)
-
-#### Źródła danych i przepływy:
-- **API Service**: `assetManagementService.js` - zawiera metody do komunikacji z backendem
-- **Mock Service**: `mockAssetManagementService.js` - zawiera dane testowe używane podczas developmentu
-
-#### Struktury danych:
-- **Asset (Aktywo)** - struktura aktywa zawiera pola:
-  - `id` - unikalny identyfikator aktywa
-  - `name` - nazwa aktywa
-  - `type` - typ aktywa (vehicle, equipment, tool, part, accessory)
-  - `category` - kategoria aktywa (np. forklift, trailer, scanner)
-  - `serialNumber` - numer seryjny aktywa
-  - `manufacturer/model` - producent i model aktywa
-  - `purchaseDate/purchasePrice` - data i cena zakupu
-  - `currentValue` - aktualna wartość aktywa
-  - `depreciationMethod/depreciationRate` - metoda i stopa amortyzacji
-  - `expectedLifespan` - oczekiwany okres użytkowania
-  - `warrantyExpiryDate` - data wygaśnięcia gwarancji
-  - `location` - lokalizacja aktywa
-  - `assignedTo` - przypisanie aktywa (pojazd, kierowca, lokalizacja)
-  - `status` - status aktywa (active, maintenance, inactive, disposed)
-  - `maintenanceSchedule` - harmonogram konserwacji
-  - `specifications` - specyfikacje techniczne
-  - `documents` - powiązane dokumenty
-  - `notes/tags` - dodatkowe informacje
-  - `customFields` - pola niestandardowe
-  - `createdAt/updatedAt/createdBy/lastCheckedAt` - metadane
-
-#### Techniczne aspekty:
-- Wszystkie komponenty używają czystego CSS do stylowania i ikon (plik IconStyles.css)
-- Ikony są implementowane jako elementy span z odpowiednimi klasami CSS
-- Brak zależności od zewnętrznych bibliotek ikon
-- Komponenty są zintegrowane z API poprzez assetManagementService
-- Dostępne są również mocki danych w mockAssetManagementService

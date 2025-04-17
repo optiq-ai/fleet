@@ -23,6 +23,7 @@ import AssetManagement from './pages/AssetManagement';
 import Communication from './pages/Communication';
 import Integrations from './pages/Integrations';
 import AIAutomation from './pages/AIAutomation';
+import Statistics from './pages/Statistics/Statistics';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -144,6 +145,12 @@ function App() {
               <AIAutomation />
             </Layout>
           } key="ai-automation-route" />
+          {/* Nowa trasa dla sekcji Statistics */}
+          <Route path="/statistics" element={
+            <Layout>
+              <Statistics />
+            </Layout>
+          } key="statistics-route" />
           {/* Fallback route for any unmatched paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
