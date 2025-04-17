@@ -1,8 +1,30 @@
 import { delay } from '../../utils';
 import { mockDashboardService } from './mockDashboardService';
-import { mockFuelAnalysisService } from './mockFuelAnalysisService';
-import { mockFleetManagementService } from './mockFleetManagementService';
-import { mockDriverSafetyService } from './mockDriverSafetyService';
+
+// Importy mockowych serwisów
+const mockFuelAnalysisService = {
+  getKpiData: async () => ({
+    averageFuelConsumption: 8.5,
+    fuelConsumptionChange: -2.3,
+    totalFuelCost: 12500,
+    fuelCostChange: 3.2,
+    potentialSavings: 1800,
+    savingsChange: 5.4,
+    co2Emission: 2150,
+    co2EmissionChange: -1.8
+  })
+};
+
+const mockFleetManagementService = {
+  getFleetKPIs: async () => ({
+    activeVehicles: 42,
+    activeVehiclesTrend: 2.4,
+    totalVehicles: 45,
+    availableVehicles: 38,
+    maintenanceVehicles: 4,
+    utilization: 84.5
+  })
+};
 
 /**
  * Mock service for Statistics module

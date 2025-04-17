@@ -1,5 +1,5 @@
-import { useStatisticsDashboardLogic } from './StatisticsDashboard.js';
 import React from 'react';
+import { useStatisticsDashboardLogic } from './StatisticsDashboard.js';
 import './StatisticsDashboard.css';
 import StatisticsCard from '../common/StatisticsCard';
 import StatisticsChart from '../common/StatisticsChart';
@@ -149,4 +149,4 @@ const StatisticsDashboard = () => {
   );
 };
 
-export default StatisticsDashboard;
+export { StatisticsDashboard as default, StatisticsDashboard };
