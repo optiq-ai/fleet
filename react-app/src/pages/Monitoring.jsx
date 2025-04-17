@@ -490,6 +490,17 @@ const Monitoring = () => {
     return JSON.stringify(location);
   };
   
+  // Prepare chart data from service response
+  const prepareChartData = (chartData) => {
+    if (!chartData || !chartData.data) return null;
+    
+    // Extract labels and data from chart data
+    const labels = chartData.data.map(item => item.date);
+    const data = chartData.data.map(item => item.value);
+    
+    return { labels, data };
+  };
+  
   // Render KPI section
   const renderKPISection = () => {
     if (!kpiData) return null;
@@ -638,36 +649,25 @@ const Monitoring = () => {
           
           {activeTab === 'fuel' && (
             <>
-              <MapContainer style={{ height: '300px' }}>
-                {isLoadingVehicleMap ? (
-                  <MapPlaceholder>Ładowanie mapy zużycia paliwa...</MapPlaceholder>
-                ) : (
-                  <SuspiciousTransactionsMap 
-                    transactions={vehicleMapData}
-                    onMarkerClick={handleMarkerClick}
-                  />
-                )}
-              </MapContainer>
-              
-              <ChartContainer style={{ marginTop: '20px', height: '300px' }}>
+              <ChartContainer style={{ height: '300px' }}>
                 {vehicleFuelConsumptionChart && (
                   <Line
                     data={{
-                      labels: vehicleFuelConsumptionChart.labels,
+                      labels: vehicleFuelConsumptionChart.data.map(item => item.date),
                       datasets: [
                         {
                           label: 'Zużycie paliwa',
-                          data: vehicleFuelConsumptionChart.data,
-                          borderColor: '#3f51b5',
-                          backgroundColor: 'rgba(63, 81, 181, 0.1)',
+                          data: vehicleFuelConsumptionChart.data.map(item => item.consumption),
+                          borderColor: vehicleFuelConsumptionChart.colors?.line || '#3f51b5',
+                          backgroundColor: vehicleFuelConsumptionChart.colors?.area || 'rgba(63, 81, 181, 0.1)',
                           borderWidth: 2,
                           tension: 0.3,
                           fill: true
                         },
                         {
-                          label: 'Cel',
-                          data: vehicleFuelConsumptionChart.target,
-                          borderColor: '#4caf50',
+                          label: vehicleFuelConsumptionChart.target?.label || 'Cel',
+                          data: Array(vehicleFuelConsumptionChart.data.length).fill(vehicleFuelConsumptionChart.target?.value || 30),
+                          borderColor: vehicleFuelConsumptionChart.colors?.target || '#4caf50',
                           borderWidth: 2,
                           borderDash: [5, 5],
                           fill: false,
@@ -818,19 +818,19 @@ const Monitoring = () => {
                 color: fuelConsumptionTrendChart?.change < 0 ? '#4caf50' : '#f44336',
                 fontWeight: '500'
               }}>
-                {fuelConsumptionTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(fuelConsumptionTrendChart?.change).toFixed(1)}%
+                {fuelConsumptionTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(fuelConsumptionTrendChart?.change || 0).toFixed(1)}%
               </span>
             </div>
             <ChartContainer>
               {fuelConsumptionTrendChart && (
                 <Bar
                   data={{
-                    labels: fuelConsumptionTrendChart.labels,
+                    labels: fuelConsumptionTrendChart.data.map(item => item.date),
                     datasets: [
                       {
                         label: 'Zużycie paliwa (l/100km)',
-                        data: fuelConsumptionTrendChart.data,
-                        backgroundColor: '#3f51b5',
+                        data: fuelConsumptionTrendChart.data.map(item => item.value),
+                        backgroundColor: fuelConsumptionTrendChart.colors?.primary || '#3f51b5',
                         borderRadius: 5
                       }
                     ]
@@ -869,19 +869,19 @@ const Monitoring = () => {
                 color: kilometersTrendChart?.change > 0 ? '#4caf50' : '#f44336',
                 fontWeight: '500'
               }}>
-                {kilometersTrendChart?.change > 0 ? '↑' : '↓'} {Math.abs(kilometersTrendChart?.change).toFixed(1)}%
+                {kilometersTrendChart?.change > 0 ? '↑' : '↓'} {Math.abs(kilometersTrendChart?.change || 0).toFixed(1)}%
               </span>
             </div>
             <ChartContainer>
               {kilometersTrendChart && (
                 <Bar
                   data={{
-                    labels: kilometersTrendChart.labels,
+                    labels: kilometersTrendChart.data.map(item => item.date),
                     datasets: [
                       {
                         label: 'Przejechane kilometry',
-                        data: kilometersTrendChart.data,
-                        backgroundColor: '#4caf50',
+                        data: kilometersTrendChart.data.map(item => item.value),
+                        backgroundColor: kilometersTrendChart.colors?.primary || '#4caf50',
                         borderRadius: 5
                       }
                     ]
@@ -931,20 +931,20 @@ const Monitoring = () => {
                 color: alertsTrendChart?.change < 0 ? '#4caf50' : '#f44336',
                 fontWeight: '500'
               }}>
-                {alertsTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(alertsTrendChart?.change).toFixed(1)}%
+                {alertsTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(alertsTrendChart?.change || 0).toFixed(1)}%
               </span>
             </div>
             <ChartContainer>
               {alertsTrendChart && (
                 <Line
                   data={{
-                    labels: alertsTrendChart.labels,
+                    labels: alertsTrendChart.data.map(item => item.date),
                     datasets: [
                       {
                         label: 'Liczba alertów',
-                        data: alertsTrendChart.data,
-                        borderColor: '#f44336',
-                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        data: alertsTrendChart.data.map(item => item.value),
+                        borderColor: alertsTrendChart.colors?.primary || '#f44336',
+                        backgroundColor: alertsTrendChart.colors?.background || 'rgba(244, 67, 54, 0.1)',
                         borderWidth: 2,
                         tension: 0.3,
                         fill: true
