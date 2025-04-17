@@ -31,7 +31,8 @@ Sekcja Settings umożliwia kompleksową konfigurację i personalizację aplikacj
 - **UserPreferences** - pozwala na konfigurację indywidualnych preferencji użytkownika, takich jak powiadomienia, częstotliwość raportów, format danych i strefa czasowa
 - **FleetConfiguration** - umożliwia definiowanie kategorii pojazdów, parametrów pojazdów, grup kierowców i regionów operacyjnych
 - **IntegrationsSettings** - zarządza integracjami z zewnętrznymi systemami, w tym API, systemami księgowymi, dostawcami map i eksportem/importem danych
-- **SecuritySettings** - konfiguruje ustawienia bezpieczeństwa, w tym uprawnienia użytkowników, polityki haseł, uwierzytelnianie dwuskładnikowe i dzienniki audytu
+- **SecuritySettings** - konfiguruje ustawienia bezpieczeństwa, w tym polityki haseł, uwierzytelnianie dwuskładnikowe, ustawienia sesji i ograniczenia IP
+- **ViewCustomization** - umożliwia dostosowanie widoczności elementów dashboardu, wybór układu i motywu kolorystycznego interfejsu
 - **AlertsSettings** - zarządza konfiguracją alertów, w tym progami alertów, kanałami powiadomień, priorytetami alertów i harmonogramem alertów
 - **AutomationSettings** - umożliwia tworzenie i zarządzanie regułami automatyzacji, harmonogramami zadań, warunkami wyzwalającymi i szablonami wiadomości
 - **BackupSettings** - konfiguruje harmonogram kopii zapasowych, retencję danych, eksport historii i archiwizację

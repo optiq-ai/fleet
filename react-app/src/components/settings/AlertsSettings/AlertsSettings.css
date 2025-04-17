@@ -1,0 +1,122 @@
+.alerts-settings {
+  margin-bottom: 24px;
+}
+
+.threshold-input {
+  width: 80px;
+}
+
+.priority-select {
+  width: 120px;
+}
+
+.unit-label {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #595959;
+}
+
+.notification-channels-section {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.notification-channels-section h5 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.channels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.channel-item {
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.schedule-section-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.day-item {
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.time-range {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.time-input {
+  flex: 1;
+}
+
+.schedule-note {
+  padding: 12px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #595959;
+  margin-top: 16px;
+}
+
+/* Dark theme styles */
+.dark-theme .unit-label {
+  color: #a6a6a6;
+}
+
+.dark-theme .notification-channels-section h5,
+.dark-theme .schedule-section-title {
+  color: #e0e0e0;
+}
+
+.dark-theme .channel-item,
+.dark-theme .day-item {
+  background-color: #2a2a2a;
+}
+
+.dark-theme .schedule-note {
+  background-color: #2a2a2a;
+  color: #a6a6a6;
+}
+
+/* Blue theme styles */
+.blue-theme .channel-item,
+.blue-theme .day-item {
+  background-color: #e6f7ff;
+}
+
+.blue-theme .schedule-note {
+  background-color: #e6f7ff;
+}
+
+/* Green theme styles */
+.green-theme .channel-item,
+.green-theme .day-item {
+  background-color: #f6ffed;
+}
+
+.green-theme .schedule-note {
+  background-color: #f6ffed;
+}

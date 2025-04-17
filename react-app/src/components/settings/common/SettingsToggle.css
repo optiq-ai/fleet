@@ -1,0 +1,101 @@
+.settings-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.settings-toggle-label {
+  font-size: 14px;
+  color: #333;
+  flex-grow: 1;
+}
+
+.settings-toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.settings-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.settings-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .settings-toggle-slider {
+  background-color: #1890ff;
+}
+
+input:focus + .settings-toggle-slider {
+  box-shadow: 0 0 1px #1890ff;
+}
+
+input:checked + .settings-toggle-slider:before {
+  transform: translateX(24px);
+}
+
+input:disabled + .settings-toggle-slider {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+input:disabled + .settings-toggle-slider:before {
+  background-color: #d9d9d9;
+}
+
+/* Dark theme styles */
+.dark-theme .settings-toggle-label {
+  color: #e0e0e0;
+}
+
+.dark-theme .settings-toggle-slider {
+  background-color: #5a5a5a;
+}
+
+.dark-theme input:checked + .settings-toggle-slider {
+  background-color: #177ddc;
+}
+
+.dark-theme input:disabled + .settings-toggle-slider {
+  background-color: #3a3a3a;
+}
+
+.dark-theme input:disabled + .settings-toggle-slider:before {
+  background-color: #5a5a5a;
+}
+
+/* Blue theme styles */
+.blue-theme input:checked + .settings-toggle-slider {
+  background-color: #0050b3;
+}
+
+/* Green theme styles */
+.green-theme input:checked + .settings-toggle-slider {
+  background-color: #52c41a;
+}

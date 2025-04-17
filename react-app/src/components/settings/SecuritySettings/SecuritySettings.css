@@ -1,0 +1,95 @@
+.security-settings {
+  margin-bottom: 24px;
+}
+
+.permissions-section {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.permissions-section h5 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.permission-item {
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.module-access {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.module-access:last-child {
+  border-bottom: none;
+}
+
+.module-name {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.module-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.role-access {
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.policy-item {
+  margin-bottom: 16px;
+}
+
+.setting-hint {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+/* Dark theme styles */
+.dark-theme .permission-item,
+.dark-theme .role-access {
+  background-color: #2a2a2a;
+}
+
+.dark-theme .module-access {
+  border-bottom-color: #303030;
+}
+
+.dark-theme .module-name,
+.dark-theme .permissions-section h5 {
+  color: #e0e0e0;
+}
+
+.dark-theme .setting-hint {
+  color: #a6a6a6;
+}
+
+/* Blue theme styles */
+.blue-theme .permission-item,
+.blue-theme .role-access {
+  background-color: #e6f7ff;
+}
+
+/* Green theme styles */
+.green-theme .permission-item,
+.green-theme .role-access {
+  background-color: #f6ffed;
+}

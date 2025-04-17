@@ -1,0 +1,59 @@
+.settings-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.settings-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.settings-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.settings-card-content {
+  padding: 20px;
+}
+
+/* Dark theme styles */
+.dark-theme .settings-card {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .settings-card-header {
+  border-bottom: 1px solid #3a3a3a;
+  background-color: #1f1f1f;
+}
+
+.dark-theme .settings-card-title {
+  color: #e0e0e0;
+}
+
+/* Blue theme styles */
+.blue-theme .settings-card {
+  background-color: #f0f7ff;
+}
+
+.blue-theme .settings-card-header {
+  background-color: #e6f7ff;
+  border-bottom: 1px solid #bae7ff;
+}
+
+/* Green theme styles */
+.green-theme .settings-card {
+  background-color: #f6ffed;
+}
+
+.green-theme .settings-card-header {
+  background-color: #f6ffed;
+  border-bottom: 1px solid #d9f7be;
+}

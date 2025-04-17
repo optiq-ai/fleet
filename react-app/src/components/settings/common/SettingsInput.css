@@ -1,0 +1,97 @@
+.settings-input-container {
+  margin-bottom: 16px;
+}
+
+.settings-input-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.settings-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: all 0.3s;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.settings-input:hover {
+  border-color: #40a9ff;
+}
+
+.settings-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.settings-input-error {
+  border-color: #ff4d4f;
+}
+
+.settings-input-error:focus {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+.settings-input-error-message {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Dark theme styles */
+.dark-theme .settings-input-label {
+  color: #e0e0e0;
+}
+
+.dark-theme .settings-input {
+  background-color: #2d2d2d;
+  border-color: #434343;
+  color: #e0e0e0;
+}
+
+.dark-theme .settings-input:focus {
+  border-color: #177ddc;
+  box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.2);
+}
+
+.dark-theme .settings-input:hover {
+  border-color: #177ddc;
+}
+
+.dark-theme .settings-input:disabled {
+  background-color: #1f1f1f;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Blue theme styles */
+.blue-theme .settings-input:focus {
+  border-color: #0050b3;
+  box-shadow: 0 0 0 2px rgba(0, 80, 179, 0.2);
+}
+
+.blue-theme .settings-input:hover {
+  border-color: #0050b3;
+}
+
+/* Green theme styles */
+.green-theme .settings-input:focus {
+  border-color: #52c41a;
+  box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2);
+}
+
+.green-theme .settings-input:hover {
+  border-color: #52c41a;
+}

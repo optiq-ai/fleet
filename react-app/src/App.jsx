@@ -24,6 +24,11 @@ import Communication from './pages/Communication';
 import Integrations from './pages/Integrations';
 import AIAutomation from './pages/AIAutomation';
 import Statistics from './pages/Statistics/Statistics';
+import Settings from './pages/Settings/Settings';
+import SettingsUsers from './pages/Settings/Users';
+import SettingsRoles from './pages/Settings/Roles';
+import SettingsSecurity from './pages/Settings/Security';
+import SettingsViewCustomization from './pages/Settings/ViewCustomization';
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 
 /**
@@ -145,12 +150,40 @@ function App() {
               <AIAutomation />
             </Layout>
           } key="ai-automation-route" />
-          {/* Nowa trasa dla sekcji Statistics */}
+          {/* Trasa dla sekcji Statistics */}
           <Route path="/statistics" element={
             <Layout>
               <Statistics />
             </Layout>
           } key="statistics-route" />
+          
+          {/* Trasy dla sekcji Settings i jej podsekcji */}
+          <Route path="/settings" element={
+            <Layout>
+              <Settings />
+            </Layout>
+          } key="settings-route" />
+          <Route path="/settings/users" element={
+            <Layout>
+              <SettingsUsers />
+            </Layout>
+          } key="settings-users-route" />
+          <Route path="/settings/roles" element={
+            <Layout>
+              <SettingsRoles />
+            </Layout>
+          } key="settings-roles-route" />
+          <Route path="/settings/view-customization" element={
+            <Layout>
+              <SettingsViewCustomization />
+            </Layout>
+          } key="settings-view-customization-route" />
+          <Route path="/settings/security" element={
+            <Layout>
+              <SettingsSecurity />
+            </Layout>
+          } key="settings-security-route" />
+          
           {/* Fallback route for any unmatched paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

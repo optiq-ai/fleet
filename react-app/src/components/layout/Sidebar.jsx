@@ -240,7 +240,10 @@ const Sidebar = () => {
         <SubMenuContainer expanded={expandedMenus.settings}>
           <MenuItem 
             active={location.pathname.startsWith('/settings')} 
-            onClick={() => toggleSubMenu('settings')}
+            onClick={() => {
+              toggleSubMenu('settings');
+              handleNavigate('/settings');
+            }}
           >
             Settings
           </MenuItem>
@@ -258,8 +261,8 @@ const Sidebar = () => {
               Roles
             </SubMenuItem>
             <SubMenuItem 
-              active={isActive('/admin/view-customization')} 
-              onClick={() => handleNavigate('/admin/view-customization')}
+              active={isActive('/settings/view-customization')} 
+              onClick={() => handleNavigate('/settings/view-customization')}
             >
               View Customization
             </SubMenuItem>

@@ -1,0 +1,65 @@
+.settings-tabs {
+  display: flex;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.settings-tab {
+  padding: 12px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  color: #595959;
+  border-bottom: 2px solid transparent;
+  margin-right: 24px;
+}
+
+.settings-tab:hover {
+  color: #1890ff;
+}
+
+.settings-tab-active {
+  color: #1890ff;
+  border-bottom-color: #1890ff;
+  font-weight: 500;
+}
+
+/* Dark theme styles */
+.dark-theme .settings-tabs {
+  border-bottom-color: #303030;
+}
+
+.dark-theme .settings-tab {
+  color: #a6a6a6;
+}
+
+.dark-theme .settings-tab:hover {
+  color: #177ddc;
+}
+
+.dark-theme .settings-tab-active {
+  color: #177ddc;
+  border-bottom-color: #177ddc;
+}
+
+/* Blue theme styles */
+.blue-theme .settings-tab:hover {
+  color: #0050b3;
+}
+
+.blue-theme .settings-tab-active {
+  color: #0050b3;
+  border-bottom-color: #0050b3;
+}
+
+/* Green theme styles */
+.green-theme .settings-tab:hover {
+  color: #52c41a;
+}
+
+.green-theme .settings-tab-active {
+  color: #52c41a;
+  border-bottom-color: #52c41a;
+}

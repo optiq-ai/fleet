@@ -1,0 +1,62 @@
+.user-preferences {
+  margin-bottom: 24px;
+}
+
+.notification-channel {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.notification-channel:last-child {
+  border-bottom: none;
+}
+
+.notification-channel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.notification-channel-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.notification-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.notification-type {
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+/* Dark theme styles */
+.dark-theme .notification-channel {
+  border-bottom-color: #303030;
+}
+
+.dark-theme .notification-channel-title {
+  color: #e0e0e0;
+}
+
+.dark-theme .notification-type {
+  background-color: #2a2a2a;
+}
+
+/* Blue theme styles */
+.blue-theme .notification-type {
+  background-color: #f0f7ff;
+}
+
+/* Green theme styles */
+.green-theme .notification-type {
+  background-color: #f6ffed;
+}

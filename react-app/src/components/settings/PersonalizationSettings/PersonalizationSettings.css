@@ -1,0 +1,152 @@
+.personalization-settings {
+  margin-bottom: 24px;
+}
+
+.settings-loading {
+  padding: 20px;
+  text-align: center;
+  color: #595959;
+}
+
+.settings-error {
+  padding: 20px;
+  text-align: center;
+  color: #ff4d4f;
+}
+
+.settings-description {
+  font-size: 14px;
+  color: #595959;
+  margin-bottom: 16px;
+}
+
+.settings-form-row {
+  margin-bottom: 16px;
+}
+
+.theme-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.theme-option:hover {
+  background-color: #f5f5f5;
+}
+
+.theme-option-selected {
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+}
+
+.theme-preview {
+  width: 60px;
+  height: 40px;
+  border: 2px solid;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.theme-name {
+  font-size: 12px;
+  color: #333;
+}
+
+.dashboard-widgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.settings-actions {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+}
+
+.settings-save-status {
+  margin-left: 16px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.settings-save-success {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+.settings-save-error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+/* Dark theme styles */
+.dark-theme .settings-description {
+  color: #a6a6a6;
+}
+
+.dark-theme .theme-name {
+  color: #e0e0e0;
+}
+
+.dark-theme .theme-option:hover {
+  background-color: #3a3a3a;
+}
+
+.dark-theme .theme-option-selected {
+  background-color: #111b26;
+  border: 1px solid #177ddc;
+}
+
+.dark-theme .settings-actions {
+  border-top-color: #303030;
+}
+
+.dark-theme .settings-save-success {
+  background-color: #162312;
+  border-color: #274916;
+  color: #73d13d;
+}
+
+.dark-theme .settings-save-error {
+  background-color: #2a1215;
+  border-color: #5c2223;
+  color: #ff7875;
+}
+
+/* Blue theme styles */
+.blue-theme .theme-option:hover {
+  background-color: #e6f7ff;
+}
+
+.blue-theme .theme-option-selected {
+  background-color: #e6f7ff;
+  border: 1px solid #69c0ff;
+}
+
+/* Green theme styles */
+.green-theme .theme-option:hover {
+  background-color: #f6ffed;
+}
+
+.green-theme .theme-option-selected {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}

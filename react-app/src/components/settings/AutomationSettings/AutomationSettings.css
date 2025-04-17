@@ -1,0 +1,150 @@
+.automation-settings {
+  margin-bottom: 24px;
+}
+
+.rule-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.rule-description,
+.task-description {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.schedule-select {
+  width: 150px;
+}
+
+.last-run {
+  font-size: 12px;
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+.condition-item {
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.condition-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.condition-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.condition-description {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #595959;
+}
+
+.condition-parameters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.template-content {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.template-variables {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.variables-title {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.variable-item {
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 4px;
+  padding: 2px 6px;
+  background-color: #e6f7ff;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #1890ff;
+  cursor: pointer;
+}
+
+/* Dark theme styles */
+.dark-theme .rule-description,
+.dark-theme .task-description,
+.dark-theme .last-run {
+  color: #a6a6a6;
+}
+
+.dark-theme .condition-item {
+  background-color: #2a2a2a;
+}
+
+.dark-theme .condition-description {
+  color: #a6a6a6;
+}
+
+.dark-theme .template-variables {
+  background-color: #2a2a2a;
+}
+
+.dark-theme .variable-item {
+  background-color: #111d2c;
+  color: #40a9ff;
+}
+
+.dark-theme .template-content {
+  background-color: #1f1f1f;
+  border-color: #434343;
+  color: #e0e0e0;
+}
+
+/* Blue theme styles */
+.blue-theme .condition-item {
+  background-color: #e6f7ff;
+}
+
+.blue-theme .template-variables {
+  background-color: #e6f7ff;
+}
+
+.blue-theme .variable-item {
+  background-color: #bae7ff;
+  color: #0050b3;
+}
+
+/* Green theme styles */
+.green-theme .condition-item {
+  background-color: #f6ffed;
+}
+
+.green-theme .template-variables {
+  background-color: #f6ffed;
+}
+
+.green-theme .variable-item {
+  background-color: #d9f7be;
+  color: #135200;
+}

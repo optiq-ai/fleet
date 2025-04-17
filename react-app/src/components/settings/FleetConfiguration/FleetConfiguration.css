@@ -1,0 +1,135 @@
+.fleet-configuration {
+  margin-bottom: 24px;
+}
+
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.settings-table th,
+.settings-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.settings-table th {
+  font-weight: 500;
+  color: #595959;
+  background-color: #fafafa;
+}
+
+.settings-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.parameter-section-title {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.parameter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.small-button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.edit-modal-content {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.edit-modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.edit-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Dark theme styles */
+.dark-theme .settings-table th,
+.dark-theme .settings-table td {
+  border-bottom-color: #303030;
+}
+
+.dark-theme .settings-table th {
+  color: #a6a6a6;
+  background-color: #1f1f1f;
+}
+
+.dark-theme .settings-table tr:hover {
+  background-color: #2a2a2a;
+}
+
+.dark-theme .parameter-section-title {
+  color: #e0e0e0;
+}
+
+.dark-theme .edit-modal-content {
+  background-color: #2d2d2d;
+}
+
+.dark-theme .edit-modal-content h3 {
+  color: #e0e0e0;
+}
+
+/* Blue theme styles */
+.blue-theme .settings-table th {
+  background-color: #e6f7ff;
+}
+
+.blue-theme .settings-table tr:hover {
+  background-color: #e6f7ff;
+}
+
+.blue-theme .edit-modal-content {
+  background-color: #f0f7ff;
+}
+
+/* Green theme styles */
+.green-theme .settings-table th {
+  background-color: #f6ffed;
+}
+
+.green-theme .settings-table tr:hover {
+  background-color: #f6ffed;
+}
+
+.green-theme .edit-modal-content {
+  background-color: #f6ffed;
+}

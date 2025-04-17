@@ -1,0 +1,87 @@
+.settings-select-container {
+  margin-bottom: 16px;
+}
+
+.settings-select-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.settings-select {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: all 0.3s;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+
+.settings-select:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.settings-select:hover {
+  border-color: #40a9ff;
+}
+
+.settings-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* Dark theme styles */
+.dark-theme .settings-select-label {
+  color: #e0e0e0;
+}
+
+.dark-theme .settings-select {
+  background-color: #2d2d2d;
+  border-color: #434343;
+  color: #e0e0e0;
+}
+
+.dark-theme .settings-select:focus {
+  border-color: #177ddc;
+  box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.2);
+}
+
+.dark-theme .settings-select:hover {
+  border-color: #177ddc;
+}
+
+.dark-theme .settings-select:disabled {
+  background-color: #1f1f1f;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Blue theme styles */
+.blue-theme .settings-select:focus {
+  border-color: #0050b3;
+  box-shadow: 0 0 0 2px rgba(0, 80, 179, 0.2);
+}
+
+.blue-theme .settings-select:hover {
+  border-color: #0050b3;
+}
+
+/* Green theme styles */
+.green-theme .settings-select:focus {
+  border-color: #52c41a;
+  box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2);
+}
+
+.green-theme .settings-select:hover {
+  border-color: #52c41a;
+}
