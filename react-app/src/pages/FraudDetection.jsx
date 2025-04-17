@@ -5,10 +5,8 @@ import mockFraudDetectionService from '../services/api/mockFraudDetectionService
 
 // Nowe importy dla ulepszonych funkcji wykrywania oszustw
 import BiometricAuthModal from '../components/fraud/BiometricAuthModal';
-import TransactionPatternAnalysis from '../components/fraud/TransactionPatternAnalysis';
 import CardPresenceVerification from '../components/fraud/CardPresenceVerification';
 import BlockchainLedger from '../components/fraud/BlockchainLedger';
-import FuelQualityTest from '../components/fraud/FuelQualityTest';
 import MultiFactorAuth from '../components/fraud/MultiFactorAuth';
 import SuspiciousTransactionsMap from '../components/fraud/SuspiciousTransactionsMap';
 
@@ -93,16 +91,7 @@ const MapContainer = styled.div`
   overflow: hidden;
 `;
 
-const MapOverlay = styled.div`
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 12px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1;
-`;
+// Usunięto nieużywany komponent MapOverlay
 
 const AlertsContainer = styled.div`
   display: flex;
@@ -513,30 +502,38 @@ const FraudDetection = () => {
     );
   };
   
+  // Stan dla danych analizy wzorców
+  const [patternData, setPatternData] = useState(null);
+  const [isLoadingPatterns, setIsLoadingPatterns] = useState(false);
+  
+  // Pobieranie danych analizy wzorców
+  useEffect(() => {
+    const fetchPatternData = async () => {
+      if (activeTab === 'patterns') {
+        setIsLoadingPatterns(true);
+        try {
+          const data = await mockFraudDetectionService.getTransactionPatterns();
+          setPatternData(data);
+        } catch (error) {
+          console.error('Error fetching pattern data:', error);
+        } finally {
+          setIsLoadingPatterns(false);
+        }
+      }
+    };
+    
+    fetchPatternData();
+  }, [activeTab]);
+  
   // Renderowanie analizy wzorców
   const renderPatternAnalysis = () => {
-    if (isLoading) {
+    if (isLoading || isLoadingPatterns) {
       return <div>Ładowanie danych analizy wzorców...</div>;
     }
     
     if (!transactions || transactions.length === 0) {
       return <div>Brak danych do analizy wzorców.</div>;
     }
-    
-    const [patternData, setPatternData] = useState(null);
-    
-    useEffect(() => {
-      const fetchPatternData = async () => {
-        try {
-          const data = await mockFraudDetectionService.getTransactionPatterns();
-          setPatternData(data);
-        } catch (error) {
-          console.error('Error fetching pattern data:', error);
-        }
-      };
-      
-      fetchPatternData();
-    }, []);
     
     if (!patternData) {
       return <div>Ładowanie analizy wzorców...</div>;
@@ -814,30 +811,38 @@ const FraudDetection = () => {
     );
   };
   
+  // Stan dla danych testów jakości paliwa
+  const [fuelTestsData, setFuelTestsData] = useState(null);
+  const [isLoadingFuelTests, setIsLoadingFuelTests] = useState(false);
+  
+  // Pobieranie danych testów jakości paliwa
+  useEffect(() => {
+    const fetchFuelTestsData = async () => {
+      if (activeTab === 'fuelTests') {
+        setIsLoadingFuelTests(true);
+        try {
+          const data = await mockFraudDetectionService.getFuelQualityTests();
+          setFuelTestsData(data);
+        } catch (error) {
+          console.error('Error fetching fuel quality tests data:', error);
+        } finally {
+          setIsLoadingFuelTests(false);
+        }
+      }
+    };
+    
+    fetchFuelTestsData();
+  }, [activeTab]);
+  
   // Renderowanie testów jakości paliwa
   const renderFuelQualityTests = () => {
-    if (isLoading) {
+    if (isLoading || isLoadingFuelTests) {
       return <div>Ładowanie danych testów jakości paliwa...</div>;
     }
     
     if (!transactions || transactions.length === 0) {
       return <div>Brak danych do testów jakości paliwa.</div>;
     }
-    
-    const [fuelTestsData, setFuelTestsData] = useState(null);
-    
-    useEffect(() => {
-      const fetchFuelTestsData = async () => {
-        try {
-          const data = await mockFraudDetectionService.getFuelQualityTests();
-          setFuelTestsData(data);
-        } catch (error) {
-          console.error('Error fetching fuel quality tests data:', error);
-        }
-      };
-      
-      fetchFuelTestsData();
-    }, []);
     
     if (!fuelTestsData) {
       return <div>Ładowanie testów jakości paliwa...</div>;

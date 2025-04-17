@@ -249,7 +249,7 @@ const SuspiciousTransactionsMap = ({
     return () => {
       newMarkers.forEach(marker => marker.setMap(null));
     };
-  }, [map, transactions, onMarkerClick]);
+  }, [map, transactions, onMarkerClick, markers]);
   
   return (
     <MapContainer>
