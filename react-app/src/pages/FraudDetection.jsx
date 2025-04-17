@@ -532,6 +532,7 @@ const FraudDetection = () => {
         setIsLoadingFuelTests(true);
         try {
           const data = await mockFraudDetectionService.getFuelQualityTests();
+          console.log('Fetched fuel tests data:', data);
           setFuelTestsData(data);
         } catch (error) {
           console.error('Error fetching fuel quality tests data:', error);
@@ -542,7 +543,7 @@ const FraudDetection = () => {
     };
     
     fetchTabData();
-  }, [activeTab, patternData]);
+  }, [activeTab]);
   
   // Renderowanie analizy wzorców
   const renderPatternAnalysis = () => {

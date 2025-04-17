@@ -601,6 +601,7 @@ class MockFraudDetectionService {
    * @returns {Promise<Object>} Fuel quality tests response
    */
   async getFuelQualityTests() {
+    console.log('Mock fuel quality tests:', mockFuelQualityTests);
     return new Promise(resolve => {
       setTimeout(() => {
         resolve({
