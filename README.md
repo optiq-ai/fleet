@@ -22,6 +22,197 @@ Projekt składa się z trzech głównych komponentów:
 
 ## Komponenty aplikacji
 
+### Settings
+
+Sekcja Settings umożliwia kompleksową konfigurację i personalizację aplikacji Fleet App, dostosowując ją do specyficznych potrzeb użytkowników i organizacji. Komponenty te pozwalają na konfigurację interfejsu, preferencji użytkownika, parametrów floty, integracji z zewnętrznymi systemami, ustawień bezpieczeństwa, alertów, automatyzacji oraz kopii zapasowych i historii.
+
+#### Komponenty:
+- **PersonalizationSettings** - umożliwia dostosowanie wyglądu i układu interfejsu użytkownika, w tym motywów kolorystycznych, układu dashboardu, gęstości informacji i języka interfejsu
+- **UserPreferences** - pozwala na konfigurację indywidualnych preferencji użytkownika, takich jak powiadomienia, częstotliwość raportów, format danych i strefa czasowa
+- **FleetConfiguration** - umożliwia definiowanie kategorii pojazdów, parametrów pojazdów, grup kierowców i regionów operacyjnych
+- **IntegrationsSettings** - zarządza integracjami z zewnętrznymi systemami, w tym API, systemami księgowymi, dostawcami map i eksportem/importem danych
+- **SecuritySettings** - konfiguruje ustawienia bezpieczeństwa, w tym uprawnienia użytkowników, polityki haseł, uwierzytelnianie dwuskładnikowe i dzienniki audytu
+- **AlertsSettings** - zarządza konfiguracją alertów, w tym progami alertów, kanałami powiadomień, priorytetami alertów i harmonogramem alertów
+- **AutomationSettings** - umożliwia tworzenie i zarządzanie regułami automatyzacji, harmonogramami zadań, warunkami wyzwalającymi i szablonami wiadomości
+- **BackupSettings** - konfiguruje harmonogram kopii zapasowych, retencję danych, eksport historii i archiwizację
+
+#### Wspólne komponenty:
+- **SettingsCard** - komponent prezentujący sekcję ustawień z tytułem i zawartością
+- **SettingsToggle** - przełącznik do włączania/wyłączania opcji
+- **SettingsSelect** - lista rozwijana do wyboru opcji
+- **SettingsInput** - pole tekstowe do wprowadzania wartości
+- **SettingsTabs** - zakładki do przełączania między różnymi grupami ustawień
+- **SettingsButton** - przycisk do wykonywania akcji w ustawieniach
+
+#### Funkcje i metody:
+- `getPersonalizationSettings()` - pobiera ustawienia personalizacji interfejsu
+- `getUserPreferences()` - pobiera preferencje użytkownika
+- `getFleetConfiguration()` - pobiera konfigurację floty
+- `getIntegrationsSettings()` - pobiera ustawienia integracji
+- `getSecuritySettings()` - pobiera ustawienia bezpieczeństwa
+- `getAlertsSettings()` - pobiera ustawienia alertów
+- `getAutomationSettings()` - pobiera ustawienia automatyzacji
+- `getBackupSettings()` - pobiera ustawienia kopii zapasowych
+- `updatePersonalizationSettings()` - aktualizuje ustawienia personalizacji interfejsu
+- `updateUserPreferences()` - aktualizuje preferencje użytkownika
+- `updateFleetConfiguration()` - aktualizuje konfigurację floty
+- `updateIntegrationsSettings()` - aktualizuje ustawienia integracji
+- `updateSecuritySettings()` - aktualizuje ustawienia bezpieczeństwa
+- `updateAlertsSettings()` - aktualizuje ustawienia alertów
+- `updateAutomationSettings()` - aktualizuje ustawienia automatyzacji
+- `updateBackupSettings()` - aktualizuje ustawienia kopii zapasowych
+- `createManualBackup()` - tworzy ręczną kopię zapasową
+- `testIntegration()` - testuje integrację z zewnętrznym systemem
+- `testAlertChannel()` - testuje kanał powiadomień alertów
+- `resetToDefaults()` - przywraca ustawienia domyślne
+- `handleThemeChange()` - obsługuje zmianę motywu kolorystycznego
+- `handleLanguageChange()` - obsługuje zmianę języka interfejsu
+- `handleNotificationToggle()` - obsługuje włączanie/wyłączanie powiadomień
+- `handleDataFormatChange()` - obsługuje zmianę formatu danych
+- `handleTimeZoneChange()` - obsługuje zmianę strefy czasowej
+- `handleVehicleCategoryChange()` - obsługuje zmianę kategorii pojazdów
+- `handleDriverGroupChange()` - obsługuje zmianę grup kierowców
+- `handleApiKeyGeneration()` - obsługuje generowanie kluczy API
+- `handlePermissionChange()` - obsługuje zmianę uprawnień użytkowników
+- `handleAlertThresholdChange()` - obsługuje zmianę progów alertów
+- `handleAutomationRuleToggle()` - obsługuje włączanie/wyłączanie reguł automatyzacji
+- `handleBackupScheduleChange()` - obsługuje zmianę harmonogramu kopii zapasowych
+- `handleRetentionPeriodChange()` - obsługuje zmianę okresu retencji danych
+- `handleTabChange()` - obsługuje zmianę aktywnej zakładki
+- `handleSaveSettings()` - obsługuje zapisywanie ustawień
+
+#### Stany (hooks):
+- `activeTab` - aktywna zakładka w głównym komponencie Settings
+- `personalizationSettings` - ustawienia personalizacji interfejsu
+- `userPreferences` - preferencje użytkownika
+- `fleetConfiguration` - konfiguracja floty
+- `integrationsSettings` - ustawienia integracji
+- `securitySettings` - ustawienia bezpieczeństwa
+- `alertsSettings` - ustawienia alertów
+- `automationSettings` - ustawienia automatyzacji
+- `backupSettings` - ustawienia kopii zapasowych
+- `isLoading` - stan ładowania danych
+- `error` - stan błędu
+- `saveStatus` - stan zapisywania ustawień
+- `testStatus` - stan testowania integracji lub kanału alertów
+
+#### Źródła danych:
+- **API Service**: `settingsService.js` - zawiera metody do komunikacji z backendem
+- **Mock Service**: `mockSettingsService.js` - zawiera dane testowe używane podczas developmentu
+
+#### Struktury danych:
+- **PersonalizationSettings** - struktura ustawień personalizacji interfejsu:
+  - `theme` - motyw kolorystyczny (light, dark, blue, green)
+  - `dashboardLayout` - układ dashboardu (compact, standard, expanded)
+  - `informationDensity` - gęstość informacji (compact, standard, expanded)
+  - `language` - język interfejsu (pl, en, de, fr)
+  - `showWelcomeScreen` - czy pokazywać ekran powitalny
+  - `defaultPage` - domyślna strona startowa
+
+- **UserPreferences** - struktura preferencji użytkownika:
+  - `notifications` - ustawienia powiadomień (email, push, sms)
+  - `reportFrequency` - częstotliwość raportów (daily, weekly, monthly)
+  - `dataFormat` - format danych (metric, imperial)
+  - `currency` - waluta (PLN, EUR, USD)
+  - `timeZone` - strefa czasowa
+  - `dateFormat` - format daty
+  - `timeFormat` - format czasu (12h, 24h)
+
+- **FleetConfiguration** - struktura konfiguracji floty:
+  - `vehicleCategories` - kategorie pojazdów
+  - `vehicleParameters` - parametry pojazdów
+  - `driverGroups` - grupy kierowców
+  - `operationalRegions` - regiony operacyjne
+  - `maintenanceSchedules` - harmonogramy konserwacji
+  - `fuelTypes` - typy paliwa
+  - `costCenters` - centra kosztów
+
+- **IntegrationsSettings** - struktura ustawień integracji:
+  - `apiKeys` - klucze API
+  - `externalSystems` - zewnętrzne systemy
+  - `mapProviders` - dostawcy map
+  - `dataExportImport` - eksport/import danych
+  - `webhooks` - webhooks
+  - `oauth` - ustawienia OAuth
+
+- **SecuritySettings** - struktura ustawień bezpieczeństwa:
+  - `userPermissions` - uprawnienia użytkowników
+  - `passwordPolicy` - polityka haseł
+  - `twoFactorAuth` - uwierzytelnianie dwuskładnikowe
+  - `auditLogs` - dzienniki audytu
+  - `ipRestrictions` - ograniczenia IP
+  - `sessionTimeout` - limit czasu sesji
+
+- **AlertsSettings** - struktura ustawień alertów:
+  - `alertThresholds` - progi alertów
+  - `notificationChannels` - kanały powiadomień
+  - `alertPriorities` - priorytety alertów
+  - `alertSchedule` - harmonogram alertów
+  - `alertCategories` - kategorie alertów
+  - `alertTemplates` - szablony alertów
+
+- **AutomationSettings** - struktura ustawień automatyzacji:
+  - `automationRules` - reguły automatyzacji
+  - `taskSchedules` - harmonogramy zadań
+  - `triggerConditions` - warunki wyzwalające
+  - `messageTemplates` - szablony wiadomości
+  - `workflowTemplates` - szablony przepływów pracy
+  - `automationHistory` - historia automatyzacji
+
+- **BackupSettings** - struktura ustawień kopii zapasowych:
+  - `backupSchedule` - harmonogram kopii zapasowych
+  - `dataRetention` - retencja danych
+  - `historyExport` - eksport historii
+  - `dataArchiving` - archiwizacja danych
+  - `backupLocations` - lokalizacje kopii zapasowych
+  - `backupHistory` - historia kopii zapasowych
+
+#### Techniczne aspekty:
+- Wszystkie komponenty używają czystego CSS do stylowania i ikon
+- Brak zależności od zewnętrznych bibliotek ikon
+- Komponenty są zintegrowane z API poprzez settingsService
+- Dostępne są również mocki danych w mockSettingsService
+- Komponenty używają React Hooks do zarządzania stanem
+- Routing do sekcji Settings jest zdefiniowany w App.jsx
+- Architektura komponentów oparta na wzorcu "matrioszki" z separacją logiki biznesowej od prezentacji
+
+#### Korzyści biznesowe:
+1. **Elastyczność**
+   - Dostosowanie systemu do specyficznych potrzeb biznesowych
+   - Konfiguracja interfejsu według preferencji użytkowników
+   - Definiowanie własnych kategorii, grup i parametrów
+   - Integracja z istniejącymi systemami IT
+
+2. **Efektywność**
+   - Optymalizacja interfejsu i procesów pod kątem konkretnych przypadków użycia
+   - Automatyzacja powtarzalnych zadań
+   - Konfiguracja alertów i powiadomień według priorytetów
+   - Dostosowanie formatu danych i raportów
+
+3. **Skalowalność**
+   - Możliwość rozbudowy konfiguracji wraz z rozwojem floty
+   - Dodawanie nowych kategorii pojazdów i grup kierowców
+   - Rozszerzanie integracji z zewnętrznymi systemami
+   - Dostosowanie ustawień bezpieczeństwa do rosnących potrzeb
+
+4. **Bezpieczeństwo**
+   - Precyzyjna kontrola dostępu i uprawnień
+   - Konfiguracja polityk haseł i uwierzytelniania dwuskładnikowego
+   - Monitorowanie dzienników audytu
+   - Regularne kopie zapasowe i archiwizacja danych
+
+5. **Integracja**
+   - Łatwe połączenie z istniejącymi systemami IT
+   - Konfiguracja API i webhooków
+   - Eksport i import danych w różnych formatach
+   - Integracja z różnymi dostawcami map i usług
+
+#### Integracja z innymi modułami:
+- **Fleet Management** - wykorzystuje konfigurację floty do zarządzania pojazdami i kierowcami
+- **Statistics** - wykorzystuje preferencje użytkownika do wyświetlania danych w odpowiednim formacie
+- **AI & Automation** - wykorzystuje reguły automatyzacji do optymalizacji procesów
+- **Document Management** - wykorzystuje ustawienia kopii zapasowych do archiwizacji dokumentów
+
 ### Statistics
 
 Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących floty pojazdów, zużycia paliwa, kosztów operacyjnych i wydajności kierowców. Komponenty te umożliwiają analizę trendów czasowych, porównywanie wydajności różnych elementów floty oraz generowanie raportów i eksportowanie danych.
