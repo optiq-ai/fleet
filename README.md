@@ -14,6 +14,8 @@ Projekt składa się z trzech głównych komponentów:
 ## Technologie i konwencje
 
 - **React** - biblioteka JavaScript do budowania interfejsów użytkownika
+- **Chart.js** - biblioteka do tworzenia interaktywnych wykresów
+- **react-chartjs-2** - wrapper React dla Chart.js
 - **Styled Components** - biblioteka do stylowania komponentów React
 - **CSS** - do stylowania i ikon (zamiast zewnętrznych bibliotek ikon)
 - **JSX** - rozszerzenie składni JavaScript do tworzenia elementów React
@@ -29,7 +31,7 @@ Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących fl
 - **TrendAnalysis** - zaawansowana analiza trendów czasowych dla różnych metryk z możliwością nakładania wielu metryk na jeden wykres
 - **ComparativeAnalysis** - porównywanie wydajności pojazdów, kierowców i tras pod względem różnych metryk
 - **StatisticsCard** - komponent prezentujący pojedynczy wskaźnik KPI z wartością, jednostką, trendem i statusem
-- **StatisticsChart** - komponent wyświetlający różne typy wykresów (liniowe, słupkowe, kołowe)
+- **StatisticsChart** - komponent wyświetlający różne typy wykresów (liniowe, słupkowe, kołowe, radarowe) przy użyciu Chart.js
 - **StatisticsTable** - komponent wyświetlający dane tabelaryczne z sortowaniem i paginacją
 - **StatisticsFilter** - komponent umożliwiający filtrowanie danych według zakresu czasu
 - **StatisticsExport** - komponent umożliwiający eksport danych do różnych formatów (CSV, PDF, Excel)
@@ -38,6 +40,8 @@ Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących fl
 - `getKPIData()` - pobiera dane kluczowych wskaźników wydajności
 - `getTrendData()` - pobiera dane trendów czasowych dla różnych metryk
 - `getComparisonData()` - pobiera dane porównawcze dla pojazdów, kierowców lub tras
+- `getDistributionData()` - pobiera dane dystrybucji dla wykresów kołowych
+- `getRadarData()` - pobiera dane dla wykresów radarowych
 - `getAnomalyData()` - pobiera dane o wykrytych anomaliach
 - `getForecastData()` - pobiera dane prognozowane
 - `getCostAnalysisData()` - pobiera dane analizy kosztów
@@ -46,12 +50,17 @@ Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących fl
 - `handleTimeRangeChange()` - obsługuje zmianę zakresu czasu
 - `handleMetricChange()` - obsługuje zmianę wybranej metryki
 - `handleComparisonTypeChange()` - obsługuje zmianę typu porównania
+- `handleChartTypeChange()` - obsługuje zmianę typu wykresu
+- `handleSortOrderChange()` - obsługuje zmianę kolejności sortowania
+- `handleLimitChange()` - obsługuje zmianę limitu wyświetlanych elementów
 - `handleTabChange()` - obsługuje zmianę aktywnej zakładki
 - `handleExport()` - obsługuje eksport danych
 - `generateInsights()` - generuje wnioski na podstawie danych trendów
 - `generateSummary()` - generuje podsumowanie na podstawie danych porównawczych
 - `prepareChartData()` - przygotowuje dane do wyświetlenia na wykresie
 - `prepareTableData()` - przygotowuje dane do wyświetlenia w tabeli
+- `getChartJsType()` - zwraca typ wykresu dla Chart.js
+- `getChartOptions()` - zwraca opcje konfiguracyjne dla Chart.js
 
 #### Stany (hooks):
 - `kpiData` - dane kluczowych wskaźników wydajności
@@ -62,6 +71,9 @@ Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących fl
 - `timeRange` - wybrany zakres czasu
 - `selectedMetrics` - wybrane metryki
 - `comparisonType` - wybrany typ porównania
+- `chartType` - wybrany typ wykresu
+- `sortOrder` - wybrana kolejność sortowania
+- `limit` - wybrany limit elementów
 - `activeTab` - aktywna zakładka
 - `isMultiMetric` - tryb wielu metryk
 
@@ -91,9 +103,26 @@ Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących fl
   - `status` - status (good, warning, critical)
   - `rank` - pozycja w rankingu
 
+- **DistributionData** - struktura danych dystrybucji:
+  - `category` - nazwa kategorii
+  - `value` - wartość kategorii
+
+- **RadarData** - struktura danych dla wykresu radarowego:
+  - `categories` - nazwy kategorii
+  - `values` - wartości dla każdej kategorii
+  - `benchmarkValues` - wartości referencyjne dla porównania
+
+#### Typy wykresów:
+- **Liniowy (line)** - do wizualizacji trendów czasowych
+- **Słupkowy (bar)** - do porównywania wartości między elementami
+- **Słupkowy poziomy (horizontalBar)** - do porównywania wartości między elementami, gdy jest ich dużo
+- **Kołowy (pie)** - do wizualizacji dystrybucji danych
+- **Radarowy (radar)** - do analizy wielowymiarowej
+
 #### Techniczne aspekty:
 - Wszystkie komponenty używają czystego CSS do stylowania i ikon
 - Brak zależności od zewnętrznych bibliotek ikon
+- Wykresy są implementowane przy użyciu Chart.js i react-chartjs-2
 - Komponenty są zintegrowane z API poprzez statisticsService
 - Dostępne są również mocki danych w mockStatisticsService
 - Komponenty używają React Hooks do zarządzania stanem
@@ -105,14 +134,17 @@ Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących fl
    - Wszystkie istotne statystyki w jednym miejscu
    - Możliwość analizy trendów czasowych
    - Porównywanie wydajności różnych elementów floty
+   - Różne typy wizualizacji danych (wykresy liniowe, słupkowe, kołowe, radarowe)
 
 2. **Identyfikacja obszarów do optymalizacji**
    - Wykrywanie nieefektywności
    - Identyfikacja potencjalnych oszczędności
    - Analiza anomalii i odchyleń
+   - Porównywanie wydajności między pojazdami, kierowcami i trasami
 
 3. **Podejmowanie decyzji w oparciu o dane**
    - Dostęp do zaawansowanych analiz
+   - Interaktywne wykresy z możliwością filtrowania i sortowania
    - Generowanie raportów
    - Eksport danych do dalszej analizy
 
@@ -121,6 +153,7 @@ Sekcja Statistics dostarcza kompleksowy widok statystyk i analiz dotyczących fl
    - Konfigurowalne widoki
    - Elastyczne filtry
    - Skalowalność dla różnych rozmiarów flot
+   - Responsywność (desktop, tablet, mobile)
 
 #### Integracja z innymi modułami:
 - **Fleet Management** - wykorzystuje dane statystyczne do optymalizacji zarządzania flotą
@@ -228,90 +261,16 @@ Sekcja Document Management umożliwia centralne zarządzanie wszystkimi dokument
 - `useMockData` - przełącznik źródła danych (API vs Mock)
 
 #### Źródła danych i przepływy:
-- **API Service**: `documentManagementService.js` - zawiera metody do komunikacji z backendem:
-  - `getDocumentsDashboard()` - pobiera dane dashboardu z endpointu `/documents/dashboard`
-  - `getDocuments()` - pobiera listę dokumentów z endpointu `/documents`
-  - `getDocumentDetails()` - pobiera szczegóły dokumentu z endpointu `/documents/{id}`
-  - `uploadDocument()` - wysyła nowy dokument do endpointu `/documents` (multipart/form-data)
-  - `updateDocument()` - aktualizuje dokument przez endpoint `/documents/{id}`
-  - `deleteDocument()` - usuwa dokument przez endpoint `/documents/{id}`
-  - `searchDocuments()` - wyszukuje dokumenty przez endpoint `/documents/search`
-  - `getDocumentTemplates()` - pobiera szablony z endpointu `/documents/templates`
-  - `createDocumentTemplate()` - tworzy szablon przez endpoint `/documents/templates`
-  - `generateDocumentFromTemplate()` - generuje dokument z szablonu przez endpoint `/documents/templates/{id}/generate`
-  - `getDocumentCategories()` - pobiera kategorie z endpointu `/documents/categories`
-  - `getDocumentAlerts()` - pobiera alerty z endpointu `/documents/alerts`
-
-- **Mock Service**: `mockDocumentManagementService.js` - zawiera dane testowe używane podczas developmentu:
-  - Symuluje wszystkie metody API service
-  - Zawiera predefiniowane dane dokumentów, szablonów, kategorii, alertów
-  - Implementuje podstawową logikę filtrowania, sortowania i paginacji
-  - Domyślnie używany w aplikacji (przełączany przez `useMockData`)
-
-- **Współdzielenie danych z innymi komponentami**:
-  - **Fleet Management** - wykorzystuje dane dokumentów pojazdów
-  - **Drivers** - wykorzystuje dane dokumentów kierowców
-  - **Geofencing** - wykorzystuje dane dokumentów wymaganych dla określonych stref
-  - **Ferry Bookings** - wykorzystuje dane dokumentów wymaganych do przepraw promowych
-  - **Road Tolls** - wykorzystuje dane dokumentów wymaganych do opłat drogowych
-
-#### Struktury danych:
-- **Document** - struktura dokumentu zawiera pola:
-  - `id` - unikalny identyfikator dokumentu
-  - `name` - nazwa dokumentu
-  - `type` - typ dokumentu (vehicle, driver, operational, compliance)
-  - `category` - kategoria dokumentu (np. registration, insurance)
-  - `vehicleId/driverId` - powiązanie z pojazdem lub kierowcą
-  - `issueDate/expiryDate` - daty wydania i wygaśnięcia
-  - `status` - status dokumentu (active, expired, pending, archived)
-  - `fileUrl/fileType/fileSize` - informacje o pliku
-  - `tags/notes` - dodatkowe informacje
-  - `createdAt/updatedAt/createdBy/lastViewedAt` - metadane
-
-- **DocumentTemplate** - struktura szablonu dokumentu
-- **AutomationRule** - struktura reguły automatyzacji
-- **ReminderSettings** - struktura ustawień przypomnień
+- **API Service**: `documentManagementService.js` - zawiera metody do komunikacji z backendem
+- **Mock Service**: `mockDocumentManagementService.js` - zawiera dane testowe używane podczas developmentu
 
 #### Techniczne aspekty:
-- Wszystkie komponenty używają czystego CSS do stylowania i ikon (plik IconStyles.css)
+- Wszystkie komponenty używają czystego CSS do stylowania i ikon
 - Ikony są implementowane jako elementy span z odpowiednimi klasami CSS
-- Brak zależności od zewnętrznych bibliotek ikon jak react-icons/fa
+- Brak zależności od zewnętrznych bibliotek ikon
 - Komponenty są zintegrowane z API poprzez documentManagementService
 - Dostępne są również mocki danych w mockDocumentManagementService
-- Komponenty DocumentAutomation używa domyślnych wartości dla props, aby uniknąć błędów przy niezdefiniowanych danych
+- Komponenty używają React Hooks do zarządzania stanem
+- Routing do sekcji Document Management jest zdefiniowany w App.jsx
 
-#### Obsługa błędów:
-- Wyświetlanie komunikatu o błędzie, gdy nie można pobrać danych
-- Osobna obsługa błędów dla głównych danych i szczegółów
-- Walidacja formularzy przed wysłaniem danych
-- Obsługa błędów przesyłania plików
-- Logowanie błędów do konsoli
-
-#### Korzyści biznesowe:
-1. **Zwiększenie zgodności z przepisami**
-   - Centralne zarządzanie wszystkimi dokumentami wymaganymi przez przepisy
-   - Automatyczne przypomnienia o zbliżających się terminach ważności dokumentów
-   - Śledzenie statusu zgodności dokumentacyjnej dla całej floty
-
-2. **Redukcja ryzyka operacyjnego**
-   - Eliminacja ryzyka związanego z przeterminowanymi dokumentami
-   - Zapobieganie karom i opłatom za brak wymaganych dokumentów
-   - Szybki dostęp do dokumentów w przypadku kontroli
-
-3. **Zwiększenie efektywności operacyjnej**
-   - Automatyzacja procesów dokumentacyjnych
-   - Szybkie wyszukiwanie i dostęp do dokumentów
-   - Eliminacja papierowej dokumentacji i związanych z nią kosztów
-
-### Asset Management
-
-Sekcja Asset Management (Zarządzanie Aktywami) umożliwia kompleksowe zarządzanie wszystkimi aktywami floty, nie tylko pojazdami, ale również sprzętem, narzędziami, częściami zamiennymi i innymi zasobami. Komponent ten zapewnia pełną widoczność cyklu życia aktywów od zakupu, przez użytkowanie, konserwację, aż po wycofanie z eksploatacji.
-
-#### Komponenty:
-- **AssetDashboard** - wyświetla kluczowe wskaźniki wydajności (KPI) związane z aktywami, prezentuje statystyki wykorzystania, pokazuje alerty dotyczące konserwacji i wygasających gwarancji, wizualizuje rozmieszczenie aktywów na mapie
-- **AssetInventory** - zarządza kompletnym inwentarzem wszystkich aktywów, kategoryzuje aktywa według typu, lokalizacji i statusu, umożliwia wyszukiwanie i filtrowanie aktywów, śledzi historię przypisania aktywów do pojazdów/kierowców
-- **AssetMaintenance** - planuje i śledzi konserwację aktywów, zarządza harmonogramami przeglądów, rejestruje historię napraw i serwisów, monitoruje koszty konserwacji, generuje przypomnienia o zbliżających się terminach
-- **AssetAcquisition** - zarządza procesem zakupu nowych aktywów, śledzi zamówienia i dostawy, rejestruje informacje o dostawcach, monitoruje koszty zakupu, zarządza dokumentacją zakupową
-- **AssetDisposal** - zarządza procesem wycofywania aktywów z eksploatacji, śledzi wartość odsprzedaży, rejestruje informacje o nabywcach, monitoruje zgodność z przepisami dotyczącymi utylizacji
-- **AssetUtilization** - analizuje wykorzystanie aktywów, identyfikuje nieefektywnie wykorzystywane aktywa, generuje raporty wykorzystania, sugeruje optymalizacje w przydziale aktywów
-- **AssetReporting** - generuje raporty dotyczące aktywów, umożliwia eksport danych do różnych formatów, tworzy niestandardowe widoki raportów, automatyzuje dystrybucję raportów
+Szczegółowa dokumentacja sekcji Document Management znajduje się w pliku [document_management_section.md](./document_management_section.md).
