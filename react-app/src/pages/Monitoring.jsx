@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
 import ViewSelector from '../components/common/ViewSelector';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import monitoringService from '../services/api/monitoringService';
 import mockMonitoringService from '../services/api/mockMonitoringService';
+import mockMonitoringChartsService from '../services/api/mockMonitoringChartsService';
 
 // Styled components
 const PageContainer = styled.div`
@@ -312,6 +315,12 @@ const Monitoring = () => {
   // State for trend data
   const [trendData, setTrendData] = useState(null);
   
+  // States for chart data
+  const [vehicleFuelConsumptionChart, setVehicleFuelConsumptionChart] = useState(null);
+  const [fuelConsumptionTrendChart, setFuelConsumptionTrendChart] = useState(null);
+  const [kilometersTrendChart, setKilometersTrendChart] = useState(null);
+  const [alertsTrendChart, setAlertsTrendChart] = useState(null);
+  
   // State for map tooltip
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -329,6 +338,20 @@ const Monitoring = () => {
   
   // State for data source toggle (API vs Mock)
   const [useMockData, setUseMockData] = useState(true);
+  
+  // Register Chart.js components
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+  );
   
   // Select data service based on toggle state
   const dataService = useMockData ? mockMonitoringService : monitoringService;
@@ -364,6 +387,19 @@ const Monitoring = () => {
         // Fetch trend data
         const trendResponse = await dataService.getTrendData();
         setTrendData(trendResponse);
+        
+        // Fetch chart data
+        const vehicleFuelChartResponse = await mockMonitoringChartsService.getVehicleFuelConsumptionChart();
+        setVehicleFuelConsumptionChart(vehicleFuelChartResponse);
+        
+        const fuelTrendChartResponse = await mockMonitoringChartsService.getFuelConsumptionTrendChart();
+        setFuelConsumptionTrendChart(fuelTrendChartResponse);
+        
+        const kmTrendChartResponse = await mockMonitoringChartsService.getKilometersTrendChart();
+        setKilometersTrendChart(kmTrendChartResponse);
+        
+        const alertsTrendChartResponse = await mockMonitoringChartsService.getAlertsTrendChart();
+        setAlertsTrendChart(alertsTrendChartResponse);
       } catch (err) {
         console.error('Error fetching monitoring data:', err);
         setError('Nie udało się pobrać danych monitoringu. Spróbuj odświeżyć stronę.');
@@ -659,7 +695,87 @@ const Monitoring = () => {
                 <DetailLabel>Koszt paliwa:</DetailLabel>
                 <DetailValue>{fuelData.totalCost.toLocaleString()} zł</DetailValue>
               </DetailRow>
-              <ChartContainer>Wykres zużycia paliwa w czasie</ChartContainer>
+              <ChartContainer>
+                {vehicleFuelConsumptionChart && (
+                  <Line
+                    data={{
+                      labels: vehicleFuelConsumptionChart.data.map(item => item.date.substring(5)), // Show only MM-DD
+                      datasets: [
+                        {
+                          label: 'Zużycie paliwa',
+                          data: vehicleFuelConsumptionChart.data.map(item => item.consumption),
+                          borderColor: vehicleFuelConsumptionChart.colors.line,
+                          backgroundColor: vehicleFuelConsumptionChart.colors.area,
+                          borderWidth: 2,
+                          fill: true,
+                          tension: 0.4,
+                          pointRadius: 3,
+                          pointHoverRadius: 5
+                        },
+                        {
+                          label: vehicleFuelConsumptionChart.target.label,
+                          data: Array(vehicleFuelConsumptionChart.data.length).fill(vehicleFuelConsumptionChart.target.value),
+                          borderColor: vehicleFuelConsumptionChart.colors.target,
+                          borderWidth: 2,
+                          borderDash: [5, 5],
+                          fill: false,
+                          pointRadius: 0
+                        }
+                      ]
+                    }}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: true,
+                          position: 'top',
+                          labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            font: {
+                              size: 11
+                            }
+                          }
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (context) => {
+                              if (context.dataset.label === vehicleFuelConsumptionChart.target.label) {
+                                return `${context.dataset.label}: ${context.raw} ${vehicleFuelConsumptionChart.unit}`;
+                              }
+                              return `${context.dataset.label}: ${context.raw} ${vehicleFuelConsumptionChart.unit}`;
+                            }
+                          }
+                        }
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: false,
+                          min: Math.min(vehicleFuelConsumptionChart.target.value * 0.9, ...vehicleFuelConsumptionChart.data.map(item => item.consumption)) * 0.95,
+                          max: Math.max(vehicleFuelConsumptionChart.target.value * 1.1, ...vehicleFuelConsumptionChart.data.map(item => item.consumption)) * 1.05,
+                          grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                          },
+                          ticks: {
+                            callback: (value) => `${value} ${vehicleFuelConsumptionChart.unit}`
+                          }
+                        },
+                        x: {
+                          grid: {
+                            display: false
+                          },
+                          ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10
+                          }
+                        }
+                      }
+                    }}
+                  />
+                )}
+              </ChartContainer>
             </>
           )}
         </Card>
@@ -738,15 +854,202 @@ const Monitoring = () => {
         <SectionTitle>RAPORTY I ANALIZY TRENDÓW</SectionTitle>
         <GridSection>
           <Card title="Trend zużycia paliwa">
-            <ChartContainer>Wykres trendu zużycia paliwa</ChartContainer>
+            <div>
+              <strong>Aktualne zużycie: </strong> 
+              {fuelConsumptionTrendChart?.current} {fuelConsumptionTrendChart?.unit}
+              <span style={{ 
+                color: fuelConsumptionTrendChart?.change < 0 ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {fuelConsumptionTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(fuelConsumptionTrendChart?.change).toFixed(1)}%
+              </span>
+            </div>
+            <ChartContainer>
+              {fuelConsumptionTrendChart && (
+                <Bar
+                  data={{
+                    labels: fuelConsumptionTrendChart.data.map(item => item.date),
+                    datasets: [
+                      {
+                        label: 'Zużycie paliwa',
+                        data: fuelConsumptionTrendChart.data.map(item => item.value),
+                        backgroundColor: fuelConsumptionTrendChart.colors.primary,
+                        borderColor: fuelConsumptionTrendChart.colors.primary,
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barThickness: 20
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            return `Zużycie: ${context.raw} ${fuelConsumptionTrendChart.unit}`;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: false,
+                        grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                          callback: (value) => `${value} ${fuelConsumptionTrendChart.unit}`
+                        }
+                      },
+                      x: {
+                        grid: {
+                          display: false
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
           </Card>
           
           <Card title="Trend przejechanych kilometrów">
-            <ChartContainer>Wykres trendu przejechanych kilometrów</ChartContainer>
+            <div>
+              <strong>Aktualny przebieg: </strong> 
+              {kilometersTrendChart?.current.toLocaleString()} {kilometersTrendChart?.unit}
+              <span style={{ 
+                color: kilometersTrendChart?.change > 0 ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {kilometersTrendChart?.change > 0 ? '↑' : '↓'} {Math.abs(kilometersTrendChart?.change).toFixed(1)}%
+              </span>
+            </div>
+            <ChartContainer>
+              {kilometersTrendChart && (
+                <Bar
+                  data={{
+                    labels: kilometersTrendChart.data.map(item => item.date),
+                    datasets: [
+                      {
+                        label: 'Przejechane kilometry',
+                        data: kilometersTrendChart.data.map(item => item.value),
+                        backgroundColor: kilometersTrendChart.colors.primary,
+                        borderColor: kilometersTrendChart.colors.primary,
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barThickness: 20
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            return `Przebieg: ${context.raw.toLocaleString()} ${kilometersTrendChart.unit}`;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: false,
+                        grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                          callback: (value) => `${value.toLocaleString()} ${kilometersTrendChart.unit}`
+                        }
+                      },
+                      x: {
+                        grid: {
+                          display: false
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
           </Card>
           
           <Card title="Trend alertów">
-            <ChartContainer>Wykres trendu liczby alertów</ChartContainer>
+            <div>
+              <strong>Aktualna liczba alertów: </strong> 
+              {alertsTrendChart?.current}
+              <span style={{ 
+                color: alertsTrendChart?.change < 0 ? '#4caf50' : '#f44336',
+                marginLeft: '8px'
+              }}>
+                {alertsTrendChart?.change < 0 ? '↓' : '↑'} {Math.abs(alertsTrendChart?.change).toFixed(1)}%
+              </span>
+            </div>
+            <ChartContainer>
+              {alertsTrendChart && (
+                <Line
+                  data={{
+                    labels: alertsTrendChart.data.map(item => item.date),
+                    datasets: [
+                      {
+                        label: 'Liczba alertów',
+                        data: alertsTrendChart.data.map(item => item.value),
+                        borderColor: alertsTrendChart.colors.primary,
+                        backgroundColor: alertsTrendChart.colors.background,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: alertsTrendChart.colors.primary,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: (context) => {
+                            return `Liczba alertów: ${context.raw}`;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                          stepSize: 1,
+                          precision: 0
+                        }
+                      },
+                      x: {
+                        grid: {
+                          display: false
+                        }
+                      }
+                    }
+                  }}
+                />
+              )}
+            </ChartContainer>
           </Card>
         </GridSection>
       </>
