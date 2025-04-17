@@ -149,4 +149,4 @@ const StatisticsDashboard = () => {
   );
 };
 
-export { StatisticsDashboard as default, StatisticsDashboard };
+export default StatisticsDashboard;
