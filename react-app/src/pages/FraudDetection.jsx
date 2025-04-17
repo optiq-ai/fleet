@@ -260,6 +260,14 @@ const FraudDetection = () => {
   // Stan dla ładowania
   const [isLoading, setIsLoading] = useState(true);
   
+  // Stan dla danych analizy wzorców
+  const [patternData, setPatternData] = useState(null);
+  const [isLoadingPatterns, setIsLoadingPatterns] = useState(false);
+  
+  // Stan dla danych testów jakości paliwa
+  const [fuelTestsData, setFuelTestsData] = useState(null);
+  const [isLoadingFuelTests, setIsLoadingFuelTests] = useState(false);
+  
   // Nowe stany dla ulepszonych funkcji wykrywania oszustw
   const [showBiometricModal, setShowBiometricModal] = useState(false);
   const [showMultiFactorAuth, setShowMultiFactorAuth] = useState(false);
@@ -506,10 +514,10 @@ const FraudDetection = () => {
   const [patternData, setPatternData] = useState(null);
   const [isLoadingPatterns, setIsLoadingPatterns] = useState(false);
   
-  // Pobieranie danych analizy wzorców
+  // Pobieranie danych analizy wzorców i testów jakości paliwa przy zmianie zakładki
   useEffect(() => {
-    const fetchPatternData = async () => {
-      if (activeTab === 'patterns') {
+    const fetchTabData = async () => {
+      if (activeTab === 'patterns' && !patternData) {
         setIsLoadingPatterns(true);
         try {
           const data = await mockFraudDetectionService.getTransactionPatterns();
@@ -520,10 +528,22 @@ const FraudDetection = () => {
           setIsLoadingPatterns(false);
         }
       }
+      
+      if (activeTab === 'fuelTests' && !fuelTestsData) {
+        setIsLoadingFuelTests(true);
+        try {
+          const data = await mockFraudDetectionService.getFuelQualityTests();
+          setFuelTestsData(data);
+        } catch (error) {
+          console.error('Error fetching fuel quality tests data:', error);
+        } finally {
+          setIsLoadingFuelTests(false);
+        }
+      }
     };
     
-    fetchPatternData();
-  }, [activeTab]);
+    fetchTabData();
+  }, [activeTab, patternData, fuelTestsData]);
   
   // Renderowanie analizy wzorców
   const renderPatternAnalysis = () => {
@@ -811,28 +831,10 @@ const FraudDetection = () => {
     );
   };
   
-  // Stan dla danych testów jakości paliwa
-  const [fuelTestsData, setFuelTestsData] = useState(null);
-  const [isLoadingFuelTests, setIsLoadingFuelTests] = useState(false);
-  
-  // Pobieranie danych testów jakości paliwa
-  useEffect(() => {
-    const fetchFuelTestsData = async () => {
-      if (activeTab === 'fuelTests') {
-        setIsLoadingFuelTests(true);
-        try {
-          const data = await mockFraudDetectionService.getFuelQualityTests();
-          setFuelTestsData(data);
-        } catch (error) {
-          console.error('Error fetching fuel quality tests data:', error);
-        } finally {
-          setIsLoadingFuelTests(false);
-        }
-      }
-    };
-    
-    fetchFuelTestsData();
-  }, [activeTab]);
+  // Obsługa zmiany zakładki
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
   
   // Renderowanie testów jakości paliwa
   const renderFuelQualityTests = () => {

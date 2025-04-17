@@ -84,7 +84,7 @@ const SuspiciousTransactionsMap = ({
     // Sprawdzenie, czy Google Maps API jest załadowane
     if (!window.google || !window.google.maps) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNLrJhOMz6idD05pzfn5lhA-TAw-mAZCU&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = initializeMap;
@@ -130,7 +130,9 @@ const SuspiciousTransactionsMap = ({
     if (!map || !transactions.length) return;
     
     // Usunięcie istniejących markerów
-    markers.forEach(marker => marker.setMap(null));
+    if (markers.length > 0) {
+      markers.forEach(marker => marker.setMap(null));
+    }
     
     // Liczniki dla statystyk
     let suspiciousCount = 0;
@@ -202,7 +204,11 @@ const SuspiciousTransactionsMap = ({
       // Obsługa kliknięcia markera
       marker.addListener('click', () => {
         // Zamknięcie wszystkich otwartych infowindow
-        newMarkers.forEach(m => m.infowindow.close());
+        newMarkers.forEach(m => {
+          if (m.infowindow) {
+            m.infowindow.close();
+          }
+        });
         
         // Otwarcie infowindow dla klikniętego markera
         infowindow.open(map, marker);
@@ -247,9 +253,11 @@ const SuspiciousTransactionsMap = ({
     
     // Cleanup
     return () => {
-      newMarkers.forEach(marker => marker.setMap(null));
+      if (newMarkers.length > 0) {
+        newMarkers.forEach(marker => marker.setMap(null));
+      }
     };
-  }, [map, transactions, onMarkerClick, markers]);
+  }, [map, transactions, onMarkerClick]);
   
   return (
     <MapContainer>
