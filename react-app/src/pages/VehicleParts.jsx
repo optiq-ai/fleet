@@ -540,10 +540,12 @@ const VehicleParts = () => {
   // Handle compatibility search
   const handleCompatibilitySearch = () => {
     if (vehicleModel) {
-      setFilters({
-        ...filters,
-        page: 1
-      });
+      // Force a re-fetch by setting compatibleParts to null first
+      setCompatibleParts(null);
+      setIsLoading(true);
+      
+      // The useEffect will handle the actual data fetching
+      // since it depends on vehicleModel
     }
   };
   
