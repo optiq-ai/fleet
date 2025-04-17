@@ -64,11 +64,11 @@ const ContinuousOptimization = () => {
                 <td>{param.recommendedValue}</td>
                 <td>{param.potentialImpact}</td>
                 <td>
-                  <span className={`confidence-badge ${param.confidence.toLowerCase()}`}>
-                    {param.confidence}
+                  <span className={`confidence-badge ${param.confidence ? param.confidence.toLowerCase() : 'unknown'}`}>
+                    {param.confidence || 'Unknown'}
                   </span>
                 </td>
-                <td>{new Date(param.lastUpdated).toLocaleDateString()}</td>
+                <td>{param.lastUpdated ? new Date(param.lastUpdated).toLocaleDateString() : 'Unknown'}</td>
                 <td>
                   <div className="action-buttons">
                     <button className="apply-button">Apply</button>
@@ -105,8 +105,8 @@ const ContinuousOptimization = () => {
                 <td>{bottleneck.impact}</td>
                 <td>{bottleneck.recommendation}</td>
                 <td>
-                  <span className={`priority-badge ${bottleneck.priority.toLowerCase()}`}>
-                    {bottleneck.priority}
+                  <span className={`priority-badge ${bottleneck.priority ? bottleneck.priority.toLowerCase() : 'unknown'}`}>
+                    {bottleneck.priority || 'Unknown'}
                   </span>
                 </td>
                 <td>
@@ -145,8 +145,8 @@ const ContinuousOptimization = () => {
                 <td>{suggestion.estimatedImpact}</td>
                 <td>{suggestion.implementationEffort}</td>
                 <td>
-                  <span className={`priority-badge ${suggestion.priority.toLowerCase()}`}>
-                    {suggestion.priority}
+                  <span className={`priority-badge ${suggestion.priority ? suggestion.priority.toLowerCase() : 'unknown'}`}>
+                    {suggestion.priority || 'Unknown'}
                   </span>
                 </td>
                 <td>
@@ -186,8 +186,8 @@ const ContinuousOptimization = () => {
                 <td>{benchmark.topPerformer}</td>
                 <td>{benchmark.percentile}</td>
                 <td>
-                  <span className={`trend-badge ${benchmark.trend.toLowerCase()}`}>
-                    {benchmark.trend}
+                  <span className={`trend-badge ${benchmark.trend ? benchmark.trend.toLowerCase() : 'unknown'}`}>
+                    {benchmark.trend || 'Unknown'}
                   </span>
                 </td>
               </tr>

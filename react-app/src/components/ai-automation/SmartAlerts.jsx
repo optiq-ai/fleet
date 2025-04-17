@@ -63,10 +63,10 @@ const SmartAlerts = () => {
     return (
       <div className="alerts-list">
         {data.map((alert) => (
-          <div key={alert.id} className={`alert-card priority-${alert.priority.toLowerCase()}`}>
+          <div key={alert.id} className={`alert-card priority-${alert.priority ? alert.priority.toLowerCase() : 'unknown'}`}>
             <div className="alert-header">
               <div className="alert-type">{alert.type}</div>
-              <div className="alert-priority">{alert.priority}</div>
+              <div className="alert-priority">{alert.priority || 'Unknown'}</div>
             </div>
             <div className="alert-message">{alert.message}</div>
             <div className="alert-meta">
@@ -108,12 +108,12 @@ const SmartAlerts = () => {
               <tr key={setting.id}>
                 <td>{setting.category}</td>
                 <td>
-                  <span className={`priority-badge ${setting.priority.toLowerCase()}`}>
-                    {setting.priority}
+                  <span className={`priority-badge ${setting.priority ? setting.priority.toLowerCase() : 'unknown'}`}>
+                    {setting.priority || 'Unknown'}
                   </span>
                 </td>
-                <td>{setting.notificationChannels.join(', ')}</td>
-                <td>{setting.recipients.join(', ')}</td>
+                <td>{setting.notificationChannels && Array.isArray(setting.notificationChannels) ? setting.notificationChannels.join(', ') : 'None'}</td>
+                <td>{setting.recipients && Array.isArray(setting.recipients) ? setting.recipients.join(', ') : 'None'}</td>
                 <td>
                   <button className="edit-settings-button">Edit</button>
                 </td>
@@ -144,14 +144,14 @@ const SmartAlerts = () => {
               <tr key={alert.id}>
                 <td>{alert.type}</td>
                 <td>
-                  <span className={`priority-badge ${alert.priority.toLowerCase()}`}>
-                    {alert.priority}
+                  <span className={`priority-badge ${alert.priority ? alert.priority.toLowerCase() : 'unknown'}`}>
+                    {alert.priority || 'Unknown'}
                   </span>
                 </td>
                 <td>{alert.message}</td>
-                <td>{new Date(alert.timestamp).toLocaleString()}</td>
-                <td>{new Date(alert.resolvedAt).toLocaleString()}</td>
-                <td>{alert.resolvedBy}</td>
+                <td>{alert.timestamp ? new Date(alert.timestamp).toLocaleString() : 'Unknown'}</td>
+                <td>{alert.resolvedAt ? new Date(alert.resolvedAt).toLocaleString() : 'Not resolved'}</td>
+                <td>{alert.resolvedBy || 'N/A'}</td>
               </tr>
             ))}
           </tbody>

@@ -57,15 +57,15 @@ const PredictiveAnalytics = () => {
           </thead>
           <tbody>
             {data.map((item) => (
-              <tr key={item.id} className={`severity-${item.severity}`}>
+              <tr key={item.id} className={`severity-${item.severity ? item.severity.toLowerCase() : 'unknown'}`}>
                 <td>{item.vehicleId}</td>
                 <td>{item.component}</td>
                 <td>{(item.probability * 100).toFixed(1)}%</td>
                 <td>{item.estimatedTimeToFailure}</td>
                 <td>{item.suggestedAction}</td>
                 <td>
-                  <span className={`severity-indicator ${item.severity}`}>
-                    {item.severity.charAt(0).toUpperCase() + item.severity.slice(1)}
+                  <span className={`severity-indicator ${item.severity ? item.severity.toLowerCase() : 'unknown'}`}>
+                    {item.severity ? item.severity.charAt(0).toUpperCase() + item.severity.slice(1) : 'Unknown'}
                   </span>
                 </td>
               </tr>
