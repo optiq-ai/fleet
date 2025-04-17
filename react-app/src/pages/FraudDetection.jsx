@@ -510,10 +510,6 @@ const FraudDetection = () => {
     );
   };
   
-  // Stan dla danych analizy wzorców
-  const [patternData, setPatternData] = useState(null);
-  const [isLoadingPatterns, setIsLoadingPatterns] = useState(false);
-  
   // Pobieranie danych analizy wzorców i testów jakości paliwa przy zmianie zakładki
   useEffect(() => {
     const fetchTabData = async () => {
