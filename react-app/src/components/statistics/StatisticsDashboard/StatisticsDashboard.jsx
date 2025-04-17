@@ -16,6 +16,8 @@ const StatisticsDashboard = () => {
   const {
     kpiData,
     trendData,
+    distributionData,
+    vehicleComparisonData,
     isLoading,
     error,
     timeRange,
@@ -65,7 +67,7 @@ const StatisticsDashboard = () => {
         ))}
       </div>
       
-      {/* Charts */}
+      {/* Charts - First Row */}
       <div className="charts-container">
         <div className="chart-wrapper">
           <h3 className="chart-title">Zużycie paliwa</h3>
@@ -75,6 +77,7 @@ const StatisticsDashboard = () => {
             xAxis="date"
             yAxis="value"
             color="#4CAF50"
+            title="Zużycie paliwa (l/100km)"
           />
         </div>
         
@@ -86,9 +89,13 @@ const StatisticsDashboard = () => {
             xAxis="date"
             yAxis="value"
             color="#2196F3"
+            title="Koszty operacyjne (PLN)"
           />
         </div>
-        
+      </div>
+      
+      {/* Charts - Second Row */}
+      <div className="charts-container">
         <div className="chart-wrapper">
           <h3 className="chart-title">Emisja CO2</h3>
           <StatisticsChart 
@@ -97,6 +104,7 @@ const StatisticsDashboard = () => {
             xAxis="date"
             yAxis="value"
             color="#FF5722"
+            title="Emisja CO2 (kg)"
           />
         </div>
         
@@ -108,6 +116,57 @@ const StatisticsDashboard = () => {
             xAxis="date"
             yAxis="value"
             color="#9C27B0"
+            title="Indeks bezpieczeństwa (%)"
+          />
+        </div>
+      </div>
+      
+      {/* Charts - Third Row */}
+      <div className="charts-container">
+        <div className="chart-wrapper">
+          <h3 className="chart-title">Rozkład zużycia paliwa</h3>
+          <StatisticsChart 
+            data={distributionData}
+            type="pie"
+            xAxis="category"
+            yAxis="value"
+            title="Rozkład zużycia paliwa wg typu trasy"
+          />
+        </div>
+        
+        <div className="chart-wrapper">
+          <h3 className="chart-title">Top 5 pojazdów - zużycie paliwa</h3>
+          <StatisticsChart 
+            data={vehicleComparisonData}
+            type="bar"
+            xAxis="name"
+            yAxis="value"
+            color="#00897B"
+            title="Zużycie paliwa (l/100km)"
+          />
+        </div>
+      </div>
+      
+      {/* Charts - Fourth Row */}
+      <div className="charts-container">
+        <div className="chart-wrapper full-width">
+          <h3 className="chart-title">Porównanie metryk</h3>
+          <StatisticsChart 
+            data={{
+              'Zużycie paliwa': trendData.fuelConsumption,
+              'Koszty operacyjne': trendData.operationalCosts,
+              'Emisja CO2': trendData.co2Emission
+            }}
+            type="multiLine"
+            xAxis="date"
+            yAxis="value"
+            series={['Zużycie paliwa', 'Koszty operacyjne', 'Emisja CO2']}
+            colors={{
+              'Zużycie paliwa': '#4CAF50',
+              'Koszty operacyjne': '#2196F3',
+              'Emisja CO2': '#FF5722'
+            }}
+            title="Porównanie kluczowych metryk"
           />
         </div>
       </div>

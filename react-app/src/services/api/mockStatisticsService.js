@@ -136,33 +136,47 @@ class MockStatisticsService {
     const result = {};
     
     metrics.forEach(metric => {
-      result[metric] = dates.map(date => {
-        let value;
+      // Generowanie danych z trendem, aby wykresy były bardziej realistyczne
+      const trendFactor = Math.random() * 0.2 - 0.1; // Losowy trend między -0.1 a 0.1
+      let baseValue;
+      
+      switch (metric) {
+        case 'fuelConsumption':
+          baseValue = 8;
+          break;
+        case 'operationalCosts':
+          baseValue = 10000;
+          break;
+        case 'co2Emission':
+          baseValue = 2000;
+          break;
+        case 'safetyIndex':
+          baseValue = 75;
+          break;
+        case 'maintenanceCosts':
+          baseValue = 2000;
+          break;
+        case 'vehicleUtilization':
+          baseValue = 60;
+          break;
+        case 'driverPerformance':
+          baseValue = 70;
+          break;
+        default:
+          baseValue = 50;
+      }
+      
+      result[metric] = dates.map((date, index) => {
+        // Dodanie trendu i losowych wahań
+        const trendValue = baseValue * (1 + trendFactor * index / dates.length);
+        const randomVariation = trendValue * (Math.random() * 0.2 - 0.1); // Losowe wahania ±10%
+        let value = trendValue + randomVariation;
         
-        switch (metric) {
-          case 'fuelConsumption':
-            value = 8 + Math.random() * 2;
-            break;
-          case 'operationalCosts':
-            value = 10000 + Math.random() * 5000;
-            break;
-          case 'co2Emission':
-            value = 2000 + Math.random() * 1000;
-            break;
-          case 'safetyIndex':
-            value = 75 + Math.random() * 20;
-            break;
-          case 'maintenanceCosts':
-            value = 2000 + Math.random() * 1000;
-            break;
-          case 'vehicleUtilization':
-            value = 60 + Math.random() * 30;
-            break;
-          case 'driverPerformance':
-            value = 70 + Math.random() * 20;
-            break;
-          default:
-            value = Math.random() * 100;
+        // Dodanie sezonowości dla niektórych metryk
+        if (['fuelConsumption', 'operationalCosts', 'co2Emission'].includes(metric)) {
+          // Dodanie wzorca sezonowego (np. wyższe wartości w środku okresu)
+          const seasonalFactor = Math.sin(Math.PI * index / dates.length);
+          value += baseValue * 0.15 * seasonalFactor;
         }
         
         return {
@@ -199,7 +213,12 @@ class MockStatisticsService {
           { id: 'v7', name: 'Iveco Stralis' },
           { id: 'v8', name: 'Mercedes Atego' },
           { id: 'v9', name: 'Volvo FM' },
-          { id: 'v10', name: 'Scania S' }
+          { id: 'v10', name: 'Scania S' },
+          { id: 'v11', name: 'MAN TGS' },
+          { id: 'v12', name: 'DAF CF' },
+          { id: 'v13', name: 'Renault D' },
+          { id: 'v14', name: 'Iveco Daily' },
+          { id: 'v15', name: 'Mercedes Arocs' }
         ];
         break;
       case 'driver':
@@ -213,7 +232,12 @@ class MockStatisticsService {
           { id: 'd7', name: 'Michał Kamiński' },
           { id: 'd8', name: 'Agnieszka Kowalczyk' },
           { id: 'd9', name: 'Krzysztof Zieliński' },
-          { id: 'd10', name: 'Monika Szymańska' }
+          { id: 'd10', name: 'Monika Szymańska' },
+          { id: 'd11', name: 'Grzegorz Woźniak' },
+          { id: 'd12', name: 'Barbara Kaczmarek' },
+          { id: 'd13', name: 'Andrzej Piotrowski' },
+          { id: 'd14', name: 'Ewa Grabowska' },
+          { id: 'd15', name: 'Robert Michalski' }
         ];
         break;
       case 'route':
@@ -227,7 +251,12 @@ class MockStatisticsService {
           { id: 'r7', name: 'Kraków - Wrocław' },
           { id: 'r8', name: 'Gdańsk - Poznań' },
           { id: 'r9', name: 'Gdańsk - Wrocław' },
-          { id: 'r10', name: 'Poznań - Wrocław' }
+          { id: 'r10', name: 'Poznań - Wrocław' },
+          { id: 'r11', name: 'Warszawa - Łódź' },
+          { id: 'r12', name: 'Kraków - Łódź' },
+          { id: 'r13', name: 'Gdańsk - Łódź' },
+          { id: 'r14', name: 'Poznań - Łódź' },
+          { id: 'r15', name: 'Wrocław - Łódź' }
         ];
         break;
       default:
@@ -238,39 +267,54 @@ class MockStatisticsService {
     return items.map((item, index) => {
       let value, change, status;
       
+      // Generowanie bardziej realistycznych danych z pewnym wzorcem
+      // Dla każdego typu porównania używamy innego wzorca, aby dane były zróżnicowane
+      const baseValue = this._getBaseValueForMetric(metric);
+      const variationFactor = comparisonType === 'vehicle' ? 0.5 : 
+                             comparisonType === 'driver' ? 0.3 : 0.4;
+      
+      // Generowanie wartości z pewnym wzorcem (np. pierwsze elementy mają lepsze wyniki)
+      const patternFactor = 1 + (index / items.length) * variationFactor;
+      
+      // Dodanie losowego czynnika, aby dane nie były zbyt przewidywalne
+      const randomFactor = 1 + (Math.random() * 0.4 - 0.2);
+      
+      value = baseValue * patternFactor * randomFactor;
+      
+      // Formatowanie wartości w zależności od metryki
       switch (metric) {
         case 'fuelConsumption':
-          value = parseFloat((6 + Math.random() * 5).toFixed(1));
+          value = parseFloat(value.toFixed(1));
           change = parseFloat((Math.random() * 10 - 5).toFixed(1));
           status = value < 8 ? 'good' : value < 10 ? 'warning' : 'critical';
           break;
         case 'operationalCosts':
-          value = Math.floor(8000 + Math.random() * 4000);
+          value = Math.floor(value);
           change = parseFloat((Math.random() * 10 - 5).toFixed(1));
           status = value < 10000 ? 'good' : value < 11000 ? 'warning' : 'critical';
           break;
         case 'co2Emission':
-          value = Math.floor(1500 + Math.random() * 1000);
+          value = Math.floor(value);
           change = parseFloat((Math.random() * 10 - 5).toFixed(1));
           status = value < 2000 ? 'good' : value < 2300 ? 'warning' : 'critical';
           break;
         case 'efficiency':
-          value = parseFloat((70 + Math.random() * 20).toFixed(1));
+          value = parseFloat(value.toFixed(1));
           change = parseFloat((Math.random() * 10 - 5).toFixed(1));
           status = value > 85 ? 'good' : value > 75 ? 'warning' : 'critical';
           break;
         case 'utilization':
-          value = parseFloat((60 + Math.random() * 30).toFixed(1));
+          value = parseFloat(value.toFixed(1));
           change = parseFloat((Math.random() * 10 - 5).toFixed(1));
           status = value > 80 ? 'good' : value > 70 ? 'warning' : 'critical';
           break;
         case 'maintenanceCosts':
-          value = Math.floor(1000 + Math.random() * 2000);
+          value = Math.floor(value);
           change = parseFloat((Math.random() * 10 - 5).toFixed(1));
           status = value < 1500 ? 'good' : value < 2500 ? 'warning' : 'critical';
           break;
         default:
-          value = parseFloat((Math.random() * 100).toFixed(1));
+          value = parseFloat(value.toFixed(1));
           change = parseFloat((Math.random() * 10 - 5).toFixed(1));
           status = 'good';
       }
@@ -293,6 +337,109 @@ class MockStatisticsService {
       ...item,
       rank: index + 1
     }));
+  }
+  
+  /**
+   * Get distribution data for statistics
+   * @param {string} distributionType - Type of distribution (fuelByRoute, costsByVehicle, etc.)
+   * @param {string} timeRange - Time range for data
+   * @returns {Promise<Array>} Distribution data
+   */
+  async getDistributionData(distributionType = 'fuelByRoute', timeRange = 'month') {
+    await delay(800);
+    
+    let data = [];
+    
+    switch (distributionType) {
+      case 'fuelByRoute':
+        data = [
+          { category: 'Trasy miejskie', value: 35 },
+          { category: 'Trasy międzymiastowe', value: 45 },
+          { category: 'Autostrady', value: 20 }
+        ];
+        break;
+      case 'costsByCategory':
+        data = [
+          { category: 'Paliwo', value: 65 },
+          { category: 'Konserwacja', value: 15 },
+          { category: 'Ubezpieczenie', value: 10 },
+          { category: 'Opłaty drogowe', value: 5 },
+          { category: 'Inne', value: 5 }
+        ];
+        break;
+      case 'vehiclesByType':
+        data = [
+          { category: 'Ciężarowe', value: 60 },
+          { category: 'Dostawcze', value: 25 },
+          { category: 'Osobowe', value: 15 }
+        ];
+        break;
+      case 'emissionsBySource':
+        data = [
+          { category: 'Transport', value: 75 },
+          { category: 'Magazyny', value: 15 },
+          { category: 'Biura', value: 10 }
+        ];
+        break;
+      default:
+        data = [
+          { category: 'Kategoria 1', value: 30 },
+          { category: 'Kategoria 2', value: 40 },
+          { category: 'Kategoria 3', value: 30 }
+        ];
+    }
+    
+    return data;
+  }
+  
+  /**
+   * Get radar chart data for statistics
+   * @param {string} radarType - Type of radar chart (vehiclePerformance, driverSkills, etc.)
+   * @param {string} entityId - ID of the entity to analyze
+   * @returns {Promise<Object>} Radar chart data
+   */
+  async getRadarData(radarType = 'vehiclePerformance', entityId = null) {
+    await delay(800);
+    
+    let categories = [];
+    let values = [];
+    let benchmarkValues = [];
+    
+    switch (radarType) {
+      case 'vehiclePerformance':
+        categories = ['Zużycie paliwa', 'Efektywność', 'Niezawodność', 'Koszty utrzymania', 'Emisja CO2'];
+        values = [85, 70, 90, 65, 80];
+        benchmarkValues = [75, 75, 75, 75, 75];
+        break;
+      case 'driverSkills':
+        categories = ['Ekonomiczna jazda', 'Bezpieczeństwo', 'Punktualność', 'Dbałość o pojazd', 'Obsługa klienta'];
+        values = [75, 85, 90, 70, 80];
+        benchmarkValues = [70, 70, 70, 70, 70];
+        break;
+      case 'routeEfficiency':
+        categories = ['Czas przejazdu', 'Zużycie paliwa', 'Koszty', 'Bezpieczeństwo', 'Obciążenie dróg'];
+        values = [65, 80, 75, 90, 85];
+        benchmarkValues = [80, 80, 80, 80, 80];
+        break;
+      default:
+        categories = ['Kategoria 1', 'Kategoria 2', 'Kategoria 3', 'Kategoria 4', 'Kategoria 5'];
+        values = [70, 70, 70, 70, 70];
+        benchmarkValues = [60, 60, 60, 60, 60];
+    }
+    
+    // Jeśli podano ID encji, dodaj losowe wahania do wartości
+    if (entityId) {
+      values = values.map(value => {
+        const variation = Math.random() * 20 - 10; // Losowe wahania ±10
+        return Math.min(100, Math.max(0, Math.round(value + variation)));
+      });
+    }
+    
+    return {
+      categories,
+      values,
+      benchmarkValues
+    };
   }
   
   /**
@@ -327,6 +474,26 @@ class MockStatisticsService {
       limit,
       data: paginatedAnomalies
     };
+  }
+  
+  // Helper method to get base value for metric
+  _getBaseValueForMetric(metric) {
+    switch (metric) {
+      case 'fuelConsumption':
+        return 8;
+      case 'operationalCosts':
+        return 10000;
+      case 'co2Emission':
+        return 2000;
+      case 'efficiency':
+        return 80;
+      case 'utilization':
+        return 75;
+      case 'maintenanceCosts':
+        return 1500;
+      default:
+        return 50;
+    }
   }
   
   // Helper method to generate dates based on time range

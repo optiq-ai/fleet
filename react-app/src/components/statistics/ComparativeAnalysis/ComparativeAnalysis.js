@@ -21,6 +21,12 @@ export const useComparativeAnalysisLogic = () => {
   const [selectedMetric, setSelectedMetric] = useState('fuelConsumption');
   // State for active tab
   const [activeTab, setActiveTab] = useState('chart');
+  // State for chart type
+  const [chartType, setChartType] = useState('bar');
+  // State for sort order
+  const [sortOrder, setSortOrder] = useState('best');
+  // State for limit
+  const [limit, setLimit] = useState(10);
   
   // Available comparison type options
   const comparisonTypeOptions = [
@@ -37,6 +43,21 @@ export const useComparativeAnalysisLogic = () => {
     { id: 'efficiency', name: 'Efektywność', unit: '%', color: '#9C27B0', lowerIsBetter: false },
     { id: 'utilization', name: 'Wykorzystanie', unit: '%', color: '#FFC107', lowerIsBetter: false },
     { id: 'maintenanceCosts', name: 'Koszty konserwacji', unit: 'PLN', color: '#607D8B', lowerIsBetter: true }
+  ];
+  
+  // Available chart type options
+  const chartTypeOptions = [
+    { id: 'bar', name: 'Słupkowy' },
+    { id: 'horizontalBar', name: 'Słupkowy poziomy' },
+    { id: 'pie', name: 'Kołowy' },
+    { id: 'radar', name: 'Radarowy' }
+  ];
+  
+  // Available sort order options
+  const sortOrderOptions = [
+    { id: 'best', name: 'Najlepsze' },
+    { id: 'worst', name: 'Najgorsze' },
+    { id: 'alphabetical', name: 'Alfabetycznie' }
   ];
   
   /**
@@ -88,6 +109,30 @@ export const useComparativeAnalysisLogic = () => {
    */
   const handleMetricChange = (event) => {
     setSelectedMetric(event.target.value);
+  };
+  
+  /**
+   * Handle chart type change
+   * @param {string} type - New chart type
+   */
+  const handleChartTypeChange = (type) => {
+    setChartType(type);
+  };
+  
+  /**
+   * Handle sort order change
+   * @param {string} order - New sort order
+   */
+  const handleSortOrderChange = (order) => {
+    setSortOrder(order);
+  };
+  
+  /**
+   * Handle limit change
+   * @param {number} newLimit - New limit
+   */
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
   };
   
   /**
@@ -190,18 +235,34 @@ export const useComparativeAnalysisLogic = () => {
       return [];
     }
     
-    // Sort data by value
-    const sortedData = [...comparisonData].sort((a, b) => {
-      const metricInfo = metricOptions.find(option => option.id === selectedMetric);
-      if (metricInfo && metricInfo.lowerIsBetter) {
-        return a.value - b.value; // Lower is better, sort ascending
-      } else {
-        return b.value - a.value; // Higher is better, sort descending
-      }
-    });
+    // Get metric info
+    const metricInfo = metricOptions.find(option => option.id === selectedMetric);
     
-    // Limit to top 10 for better visualization
-    return sortedData.slice(0, 10);
+    // Sort data based on sort order
+    let sortedData = [...comparisonData];
+    
+    if (sortOrder === 'best') {
+      sortedData.sort((a, b) => {
+        if (metricInfo && metricInfo.lowerIsBetter) {
+          return a.value - b.value; // Lower is better, sort ascending
+        } else {
+          return b.value - a.value; // Higher is better, sort descending
+        }
+      });
+    } else if (sortOrder === 'worst') {
+      sortedData.sort((a, b) => {
+        if (metricInfo && metricInfo.lowerIsBetter) {
+          return b.value - a.value; // Lower is better, sort descending
+        } else {
+          return a.value - b.value; // Higher is better, sort ascending
+        }
+      });
+    } else if (sortOrder === 'alphabetical') {
+      sortedData.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    // Limit to specified number for better visualization
+    return sortedData.slice(0, limit);
   };
   
   /**
@@ -244,6 +305,33 @@ export const useComparativeAnalysisLogic = () => {
     };
   };
   
+  /**
+   * Get chart type for Chart.js
+   * @returns {string} Chart.js chart type
+   */
+  const getChartJsType = () => {
+    switch (chartType) {
+      case 'horizontalBar':
+        return 'bar'; // Will be configured as horizontal in options
+      default:
+        return chartType;
+    }
+  };
+  
+  /**
+   * Get chart options for Chart.js
+   * @returns {Object} Chart.js options
+   */
+  const getChartOptions = () => {
+    const options = {
+      indexAxis: chartType === 'horizontalBar' ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false
+    };
+    
+    return options;
+  };
+  
   return {
     comparisonData,
     isLoading,
@@ -252,15 +340,25 @@ export const useComparativeAnalysisLogic = () => {
     comparisonType,
     selectedMetric,
     activeTab,
+    chartType,
+    sortOrder,
+    limit,
     comparisonTypeOptions,
     metricOptions,
+    chartTypeOptions,
+    sortOrderOptions,
     handleTimeRangeChange,
     handleComparisonTypeChange,
     handleMetricChange,
+    handleChartTypeChange,
+    handleSortOrderChange,
+    handleLimitChange,
     handleTabChange,
     handleExport,
     generateSummary,
     prepareChartData,
-    prepareTableData
+    prepareTableData,
+    getChartJsType,
+    getChartOptions
   };
 };

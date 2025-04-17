@@ -21,16 +21,26 @@ const ComparativeAnalysis = () => {
     comparisonType,
     selectedMetric,
     activeTab,
+    chartType,
+    sortOrder,
+    limit,
     comparisonTypeOptions,
     metricOptions,
+    chartTypeOptions,
+    sortOrderOptions,
     handleTimeRangeChange,
     handleComparisonTypeChange,
     handleMetricChange,
+    handleChartTypeChange,
+    handleSortOrderChange,
+    handleLimitChange,
     handleTabChange,
     handleExport,
     generateSummary,
     prepareChartData,
-    prepareTableData
+    prepareTableData,
+    getChartJsType,
+    getChartOptions
   } = useComparativeAnalysisLogic();
   
   // Show loading spinner while data is being fetched
@@ -172,25 +182,76 @@ const ComparativeAnalysis = () => {
             <h3 className="comparison-chart-title">
               {`${metricInfo?.name || 'Wartość'} według ${comparisonTypeInfo?.name.toLowerCase() || 'typu'}`}
             </h3>
-            <div className="comparison-chart-actions">
-              <button className="comparison-chart-action-button">
-                <span className="comparison-chart-action-icon">🔍</span>
-                Powiększ
-              </button>
-              <button className="comparison-chart-action-button">
-                <span className="comparison-chart-action-icon">⚙️</span>
-                Opcje
-              </button>
+            <div className="comparison-chart-controls">
+              <div className="chart-type-selector">
+                <span className="selector-label">Typ wykresu:</span>
+                <select 
+                  className="selector-select"
+                  value={chartType}
+                  onChange={(e) => handleChartTypeChange(e.target.value)}
+                >
+                  {chartTypeOptions.map(option => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="chart-sort-selector">
+                <span className="selector-label">Sortowanie:</span>
+                <select 
+                  className="selector-select"
+                  value={sortOrder}
+                  onChange={(e) => handleSortOrderChange(e.target.value)}
+                >
+                  {sortOrderOptions.map(option => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="chart-limit-selector">
+                <span className="selector-label">Limit:</span>
+                <select 
+                  className="selector-select"
+                  value={limit}
+                  onChange={(e) => handleLimitChange(parseInt(e.target.value))}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="50">Wszystkie</option>
+                </select>
+              </div>
             </div>
           </div>
           
-          <StatisticsChart 
-            data={chartData}
-            type="bar"
-            xAxis="name"
-            yAxis="value"
-            color={metricInfo?.color || '#2196F3'}
-          />
+          <div className="comparison-chart">
+            <StatisticsChart 
+              data={chartData}
+              type={getChartJsType()}
+              xAxis="name"
+              yAxis="value"
+              color={metricInfo?.color || '#2196F3'}
+              title={`${metricInfo?.name || 'Wartość'} według ${comparisonTypeInfo?.name.toLowerCase() || 'typu'}`}
+              options={getChartOptions()}
+            />
+          </div>
+          
+          <div className="chart-legend">
+            <div className="legend-title">Legenda</div>
+            <div className="legend-description">
+              {chartType === 'pie' || chartType === 'radar' ? (
+                <p>Każdy segment reprezentuje {comparisonTypeInfo?.name.toLowerCase()} z wartością {metricInfo?.name.toLowerCase()}.</p>
+              ) : (
+                <p>Wykres przedstawia {metricInfo?.name.toLowerCase()} dla {limit} {sortOrder === 'best' ? 'najlepszych' : sortOrder === 'worst' ? 'najgorszych' : ''} {comparisonTypeInfo?.name.toLowerCase()}.</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
       

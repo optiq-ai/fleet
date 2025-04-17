@@ -11,6 +11,10 @@ export const useStatisticsDashboardLogic = () => {
   const [kpiData, setKpiData] = useState([]);
   // State for trend data
   const [trendData, setTrendData] = useState({});
+  // State for distribution data
+  const [distributionData, setDistributionData] = useState([]);
+  // State for vehicle comparison data
+  const [vehicleComparisonData, setVehicleComparisonData] = useState([]);
   // State for loading status
   const [isLoading, setIsLoading] = useState(true);
   // State for error message
@@ -34,6 +38,19 @@ export const useStatisticsDashboardLogic = () => {
         const metrics = ['fuelConsumption', 'operationalCosts', 'co2Emission', 'safetyIndex'];
         const trendResponse = await mockStatisticsService.getTrendData(timeRange, metrics);
         setTrendData(trendResponse);
+        
+        // Fetch fuel distribution data (for pie chart)
+        const distributionResponse = [
+          { category: 'Trasy miejskie', value: 35 },
+          { category: 'Trasy międzymiastowe', value: 45 },
+          { category: 'Autostrady', value: 20 }
+        ];
+        setDistributionData(distributionResponse);
+        
+        // Fetch vehicle comparison data (for bar chart)
+        const comparisonResponse = await mockStatisticsService.getComparisonData('vehicle', 'fuelConsumption', timeRange);
+        // Limit to top 5 vehicles
+        setVehicleComparisonData(comparisonResponse.slice(0, 5));
         
         setError(null);
       } catch (err) {
@@ -68,6 +85,8 @@ export const useStatisticsDashboardLogic = () => {
   return {
     kpiData,
     trendData,
+    distributionData,
+    vehicleComparisonData,
     isLoading,
     error,
     timeRange,

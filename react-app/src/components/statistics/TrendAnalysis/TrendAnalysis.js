@@ -21,6 +21,10 @@ export const useTrendAnalysisLogic = () => {
   const [activeTab, setActiveTab] = useState('chart');
   // State for multi-metric mode
   const [isMultiMetric, setIsMultiMetric] = useState(false);
+  // State for chart type
+  const [chartType, setChartType] = useState('line');
+  // State for chart options
+  const [showDataLabels, setShowDataLabels] = useState(false);
   
   // Available metrics options
   const metricOptions = [
@@ -31,6 +35,13 @@ export const useTrendAnalysisLogic = () => {
     { id: 'maintenanceCosts', name: 'Koszty konserwacji', unit: 'PLN', color: '#FFC107' },
     { id: 'vehicleUtilization', name: 'Wykorzystanie pojazdów', unit: '%', color: '#607D8B' },
     { id: 'driverPerformance', name: 'Wydajność kierowców', unit: '%', color: '#00BCD4' }
+  ];
+  
+  // Available chart types
+  const chartTypeOptions = [
+    { id: 'line', name: 'Liniowy' },
+    { id: 'bar', name: 'Słupkowy' },
+    { id: 'area', name: 'Obszarowy' }
   ];
   
   /**
@@ -98,6 +109,21 @@ export const useTrendAnalysisLogic = () => {
     if (isMultiMetric && selectedMetrics.length > 1) {
       setSelectedMetrics([selectedMetrics[0]]);
     }
+  };
+  
+  /**
+   * Handle chart type change
+   * @param {string} type - New chart type
+   */
+  const handleChartTypeChange = (type) => {
+    setChartType(type);
+  };
+  
+  /**
+   * Handle data labels toggle
+   */
+  const handleDataLabelsToggle = () => {
+    setShowDataLabels(!showDataLabels);
   };
   
   /**
@@ -202,10 +228,15 @@ export const useTrendAnalysisLogic = () => {
     selectedMetrics,
     activeTab,
     isMultiMetric,
+    chartType,
+    showDataLabels,
     metricOptions,
+    chartTypeOptions,
     handleTimeRangeChange,
     handleMetricChange,
     handleMultiMetricToggle,
+    handleChartTypeChange,
+    handleDataLabelsToggle,
     handleTabChange,
     handleExport,
     generateInsights

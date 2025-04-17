@@ -20,10 +20,15 @@ const TrendAnalysis = () => {
     selectedMetrics,
     activeTab,
     isMultiMetric,
+    chartType,
+    showDataLabels,
     metricOptions,
+    chartTypeOptions,
     handleTimeRangeChange,
     handleMetricChange,
     handleMultiMetricToggle,
+    handleChartTypeChange,
+    handleDataLabelsToggle,
     handleTabChange,
     handleExport,
     generateInsights
@@ -63,6 +68,20 @@ const TrendAnalysis = () => {
   const getMetricName = (metricId) => {
     const metric = metricOptions.find(option => option.id === metricId);
     return metric ? metric.name : metricId;
+  };
+  
+  // Get unit for selected metric
+  const getMetricUnit = (metricId) => {
+    const metric = metricOptions.find(option => option.id === metricId);
+    return metric ? metric.unit : '';
+  };
+  
+  // Determine chart type for Chart.js
+  const getChartJsType = () => {
+    if (chartType === 'area') {
+      return 'line'; // Area chart is a line chart with fill
+    }
+    return chartType;
   };
   
   return (
@@ -128,35 +147,82 @@ const TrendAnalysis = () => {
                 : `Trend: ${getMetricName(selectedMetrics[0])}`}
             </h3>
             <div className="chart-actions">
-              <button className="chart-action-button">
-                <span className="chart-action-icon">🔍</span>
-                Powiększ
-              </button>
-              <button className="chart-action-button">
-                <span className="chart-action-icon">⚙️</span>
-                Opcje
-              </button>
+              <div className="chart-type-selector">
+                <span className="chart-type-label">Typ wykresu:</span>
+                <select 
+                  className="chart-type-select"
+                  value={chartType}
+                  onChange={(e) => handleChartTypeChange(e.target.value)}
+                >
+                  {chartTypeOptions.map(option => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="chart-options">
+                <label className="chart-option">
+                  <input 
+                    type="checkbox" 
+                    checked={showDataLabels}
+                    onChange={handleDataLabelsToggle}
+                  />
+                  <span>Etykiety danych</span>
+                </label>
+              </div>
             </div>
           </div>
           
-          {isMultiMetric ? (
-            <StatisticsChart 
-              data={trendData}
-              type="multiLine"
-              xAxis="date"
-              yAxis="value"
-              series={selectedMetrics}
-              colors={getMetricColors()}
-            />
-          ) : (
-            <StatisticsChart 
-              data={trendData[selectedMetrics[0]]}
-              type="line"
-              xAxis="date"
-              yAxis="value"
-              color={metricOptions.find(option => option.id === selectedMetrics[0])?.color || '#2196F3'}
-            />
-          )}
+          <div className="trend-chart">
+            {isMultiMetric ? (
+              <StatisticsChart 
+                data={{
+                  ...Object.fromEntries(
+                    selectedMetrics.map(metricId => [
+                      metricId, 
+                      trendData[metricId] || []
+                    ])
+                  )
+                }}
+                type="multiLine"
+                xAxis="date"
+                yAxis="value"
+                series={selectedMetrics}
+                colors={getMetricColors()}
+                title={`Porównanie trendów (${timeRange})`}
+              />
+            ) : (
+              <StatisticsChart 
+                data={trendData[selectedMetrics[0]] || []}
+                type={getChartJsType()}
+                xAxis="date"
+                yAxis="value"
+                color={metricOptions.find(option => option.id === selectedMetrics[0])?.color || '#2196F3'}
+                title={`${getMetricName(selectedMetrics[0])} (${getMetricUnit(selectedMetrics[0])})`}
+              />
+            )}
+          </div>
+          
+          <div className="chart-legend">
+            {isMultiMetric && (
+              <div className="legend-items">
+                {selectedMetrics.map(metricId => {
+                  const metric = metricOptions.find(option => option.id === metricId);
+                  return (
+                    <div key={metricId} className="legend-item">
+                      <span 
+                        className="legend-color" 
+                        style={{ backgroundColor: metric?.color || '#333' }}
+                      ></span>
+                      <span className="legend-label">{metric?.name || metricId}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="trend-insights">
