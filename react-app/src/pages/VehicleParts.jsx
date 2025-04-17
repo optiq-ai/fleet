@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Pie, Bar, Line } from 'react-chartjs-2';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
 import partsService from '../services/api/partsService';
 import mockPartsService from '../services/api/mockPartsService';
+
+// Register ChartJS components
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 /**
  * @typedef {Object} Part
@@ -49,6 +64,7 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding: 20px;
 `;
 
 const SectionTitle = styled.h2`
@@ -62,6 +78,16 @@ const TabsContainer = styled.div`
   display: flex;
   border-bottom: 1px solid #e0e0e0;
   margin-bottom: 20px;
+  overflow-x: auto;
+  
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 2px;
+  }
 `;
 
 const Tab = styled.div`
@@ -71,6 +97,7 @@ const Tab = styled.div`
   color: ${props => props.active ? '#3f51b5' : '#666'};
   border-bottom: 2px solid ${props => props.active ? '#3f51b5' : 'transparent'};
   transition: all 0.3s ease;
+  white-space: nowrap;
   
   &:hover {
     color: #3f51b5;
@@ -170,6 +197,7 @@ const ChartContainer = styled.div`
   border-radius: 8px;
   padding: 16px;
   margin-top: 16px;
+  position: relative;
 `;
 
 const Badge = styled.span`
@@ -181,6 +209,11 @@ const Badge = styled.span`
       case 'low': return '#ff9800';
       case 'ordered': return '#2196f3';
       case 'out_of_stock': return '#f44336';
+      case 'pending': return '#ff9800';
+      case 'processing': return '#2196f3';
+      case 'shipped': return '#9c27b0';
+      case 'delivered': return '#4caf50';
+      case 'cancelled': return '#f44336';
       default: return '#9e9e9e';
     }
   }};
@@ -239,20 +272,180 @@ const ErrorMessage = styled.div`
   margin-bottom: 20px;
 `;
 
-// eslint-disable-next-line no-unused-vars
 const CompatibilityList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
 `;
 
-// eslint-disable-next-line no-unused-vars
 const CompatibilityItem = styled.li`
   padding: 8px 0;
   border-bottom: 1px solid #e0e0e0;
   
   &:last-child {
     border-bottom: none;
+  }
+`;
+
+const DataSourceToggle = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+`;
+
+const ToggleLabel = styled.label`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+`;
+
+const ToggleSwitch = styled.div`
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background-color: ${props => props.checked ? '#3f51b5' : '#ccc'};
+  border-radius: 12px;
+  margin: 0 8px;
+  transition: background-color 0.3s;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: ${props => props.checked ? '26px' : '2px'};
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: left 0.3s;
+  }
+`;
+
+const OrderItemsTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  
+  th, td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  th {
+    font-weight: 500;
+    color: #666;
+    background-color: #f0f0f0;
+  }
+  
+  tr:last-child td {
+    border-bottom: none;
+  }
+`;
+
+const OrderSummary = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  font-weight: 500;
+`;
+
+const ProgressBar = styled.div`
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+`;
+
+const ProgressFill = styled.div`
+  height: 100%;
+  width: ${props => props.percentage}%;
+  background-color: ${props => props.color || '#3f51b5'};
+  border-radius: 4px;
+`;
+
+const SupplierCard = styled.div`
+  padding: 16px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+`;
+
+const SupplierHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+`;
+
+const SupplierName = styled.h3`
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+  color: #333;
+`;
+
+const SupplierRating = styled.div`
+  display: flex;
+  align-items: center;
+  color: #ff9800;
+  font-weight: 500;
+`;
+
+const SupplierInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #666;
+`;
+
+const SupplierContact = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const SupplierCategories = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+`;
+
+const CategoryTag = styled.span`
+  padding: 4px 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #333;
+`;
+
+const PerformanceMetric = styled.div`
+  margin-bottom: 12px;
+`;
+
+const MetricLabel = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  
+  span:first-child {
+    color: #666;
+  }
+  
+  span:last-child {
+    font-weight: 500;
+    color: #333;
   }
 `;
 
@@ -582,37 +775,22 @@ const VehicleParts = () => {
               id="search" 
               name="search" 
               value={filters.search} 
-              onChange={handleFilterChange}
-              placeholder="Nazwa lub numer katalogowy"
+              onChange={handleFilterChange} 
+              placeholder="Nazwa, numer katalogowy..."
             />
           </FilterGroup>
           
-          <FilterGroup style={{ alignSelf: 'flex-end' }}>
-            <Button primary onClick={handleSearch}>
-              Szukaj
-            </Button>
-          </FilterGroup>
-          
           <ButtonGroup>
-            <Button onClick={handleExportCSV}>
-              Eksport CSV
-            </Button>
-            <Button onClick={handleExportPDF}>
-              Eksport PDF
-            </Button>
-            <Button onClick={handleToggleDataSource}>
-              {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
-            </Button>
+            <Button onClick={handleSearch}>Szukaj</Button>
+            <Button onClick={handleExportCSV}>Eksport CSV</Button>
           </ButtonGroup>
         </FilterContainer>
         
         <Table 
-          headers={columns.map(col => col.label)}
-          data={parts.data.map(part => columns.map(col => {
-            const value = part[col.id];
-            return col.format && typeof col.format === 'function' ? col.format(value) : value;
-          }))}
-          onRowClick={(rowIndex) => handlePartSelect(parts.data[rowIndex])}
+          columns={columns}
+          data={parts.data}
+          onRowClick={handlePartSelect}
+          emptyMessage="Brak części spełniających kryteria wyszukiwania."
         />
         
         {selectedPart && (
@@ -625,8 +803,18 @@ const VehicleParts = () => {
             </DetailRow>
             
             <DetailRow>
+              <DetailLabel>Nazwa:</DetailLabel>
+              <DetailValue>{selectedPart.name}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
               <DetailLabel>Numer katalogowy:</DetailLabel>
               <DetailValue>{selectedPart.catalogNumber}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Kategoria:</DetailLabel>
+              <DetailValue>{selectedPart.category}</DetailValue>
             </DetailRow>
             
             <DetailRow>
@@ -640,7 +828,7 @@ const VehicleParts = () => {
             </DetailRow>
             
             <DetailRow>
-              <DetailLabel>Minimalny poziom zapasów:</DetailLabel>
+              <DetailLabel>Minimalny poziom:</DetailLabel>
               <DetailValue>{selectedPart.minLevel}</DetailValue>
             </DetailRow>
             
@@ -668,12 +856,7 @@ const VehicleParts = () => {
             </DetailRow>
             
             <DetailRow>
-              <DetailLabel>Kategoria:</DetailLabel>
-              <DetailValue>{selectedPart.category}</DetailValue>
-            </DetailRow>
-            
-            <DetailRow>
-              <DetailLabel>Lokalizacja w magazynie:</DetailLabel>
+              <DetailLabel>Lokalizacja:</DetailLabel>
               <DetailValue>{selectedPart.location}</DetailValue>
             </DetailRow>
             
@@ -688,67 +871,17 @@ const VehicleParts = () => {
             </DetailRow>
             
             {selectedPart.technicalSpecs && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Specyfikacja techniczna</DetailTitle>
-                
-                <DetailRow>
-                  <DetailLabel>Wymiary:</DetailLabel>
-                  <DetailValue>{selectedPart.technicalSpecs.dimensions}</DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Waga:</DetailLabel>
-                  <DetailValue>{selectedPart.technicalSpecs.weight}</DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Materiał:</DetailLabel>
-                  <DetailValue>{selectedPart.technicalSpecs.material}</DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Producent:</DetailLabel>
-                  <DetailValue>{selectedPart.technicalSpecs.manufacturer}</DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Kraj pochodzenia:</DetailLabel>
-                  <DetailValue>{selectedPart.technicalSpecs.countryOfOrigin}</DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Gwarancja:</DetailLabel>
-                  <DetailValue>{selectedPart.technicalSpecs.warranty}</DetailValue>
-                </DetailRow>
-              </>
+              <DetailRow>
+                <DetailLabel>Specyfikacja techniczna:</DetailLabel>
+                <DetailValue>{selectedPart.technicalSpecs}</DetailValue>
+              </DetailRow>
             )}
             
-            {selectedPart.installationInstructions && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Instrukcja montażu</DetailTitle>
-                <DetailRow>
-                  <DetailValue>{selectedPart.installationInstructions}</DetailValue>
-                </DetailRow>
-              </>
-            )}
-            
-            {selectedPart.replacementInterval && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Zalecany interwał wymiany</DetailTitle>
-                <DetailRow>
-                  <DetailValue>{selectedPart.replacementInterval}</DetailValue>
-                </DetailRow>
-              </>
-            )}
-            
-            {selectedPart.additionalNotes && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Dodatkowe informacje</DetailTitle>
-                <DetailRow>
-                  <DetailValue>{selectedPart.additionalNotes}</DetailValue>
-                </DetailRow>
-              </>
-            )}
+            <ButtonGroup style={{ marginTop: '16px' }}>
+              <Button>Zamów</Button>
+              <Button>Edytuj</Button>
+              <Button onClick={() => setSelectedPart(null)}>Zamknij</Button>
+            </ButtonGroup>
           </DetailContainer>
         )}
       </>
@@ -773,16 +906,8 @@ const VehicleParts = () => {
       { id: 'id', label: 'ID zamówienia' },
       { id: 'date', label: 'Data zamówienia' },
       { id: 'supplier', label: 'Dostawca' },
-      { 
-        id: 'items', 
-        label: 'Liczba pozycji',
-        format: (items) => items.length
-      },
-      { 
-        id: 'totalCost', 
-        label: 'Koszt całkowity',
-        format: (value) => `${value.toFixed(2)} zł`
-      },
+      { id: 'itemCount', label: 'Liczba pozycji' },
+      { id: 'totalCost', label: 'Wartość', format: (value) => `${value.toFixed(2)} zł` },
       { 
         id: 'status', 
         label: 'Status',
@@ -793,23 +918,23 @@ const VehicleParts = () => {
           switch(value) {
             case 'pending':
               label = 'Oczekujące';
-              status = 'ordered';
+              status = 'pending';
               break;
             case 'processing':
               label = 'W realizacji';
-              status = 'ordered';
+              status = 'processing';
               break;
             case 'shipped':
               label = 'Wysłane';
-              status = 'available';
+              status = 'shipped';
               break;
             case 'delivered':
               label = 'Dostarczone';
-              status = 'available';
+              status = 'delivered';
               break;
             case 'cancelled':
               label = 'Anulowane';
-              status = 'out_of_stock';
+              status = 'cancelled';
               break;
             default:
               label = value;
@@ -818,34 +943,81 @@ const VehicleParts = () => {
           
           return <Badge status={status}>{label}</Badge>;
         }
-      }
+      },
+      { id: 'estimatedDelivery', label: 'Przewidywana dostawa' }
     ];
     
     return (
       <>
-        <ButtonGroup style={{ marginBottom: '20px' }}>
-          <Button onClick={handleExportCSV}>
-            Eksport CSV
-          </Button>
-          <Button onClick={handleExportPDF}>
-            Eksport PDF
-          </Button>
-          <Button onClick={handleToggleDataSource}>
-            {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
-          </Button>
-        </ButtonGroup>
+        <FilterContainer>
+          <FilterGroup>
+            <FilterLabel htmlFor="orderStatus">Status</FilterLabel>
+            <FilterSelect 
+              id="orderStatus" 
+              name="orderStatus" 
+              value={filters.orderStatus || 'all'} 
+              onChange={handleFilterChange}
+            >
+              <option value="all">Wszystkie</option>
+              <option value="pending">Oczekujące</option>
+              <option value="processing">W realizacji</option>
+              <option value="shipped">Wysłane</option>
+              <option value="delivered">Dostarczone</option>
+              <option value="cancelled">Anulowane</option>
+            </FilterSelect>
+          </FilterGroup>
+          
+          <FilterGroup>
+            <FilterLabel htmlFor="orderSupplier">Dostawca</FilterLabel>
+            <FilterSelect 
+              id="orderSupplier" 
+              name="orderSupplier" 
+              value={filters.orderSupplier || 'all'} 
+              onChange={handleFilterChange}
+            >
+              <option value="all">Wszyscy</option>
+              <option value="bosch">Bosch</option>
+              <option value="mann-filter">Mann-Filter</option>
+              <option value="valeo">Valeo</option>
+              <option value="sachs">Sachs</option>
+              <option value="continental">Continental</option>
+              <option value="varta">Varta</option>
+            </FilterSelect>
+          </FilterGroup>
+          
+          <FilterGroup>
+            <FilterLabel htmlFor="orderSearch">Wyszukaj</FilterLabel>
+            <FilterInput 
+              type="text" 
+              id="orderSearch" 
+              name="orderSearch" 
+              value={filters.orderSearch || ''} 
+              onChange={handleFilterChange} 
+              placeholder="ID zamówienia..."
+            />
+          </FilterGroup>
+          
+          <ButtonGroup>
+            <Button onClick={handleSearch}>Szukaj</Button>
+            <Button primary>Nowe zamówienie</Button>
+          </ButtonGroup>
+        </FilterContainer>
         
         <Table 
-          columns={columns} 
-          data={orders.data} 
-          pagination={orders.pagination}
+          columns={columns}
+          data={orders.data}
           onRowClick={handleOrderSelect}
-          onPageChange={(page) => setFilters({ ...filters, page })}
+          emptyMessage="Brak zamówień spełniających kryteria wyszukiwania."
         />
         
         {selectedOrder && (
           <DetailContainer>
             <DetailTitle>Szczegóły zamówienia: {selectedOrder.id}</DetailTitle>
+            
+            <DetailRow>
+              <DetailLabel>ID zamówienia:</DetailLabel>
+              <DetailValue>{selectedOrder.id}</DetailValue>
+            </DetailRow>
             
             <DetailRow>
               <DetailLabel>Data zamówienia:</DetailLabel>
@@ -860,11 +1032,7 @@ const VehicleParts = () => {
             <DetailRow>
               <DetailLabel>Status:</DetailLabel>
               <DetailValue>
-                <Badge status={
-                  selectedOrder.status === 'pending' || selectedOrder.status === 'processing' ? 'ordered' :
-                  selectedOrder.status === 'shipped' || selectedOrder.status === 'delivered' ? 'available' :
-                  selectedOrder.status === 'cancelled' ? 'out_of_stock' : 'default'
-                }>
+                <Badge status={selectedOrder.status}>
                   {selectedOrder.status === 'pending' ? 'Oczekujące' : 
                    selectedOrder.status === 'processing' ? 'W realizacji' : 
                    selectedOrder.status === 'shipped' ? 'Wysłane' : 
@@ -876,37 +1044,9 @@ const VehicleParts = () => {
             </DetailRow>
             
             <DetailRow>
-              <DetailLabel>Koszt całkowity:</DetailLabel>
-              <DetailValue>{selectedOrder.totalCost.toFixed(2)} zł</DetailValue>
+              <DetailLabel>Przewidywana dostawa:</DetailLabel>
+              <DetailValue>{selectedOrder.estimatedDelivery}</DetailValue>
             </DetailRow>
-            
-            {selectedOrder.estimatedDelivery && (
-              <DetailRow>
-                <DetailLabel>Szacowana data dostawy:</DetailLabel>
-                <DetailValue>{selectedOrder.estimatedDelivery}</DetailValue>
-              </DetailRow>
-            )}
-            
-            {selectedOrder.deliveryDate && (
-              <DetailRow>
-                <DetailLabel>Data dostawy:</DetailLabel>
-                <DetailValue>{selectedOrder.deliveryDate}</DetailValue>
-              </DetailRow>
-            )}
-            
-            {selectedOrder.trackingNumber && (
-              <DetailRow>
-                <DetailLabel>Numer przesyłki:</DetailLabel>
-                <DetailValue>{selectedOrder.trackingNumber}</DetailValue>
-              </DetailRow>
-            )}
-            
-            {selectedOrder.cancellationReason && (
-              <DetailRow>
-                <DetailLabel>Powód anulowania:</DetailLabel>
-                <DetailValue>{selectedOrder.cancellationReason}</DetailValue>
-              </DetailRow>
-            )}
             
             {selectedOrder.notes && (
               <DetailRow>
@@ -915,95 +1055,44 @@ const VehicleParts = () => {
               </DetailRow>
             )}
             
-            <DetailTitle style={{ marginTop: '16px' }}>Pozycje zamówienia</DetailTitle>
+            <DetailTitle style={{ marginTop: '20px' }}>Pozycje zamówienia</DetailTitle>
             
-            <Table 
-              columns={[
-                { id: 'partId', label: 'ID części' },
-                { id: 'name', label: 'Nazwa' },
-                { id: 'quantity', label: 'Ilość' },
-                { id: 'price', label: 'Cena jedn.', format: (value) => `${value.toFixed(2)} zł` },
-                { 
-                  id: 'total', 
-                  label: 'Wartość',
-                  format: (_, item) => `${(item.quantity * item.price).toFixed(2)} zł`
-                }
-              ]} 
-              data={selectedOrder.items} 
-              pagination={null}
-            />
+            <OrderItemsTable>
+              <thead>
+                <tr>
+                  <th>ID części</th>
+                  <th>Nazwa</th>
+                  <th>Ilość</th>
+                  <th>Cena jedn.</th>
+                  <th>Wartość</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedOrder.items.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.partId}</td>
+                    <td>{item.name}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.unitPrice.toFixed(2)} zł</td>
+                    <td>{item.totalPrice.toFixed(2)} zł</td>
+                  </tr>
+                ))}
+              </tbody>
+            </OrderItemsTable>
             
-            {selectedOrder.contact && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Kontakt</DetailTitle>
-                
-                <DetailRow>
-                  <DetailLabel>Osoba kontaktowa:</DetailLabel>
-                  <DetailValue>{selectedOrder.contact.name}</DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Email:</DetailLabel>
-                  <DetailValue>{selectedOrder.contact.email}</DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Telefon:</DetailLabel>
-                  <DetailValue>{selectedOrder.contact.phone}</DetailValue>
-                </DetailRow>
-              </>
-            )}
+            <OrderSummary>
+              Wartość całkowita: <span style={{ marginLeft: '8px', fontWeight: 'bold' }}>{selectedOrder.totalCost.toFixed(2)} zł</span>
+            </OrderSummary>
             
-            {selectedOrder.history && selectedOrder.history.length > 0 && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Historia zamówienia</DetailTitle>
-                
-                <Table 
-                  columns={[
-                    { id: 'date', label: 'Data' },
-                    { 
-                      id: 'status', 
-                      label: 'Status',
-                      format: (value) => {
-                        let label = '';
-                        let status = '';
-                        
-                        switch(value) {
-                          case 'created':
-                            label = 'Utworzone';
-                            status = 'default';
-                            break;
-                          case 'processing':
-                            label = 'W realizacji';
-                            status = 'ordered';
-                            break;
-                          case 'shipped':
-                            label = 'Wysłane';
-                            status = 'available';
-                            break;
-                          case 'delivered':
-                            label = 'Dostarczone';
-                            status = 'available';
-                            break;
-                          case 'cancelled':
-                            label = 'Anulowane';
-                            status = 'out_of_stock';
-                            break;
-                          default:
-                            label = value;
-                            status = 'default';
-                        }
-                        
-                        return <Badge status={status}>{label}</Badge>;
-                      }
-                    },
-                    { id: 'note', label: 'Notatka' }
-                  ]} 
-                  data={selectedOrder.history} 
-                  pagination={null}
-                />
-              </>
-            )}
+            <ButtonGroup style={{ marginTop: '16px' }}>
+              {selectedOrder.status === 'pending' && (
+                <>
+                  <Button>Edytuj</Button>
+                  <Button>Anuluj</Button>
+                </>
+              )}
+              <Button onClick={() => setSelectedOrder(null)}>Zamknij</Button>
+            </ButtonGroup>
           </DetailContainer>
         )}
       </>
@@ -1011,7 +1100,7 @@ const VehicleParts = () => {
   };
   
   // Render usage analysis tab content
-  const renderUsageTab = () => {
+  const renderUsageAnalysisTab = () => {
     if (isLoading) {
       return <LoadingIndicator>Ładowanie danych analizy zużycia...</LoadingIndicator>;
     }
@@ -1024,95 +1113,181 @@ const VehicleParts = () => {
       return <div>Brak danych analizy zużycia do wyświetlenia.</div>;
     }
     
+    // Prepare data for most used parts chart
+    const mostUsedPartsData = {
+      labels: usageAnalysis.mostUsedParts.map(part => part.name),
+      datasets: [
+        {
+          data: usageAnalysis.mostUsedParts.map(part => part.count),
+          backgroundColor: [
+            '#3f51b5',
+            '#2196f3',
+            '#03a9f4',
+            '#00bcd4',
+            '#009688'
+          ],
+          borderWidth: 1
+        }
+      ]
+    };
+    
+    // Prepare data for cost by category chart
+    const costByCategoryData = {
+      labels: usageAnalysis.costByCategory.map(category => category.category),
+      datasets: [
+        {
+          data: usageAnalysis.costByCategory.map(category => category.cost),
+          backgroundColor: [
+            '#f44336',
+            '#e91e63',
+            '#9c27b0',
+            '#673ab7',
+            '#3f51b5',
+            '#2196f3',
+            '#03a9f4'
+          ],
+          borderWidth: 1
+        }
+      ]
+    };
+    
+    // Prepare data for usage trends chart
+    const usageTrendsData = {
+      labels: usageAnalysis.usageTrends.map(trend => trend.month),
+      datasets: [
+        {
+          label: 'Liczba użytych części',
+          data: usageAnalysis.usageTrends.map(trend => trend.count),
+          borderColor: '#3f51b5',
+          backgroundColor: 'rgba(63, 81, 181, 0.1)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    };
+    
+    // Prepare data for parts by supplier chart
+    const partsBySupplierData = {
+      labels: usageAnalysis.partsBySupplier.map(supplier => supplier.supplier),
+      datasets: [
+        {
+          data: usageAnalysis.partsBySupplier.map(supplier => supplier.partCount),
+          backgroundColor: [
+            '#ff9800',
+            '#ff5722',
+            '#795548',
+            '#607d8b',
+            '#9e9e9e',
+            '#4caf50',
+            '#8bc34a'
+          ],
+          borderWidth: 1
+        }
+      ]
+    };
+    
+    // Chart options
+    const pieChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 15,
+            padding: 15
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    };
+    
+    const lineChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
+    };
+    
     return (
       <>
-        <ButtonGroup style={{ marginBottom: '20px' }}>
-          <Button onClick={handleExportCSV}>
-            Eksport CSV
-          </Button>
-          <Button onClick={handleExportPDF}>
-            Eksport PDF
-          </Button>
-          <Button onClick={handleToggleDataSource}>
-            {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
-          </Button>
-        </ButtonGroup>
-        
         <GridSection>
-          <Card title="Najczęściej wymieniane części">
-            <Table 
-              columns={[
-                { id: 'name', label: 'Nazwa części' },
-                { id: 'count', label: 'Liczba wymian' },
-                { id: 'cost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` }
-              ]} 
-              data={usageAnalysis.mostUsedParts} 
-              pagination={null}
-            />
+          <Card title="Najczęściej używane części">
+            <ChartContainer>
+              <Pie data={mostUsedPartsData} options={pieChartOptions} />
+            </ChartContainer>
           </Card>
           
-          <Card title="Koszty części według kategorii">
+          <Card title="Koszty według kategorii">
             <ChartContainer>
-              {/* Placeholder for chart - would be implemented with a charting library */}
-              <div style={{ textAlign: 'center', paddingTop: '120px' }}>
-                Wykres kosztów według kategorii części
-              </div>
+              <Pie data={costByCategoryData} options={pieChartOptions} />
             </ChartContainer>
-            <Table 
-              columns={[
-                { id: 'category', label: 'Kategoria' },
-                { id: 'cost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` },
-                { id: 'percentage', label: 'Procent całości', format: (value) => `${value}%` }
-              ]} 
-              data={usageAnalysis.costByCategory} 
-              pagination={null}
-            />
+          </Card>
+          
+          <Card title="Trendy zużycia części">
+            <ChartContainer>
+              <Line data={usageTrendsData} options={lineChartOptions} />
+            </ChartContainer>
+          </Card>
+          
+          <Card title="Części według dostawcy">
+            <ChartContainer>
+              <Pie data={partsBySupplierData} options={pieChartOptions} />
+            </ChartContainer>
           </Card>
         </GridSection>
         
-        <GridSection>
-          <Card title="Trendy zużycia części w czasie">
-            <ChartContainer>
-              {/* Placeholder for chart - would be implemented with a charting library */}
-              <div style={{ textAlign: 'center', paddingTop: '120px' }}>
-                Wykres trendów zużycia części w czasie
-              </div>
-            </ChartContainer>
-            <Table 
-              columns={[
-                { id: 'month', label: 'Miesiąc' },
-                { id: 'count', label: 'Liczba wymian' },
-                { id: 'cost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` }
-              ]} 
-              data={usageAnalysis.usageTrends} 
-              pagination={null}
-            />
-          </Card>
-          
-          <Card title="Części według dostawców">
-            <ChartContainer>
-              {/* Placeholder for chart - would be implemented with a charting library */}
-              <div style={{ textAlign: 'center', paddingTop: '120px' }}>
-                Wykres części według dostawców
-              </div>
-            </ChartContainer>
-            <Table 
-              columns={[
-                { id: 'supplier', label: 'Dostawca' },
-                { id: 'count', label: 'Liczba części' },
-                { id: 'percentage', label: 'Procent całości', format: (value) => `${value}%` }
-              ]} 
-              data={usageAnalysis.partsBySupplier} 
-              pagination={null}
-            />
-          </Card>
-        </GridSection>
+        <Card title="Szczegółowe dane zużycia części">
+          <Table 
+            columns={[
+              { id: 'name', label: 'Nazwa części' },
+              { id: 'count', label: 'Liczba użyć' },
+              { id: 'percentage', label: 'Udział procentowy', format: (value) => `${value}%` }
+            ]}
+            data={usageAnalysis.mostUsedParts}
+            emptyMessage="Brak danych o zużyciu części."
+          />
+        </Card>
       </>
     );
   };
   
   // Render compatibility tab content
   const renderCompatibilityTab = () => {
+    if (isLoading && vehicleModel) {
+      return <LoadingIndicator>Ładowanie danych kompatybilności...</LoadingIndicator>;
+    }
+    
+    if (error) {
+      return <ErrorMessage>{error}</ErrorMessage>;
+    }
+    
     return (
       <>
         <FilterContainer>
@@ -1135,103 +1310,112 @@ const VehicleParts = () => {
             </FilterSelect>
           </FilterGroup>
           
-          <FilterGroup style={{ alignSelf: 'flex-end' }}>
-            <Button 
-              primary 
-              onClick={handleCompatibilitySearch}
-              disabled={!vehicleModel}
-            >
-              Szukaj
-            </Button>
-          </FilterGroup>
-          
           <ButtonGroup>
-            <Button onClick={handleToggleDataSource}>
-              {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
-            </Button>
+            <Button onClick={handleCompatibilitySearch} disabled={!vehicleModel}>Szukaj</Button>
           </ButtonGroup>
         </FilterContainer>
         
-        {isLoading ? (
-          <LoadingIndicator>Ładowanie kompatybilnych części...</LoadingIndicator>
-        ) : error ? (
-          <ErrorMessage>{error}</ErrorMessage>
-        ) : compatibleParts ? (
+        {!vehicleModel ? (
+          <div>Wybierz model pojazdu, aby wyświetlić kompatybilne części.</div>
+        ) : !compatibleParts ? (
+          <div>Brak danych kompatybilności dla wybranego modelu.</div>
+        ) : (
           <>
-            <SectionTitle>Kompatybilne części dla modelu: {vehicleModel}</SectionTitle>
-            
-            <Table 
-              columns={[
-                { id: 'id', label: 'ID' },
-                { id: 'name', label: 'Nazwa' },
-                { id: 'catalogNumber', label: 'Numer katalogowy' },
-                { id: 'category', label: 'Kategoria' },
-                { id: 'price', label: 'Cena', format: (value) => `${value.toFixed(2)} zł` },
-                { 
-                  id: 'status', 
-                  label: 'Status',
-                  format: (value) => {
-                    let label = '';
-                    let status = '';
-                    
-                    switch(value) {
-                      case 'available':
-                        label = 'Dostępna';
-                        status = 'available';
-                        break;
-                      case 'low':
-                        label = 'Niski stan';
-                        status = 'low';
-                        break;
-                      case 'ordered':
-                        label = 'Zamówiona';
-                        status = 'ordered';
-                        break;
-                      case 'out_of_stock':
-                        label = 'Brak w magazynie';
-                        status = 'out_of_stock';
-                        break;
-                      default:
-                        label = value;
-                        status = 'default';
+            <Card title={`Kompatybilne części dla ${vehicleModel}`}>
+              <Table 
+                columns={[
+                  { id: 'id', label: 'ID' },
+                  { id: 'name', label: 'Nazwa' },
+                  { id: 'catalogNumber', label: 'Numer katalogowy' },
+                  { id: 'category', label: 'Kategoria' },
+                  { id: 'price', label: 'Cena', format: (value) => `${value.toFixed(2)} zł` },
+                  { 
+                    id: 'status', 
+                    label: 'Status',
+                    format: (value) => {
+                      let label = '';
+                      let status = '';
+                      
+                      switch(value) {
+                        case 'available':
+                          label = 'Dostępna';
+                          status = 'available';
+                          break;
+                        case 'low':
+                          label = 'Niski stan';
+                          status = 'low';
+                          break;
+                        case 'ordered':
+                          label = 'Zamówiona';
+                          status = 'ordered';
+                          break;
+                        case 'out_of_stock':
+                          label = 'Brak w magazynie';
+                          status = 'out_of_stock';
+                          break;
+                        default:
+                          label = value;
+                          status = 'default';
+                      }
+                      
+                      return <Badge status={status}>{label}</Badge>;
                     }
-                    
-                    return <Badge status={status}>{label}</Badge>;
                   }
-                }
-              ]} 
-              data={compatibleParts.compatibleParts} 
-              pagination={null}
-              onRowClick={handlePartSelect}
-            />
+                ]}
+                data={compatibleParts.parts}
+                emptyMessage={`Brak kompatybilnych części dla ${vehicleModel}.`}
+              />
+            </Card>
             
-            {selectedPart && compatibleParts.alternativeParts && compatibleParts.alternativeParts[selectedPart.id] && (
-              <DetailContainer>
-                <DetailTitle>Alternatywne części dla: {selectedPart.name}</DetailTitle>
-                
+            {compatibleParts.alternativeParts && compatibleParts.alternativeParts.length > 0 && (
+              <Card title="Części alternatywne" style={{ marginTop: '20px' }}>
                 <Table 
                   columns={[
                     { id: 'id', label: 'ID' },
                     { id: 'name', label: 'Nazwa' },
-                    { id: 'manufacturer', label: 'Producent' },
+                    { id: 'catalogNumber', label: 'Numer katalogowy' },
+                    { id: 'category', label: 'Kategoria' },
+                    { id: 'compatibility', label: 'Kompatybilność', format: (value) => `${value}%` },
                     { id: 'price', label: 'Cena', format: (value) => `${value.toFixed(2)} zł` },
                     { 
-                      id: 'compatibilityRating', 
-                      label: 'Ocena kompatybilności',
+                      id: 'status', 
+                      label: 'Status',
                       format: (value) => {
-                        const stars = '★'.repeat(Math.floor(value)) + '☆'.repeat(5 - Math.floor(value));
-                        return <span style={{ color: '#f39c12' }}>{stars} ({value.toFixed(1)})</span>;
+                        let label = '';
+                        let status = '';
+                        
+                        switch(value) {
+                          case 'available':
+                            label = 'Dostępna';
+                            status = 'available';
+                            break;
+                          case 'low':
+                            label = 'Niski stan';
+                            status = 'low';
+                            break;
+                          case 'ordered':
+                            label = 'Zamówiona';
+                            status = 'ordered';
+                            break;
+                          case 'out_of_stock':
+                            label = 'Brak w magazynie';
+                            status = 'out_of_stock';
+                            break;
+                          default:
+                            label = value;
+                            status = 'default';
+                        }
+                        
+                        return <Badge status={status}>{label}</Badge>;
                       }
                     }
-                  ]} 
-                  data={compatibleParts.alternativeParts[selectedPart.id]} 
-                  pagination={null}
+                  ]}
+                  data={compatibleParts.alternativeParts}
+                  emptyMessage="Brak alternatywnych części."
                 />
-              </DetailContainer>
+              </Card>
             )}
           </>
-        ) : (
-          <div>Wybierz model pojazdu, aby wyświetlić kompatybilne części.</div>
         )}
       </>
     );
@@ -1251,48 +1435,61 @@ const VehicleParts = () => {
       return <div>Brak danych dostawców do wyświetlenia.</div>;
     }
     
-    const columns = [
-      { id: 'id', label: 'ID' },
-      { id: 'name', label: 'Nazwa' },
-      { id: 'contactPerson', label: 'Osoba kontaktowa' },
-      { id: 'email', label: 'Email' },
-      { id: 'phone', label: 'Telefon' },
-      { 
-        id: 'categories', 
-        label: 'Kategorie',
-        format: (categories) => categories.join(', ')
-      },
-      { 
-        id: 'rating', 
-        label: 'Ocena',
-        format: (value) => {
-          const stars = '★'.repeat(Math.floor(value)) + '☆'.repeat(5 - Math.floor(value));
-          return <span style={{ color: '#f39c12' }}>{stars} ({value.toFixed(1)})</span>;
-        }
-      }
-    ];
-    
     return (
       <>
-        <ButtonGroup style={{ marginBottom: '20px' }}>
-          <Button onClick={handleExportCSV}>
-            Eksport CSV
-          </Button>
-          <Button onClick={handleExportPDF}>
-            Eksport PDF
-          </Button>
-          <Button onClick={handleToggleDataSource}>
-            {useMockData ? 'Użyj API' : 'Użyj danych testowych'}
-          </Button>
-        </ButtonGroup>
+        <FilterContainer>
+          <FilterGroup>
+            <FilterLabel htmlFor="supplierSearch">Wyszukaj</FilterLabel>
+            <FilterInput 
+              type="text" 
+              id="supplierSearch" 
+              name="supplierSearch" 
+              value={filters.supplierSearch || ''} 
+              onChange={handleFilterChange} 
+              placeholder="Nazwa dostawcy..."
+            />
+          </FilterGroup>
+          
+          <ButtonGroup>
+            <Button onClick={handleSearch}>Szukaj</Button>
+            <Button primary>Dodaj dostawcę</Button>
+          </ButtonGroup>
+        </FilterContainer>
         
-        <Table 
-          columns={columns} 
-          data={suppliers.data} 
-          pagination={suppliers.pagination}
-          onRowClick={handleSupplierSelect}
-          onPageChange={(page) => setFilters({ ...filters, page })}
-        />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+          {suppliers.data.map(supplier => (
+            <SupplierCard key={supplier.id} onClick={() => handleSupplierSelect(supplier)}>
+              <SupplierHeader>
+                <SupplierName>{supplier.name}</SupplierName>
+                <SupplierRating>
+                  {supplier.rating} ★
+                </SupplierRating>
+              </SupplierHeader>
+              
+              <SupplierInfo>
+                <SupplierContact>
+                  <span>Kontakt:</span>
+                  <span>{supplier.contactPerson}</span>
+                </SupplierContact>
+                
+                <SupplierContact>
+                  <span>Email:</span>
+                  <span>{supplier.email}</span>
+                </SupplierContact>
+                
+                <SupplierContact>
+                  <span>Telefon:</span>
+                  <span>{supplier.phone}</span>
+                </SupplierContact>
+                
+                <SupplierContact>
+                  <span>Liczba kategorii:</span>
+                  <span>{supplier.categoryCount}</span>
+                </SupplierContact>
+              </SupplierInfo>
+            </SupplierCard>
+          ))}
+        </div>
         
         {selectedSupplier && (
           <DetailContainer>
@@ -1301,6 +1498,11 @@ const VehicleParts = () => {
             <DetailRow>
               <DetailLabel>ID:</DetailLabel>
               <DetailValue>{selectedSupplier.id}</DetailValue>
+            </DetailRow>
+            
+            <DetailRow>
+              <DetailLabel>Nazwa:</DetailLabel>
+              <DetailValue>{selectedSupplier.name}</DetailValue>
             </DetailRow>
             
             <DetailRow>
@@ -1318,161 +1520,147 @@ const VehicleParts = () => {
               <DetailValue>{selectedSupplier.phone}</DetailValue>
             </DetailRow>
             
-            {selectedSupplier.address && (
-              <DetailRow>
-                <DetailLabel>Adres:</DetailLabel>
-                <DetailValue>{selectedSupplier.address}</DetailValue>
-              </DetailRow>
-            )}
+            <DetailRow>
+              <DetailLabel>Adres:</DetailLabel>
+              <DetailValue>{selectedSupplier.address}</DetailValue>
+            </DetailRow>
             
             <DetailRow>
-              <DetailLabel>Kategorie części:</DetailLabel>
-              <DetailValue>{selectedSupplier.categories.join(', ')}</DetailValue>
+              <DetailLabel>Kategorie:</DetailLabel>
+              <DetailValue>
+                <SupplierCategories>
+                  {selectedSupplier.categories.map((category, index) => (
+                    <CategoryTag key={index}>{category}</CategoryTag>
+                  ))}
+                </SupplierCategories>
+              </DetailValue>
             </DetailRow>
             
             <DetailRow>
               <DetailLabel>Ocena ogólna:</DetailLabel>
-              <DetailValue>
-                {(() => {
-                  const stars = '★'.repeat(Math.floor(selectedSupplier.rating)) + '☆'.repeat(5 - Math.floor(selectedSupplier.rating));
-                  return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.rating.toFixed(1)})</span>;
-                })()}
-              </DetailValue>
+              <DetailValue>{selectedSupplier.rating} / 5</DetailValue>
             </DetailRow>
             
-            {selectedSupplier.performance && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Ocena wydajności</DetailTitle>
-                
-                <DetailRow>
-                  <DetailLabel>Terminowość:</DetailLabel>
-                  <DetailValue>
-                    {(() => {
-                      const stars = '★'.repeat(Math.floor(selectedSupplier.performance.timeliness)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.timeliness));
-                      return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.performance.timeliness.toFixed(1)})</span>;
-                    })()}
-                  </DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Jakość:</DetailLabel>
-                  <DetailValue>
-                    {(() => {
-                      const stars = '★'.repeat(Math.floor(selectedSupplier.performance.quality)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.quality));
-                      return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.performance.quality.toFixed(1)})</span>;
-                    })()}
-                  </DetailValue>
-                </DetailRow>
-                
-                <DetailRow>
-                  <DetailLabel>Ceny:</DetailLabel>
-                  <DetailValue>
-                    {(() => {
-                      const stars = '★'.repeat(Math.floor(selectedSupplier.performance.pricing)) + '☆'.repeat(5 - Math.floor(selectedSupplier.performance.pricing));
-                      return <span style={{ color: '#f39c12' }}>{stars} ({selectedSupplier.performance.pricing.toFixed(1)})</span>;
-                    })()}
-                  </DetailValue>
-                </DetailRow>
-              </>
-            )}
+            <DetailTitle style={{ marginTop: '20px' }}>Ocena wydajności</DetailTitle>
+            
+            <PerformanceMetric>
+              <MetricLabel>
+                <span>Terminowość</span>
+                <span>{selectedSupplier.performance.timeliness} / 5</span>
+              </MetricLabel>
+              <ProgressBar>
+                <ProgressFill 
+                  percentage={(selectedSupplier.performance.timeliness / 5) * 100} 
+                  color="#4caf50"
+                />
+              </ProgressBar>
+            </PerformanceMetric>
+            
+            <PerformanceMetric>
+              <MetricLabel>
+                <span>Jakość</span>
+                <span>{selectedSupplier.performance.quality} / 5</span>
+              </MetricLabel>
+              <ProgressBar>
+                <ProgressFill 
+                  percentage={(selectedSupplier.performance.quality / 5) * 100} 
+                  color="#2196f3"
+                />
+              </ProgressBar>
+            </PerformanceMetric>
+            
+            <PerformanceMetric>
+              <MetricLabel>
+                <span>Ceny</span>
+                <span>{selectedSupplier.performance.pricing} / 5</span>
+              </MetricLabel>
+              <ProgressBar>
+                <ProgressFill 
+                  percentage={(selectedSupplier.performance.pricing / 5) * 100} 
+                  color="#ff9800"
+                />
+              </ProgressBar>
+            </PerformanceMetric>
             
             {selectedSupplier.notes && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Notatki</DetailTitle>
-                <DetailRow>
-                  <DetailValue>{selectedSupplier.notes}</DetailValue>
-                </DetailRow>
-              </>
+              <DetailRow>
+                <DetailLabel>Uwagi:</DetailLabel>
+                <DetailValue>{selectedSupplier.notes}</DetailValue>
+              </DetailRow>
             )}
             
-            {selectedSupplier.orderHistory && selectedSupplier.orderHistory.length > 0 && (
-              <>
-                <DetailTitle style={{ marginTop: '16px' }}>Historia zamówień</DetailTitle>
-                
-                <Table 
-                  columns={[
-                    { id: 'date', label: 'Data' },
-                    { id: 'orderId', label: 'ID zamówienia' },
-                    { id: 'itemCount', label: 'Liczba pozycji' },
-                    { id: 'totalCost', label: 'Koszt całkowity', format: (value) => `${value.toFixed(2)} zł` },
-                    { 
-                      id: 'status', 
-                      label: 'Status',
-                      format: (value) => {
-                        let label = '';
-                        let status = '';
-                        
-                        switch(value) {
-                          case 'pending':
-                            label = 'Oczekujące';
-                            status = 'ordered';
-                            break;
-                          case 'processing':
-                            label = 'W realizacji';
-                            status = 'ordered';
-                            break;
-                          case 'shipped':
-                            label = 'Wysłane';
-                            status = 'available';
-                            break;
-                          case 'delivered':
-                            label = 'Dostarczone';
-                            status = 'available';
-                            break;
-                          case 'cancelled':
-                            label = 'Anulowane';
-                            status = 'out_of_stock';
-                            break;
-                          default:
-                            label = value;
-                            status = 'default';
-                        }
-                        
-                        return <Badge status={status}>{label}</Badge>;
-                      }
+            <DetailTitle style={{ marginTop: '20px' }}>Historia zamówień</DetailTitle>
+            
+            <Table 
+              columns={[
+                { id: 'date', label: 'Data' },
+                { id: 'orderId', label: 'ID zamówienia' },
+                { id: 'itemCount', label: 'Liczba pozycji' },
+                { id: 'totalCost', label: 'Wartość', format: (value) => `${value.toFixed(2)} zł` },
+                { 
+                  id: 'status', 
+                  label: 'Status',
+                  format: (value) => {
+                    let label = '';
+                    let status = '';
+                    
+                    switch(value) {
+                      case 'pending':
+                        label = 'Oczekujące';
+                        status = 'pending';
+                        break;
+                      case 'processing':
+                        label = 'W realizacji';
+                        status = 'processing';
+                        break;
+                      case 'shipped':
+                        label = 'Wysłane';
+                        status = 'shipped';
+                        break;
+                      case 'delivered':
+                        label = 'Dostarczone';
+                        status = 'delivered';
+                        break;
+                      case 'cancelled':
+                        label = 'Anulowane';
+                        status = 'cancelled';
+                        break;
+                      default:
+                        label = value;
+                        status = 'default';
                     }
-                  ]} 
-                  data={selectedSupplier.orderHistory} 
-                  pagination={null}
-                />
-              </>
-            )}
+                    
+                    return <Badge status={status}>{label}</Badge>;
+                  }
+                }
+              ]}
+              data={selectedSupplier.orderHistory}
+              emptyMessage="Brak historii zamówień."
+            />
+            
+            <ButtonGroup style={{ marginTop: '16px' }}>
+              <Button primary>Nowe zamówienie</Button>
+              <Button>Edytuj</Button>
+              <Button onClick={() => setSelectedSupplier(null)}>Zamknij</Button>
+            </ButtonGroup>
           </DetailContainer>
         )}
       </>
     );
   };
   
-  // Render main content
-  const renderContent = () => {
-    switch(activeTab) {
-      case 'inventory':
-        return renderInventoryTab();
-      case 'orders':
-        return renderOrdersTab();
-      case 'usage':
-        return renderUsageTab();
-      case 'compatibility':
-        return renderCompatibilityTab();
-      case 'suppliers':
-        return renderSuppliersTab();
-      default:
-        return renderInventoryTab();
-    }
-  };
-  
-  // Debug output
-  console.log('Current tab:', activeTab);
-  console.log('Using mock data:', useMockData);
-  console.log('Parts data:', parts);
-  console.log('Orders data:', orders);
-  console.log('Usage data:', usageAnalysis);
-  console.log('Compatible parts data:', compatibleParts);
-  console.log('Suppliers data:', suppliers);
-  
   return (
     <PageContainer>
-      <SectionTitle>Zarządzanie częściami</SectionTitle>
+      <DataSourceToggle>
+        <ToggleLabel>
+          API
+          <ToggleSwitch 
+            checked={useMockData} 
+            onClick={handleToggleDataSource}
+          />
+          Mock
+        </ToggleLabel>
+      </DataSourceToggle>
       
       <TabsContainer>
         <Tab 
@@ -1497,7 +1685,7 @@ const VehicleParts = () => {
           active={activeTab === 'compatibility'} 
           onClick={() => setActiveTab('compatibility')}
         >
-          Kompatybilność części
+          Kompatybilne części
         </Tab>
         <Tab 
           active={activeTab === 'suppliers'} 
@@ -1507,7 +1695,11 @@ const VehicleParts = () => {
         </Tab>
       </TabsContainer>
       
-      {renderContent()}
+      {activeTab === 'inventory' && renderInventoryTab()}
+      {activeTab === 'orders' && renderOrdersTab()}
+      {activeTab === 'usage' && renderUsageAnalysisTab()}
+      {activeTab === 'compatibility' && renderCompatibilityTab()}
+      {activeTab === 'suppliers' && renderSuppliersTab()}
     </PageContainer>
   );
 };
