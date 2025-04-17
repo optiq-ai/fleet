@@ -841,12 +841,8 @@ const FraudDetection = () => {
       return <div>Ładowanie danych testów jakości paliwa...</div>;
     }
     
-    if (!transactions || transactions.length === 0) {
+    if (!fuelTestsData || !fuelTestsData.tests || fuelTestsData.tests.length === 0) {
       return <div>Brak danych do testów jakości paliwa.</div>;
-    }
-    
-    if (!fuelTestsData) {
-      return <div>Ładowanie testów jakości paliwa...</div>;
     }
     
     return (
