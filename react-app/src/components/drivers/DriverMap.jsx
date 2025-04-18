@@ -8,6 +8,14 @@ const MapContainer = styled.div`
   border-radius: 8px;
   overflow: hidden;
   position: relative;
+  z-index: 0; /* Ensure proper stacking context */
+`;
+
+const MapContent = styled.div`
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1; /* Ensure map is above other elements */
 `;
 
 const MapPlaceholder = styled.div`
@@ -136,177 +144,239 @@ const DriverMap = ({ drivers, selectedDriver, onDriverSelect }) => {
     // Check if Google Maps API is loaded
     if (!window.google || !window.google.maps) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNLrJhOMz6idD05pzfn5lhA-TAw-mAZCU&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNLrJhOMz6idD05pzfn5lhA-TAw-mAZCU&libraries=places&callback=Function.prototype`;
       script.async = true;
       script.defer = true;
-      script.onload = initializeMap;
+      
+      // Create a promise to track when the API is loaded
+      const loadGoogleMapsApi = new Promise((resolve) => {
+        window.initMap = () => {
+          resolve(window.google);
+        };
+        script.onload = () => {
+          if (window.google && window.google.maps) {
+            resolve(window.google);
+          }
+        };
+      });
+      
       document.head.appendChild(script);
       
+      // Initialize map after API is loaded
+      loadGoogleMapsApi.then(() => {
+        console.log("Google Maps API loaded successfully");
+        setTimeout(initializeMap, 100); // Small delay to ensure DOM is ready
+      }).catch(error => {
+        console.error("Error loading Google Maps API:", error);
+      });
+      
       return () => {
-        document.head.removeChild(script);
+        if (script.parentNode) {
+          document.head.removeChild(script);
+        }
       };
     } else {
-      initializeMap();
+      console.log("Google Maps API already loaded");
+      setTimeout(initializeMap, 100); // Small delay to ensure DOM is ready
     }
   }, []);
   
   // Initialize map
   const initializeMap = () => {
-    if (!mapRef.current) return;
+    console.log("Initializing map...");
+    if (!mapRef.current) {
+      console.error("Map reference is not available");
+      return;
+    }
     
-    // Center of Poland
-    const center = { lat: 52.0692, lng: 19.4803 };
-    
-    const mapOptions = {
-      center,
-      zoom: 6,
-      mapTypeId: window.google.maps.MapTypeId.ROADMAP,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-      styles: [
-        {
-          featureType: 'poi',
-          elementType: 'labels',
-          stylers: [{ visibility: 'off' }]
-        }
-      ]
-    };
-    
-    const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
-    setMap(newMap);
+    try {
+      // Center of Poland
+      const center = { lat: 52.0692, lng: 19.4803 };
+      
+      const mapOptions = {
+        center,
+        zoom: 6,
+        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: true,
+        zoomControl: true,
+        gestureHandling: 'greedy', // Makes the map fully draggable
+        styles: [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ]
+      };
+      
+      console.log("Creating new Google Map instance");
+      const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
+      
+      // Add event listener to confirm map is interactive
+      newMap.addListener('tilesloaded', () => {
+        console.log("Map tiles loaded successfully");
+      });
+      
+      newMap.addListener('click', (event) => {
+        console.log("Map clicked at:", event.latLng.lat(), event.latLng.lng());
+      });
+      
+      console.log("Setting map state");
+      setMap(newMap);
+    } catch (error) {
+      console.error("Error initializing map:", error);
+    }
   };
   
   // Add markers to the map
   useEffect(() => {
-    if (!map || !driversWithLocation.length) return;
-    
-    // Remove existing markers
-    if (markers.length > 0) {
-      markers.forEach(marker => marker.setMap(null));
+    console.log("Adding markers effect triggered", { map, driversWithLocation });
+    if (!map || !driversWithLocation.length) {
+      console.log("Map or drivers not available yet");
+      return;
     }
     
-    // Counters for statistics
-    let activeCount = 0;
-    let inactiveCount = 0;
-    let onLeaveCount = 0;
-    
-    // Add new markers
-    const newMarkers = driversWithLocation.map(driver => {
-      // Determine marker color based on driver status
-      let markerColor;
-      
-      switch (driver.status) {
-        case 'active':
-          markerColor = '#4caf50'; // green
-          activeCount++;
-          break;
-        case 'inactive':
-          markerColor = '#f44336'; // red
-          inactiveCount++;
-          break;
-        case 'on_leave':
-          markerColor = '#ff9800'; // orange
-          onLeaveCount++;
-          break;
-        default:
-          markerColor = '#2196f3'; // blue
+    try {
+      console.log("Removing existing markers");
+      // Remove existing markers
+      if (markers.length > 0) {
+        markers.forEach(marker => marker.setMap(null));
       }
       
-      // Create marker icon
-      const markerIcon = {
-        path: window.google.maps.SymbolPath.CIRCLE,
-        fillColor: markerColor,
-        fillOpacity: 0.8,
-        strokeColor: '#ffffff',
-        strokeWeight: 2,
-        scale: 10
-      };
+      // Counters for statistics
+      let activeCount = 0;
+      let inactiveCount = 0;
+      let onLeaveCount = 0;
       
-      // Create marker
-      const marker = new window.google.maps.Marker({
-        position: {
-          lat: driver.currentLocation.latitude,
-          lng: driver.currentLocation.longitude
-        },
-        map,
-        icon: markerIcon,
-        title: driver.name
-      });
-      
-      // Add infowindow
-      const infowindow = new window.google.maps.InfoWindow({
-        content: `
-          <div style="padding: 8px;">
-            <div style="font-weight: bold; margin-bottom: 4px;">${driver.name}</div>
-            <div>Pojazd: ${driver.currentVehicle || 'Brak'}</div>
-            <div>Status: ${
-              driver.status === 'active' ? 'Aktywny' : 
-              driver.status === 'inactive' ? 'Nieaktywny' : 
-              driver.status === 'on_leave' ? 'Na urlopie' : driver.status
-            }</div>
-            <div>Ocena bezpieczeństwa: ${driver.safetyScore}%</div>
-            <div>Ostatnia aktualizacja: ${driver.lastUpdate}</div>
-          </div>
-        `
-      });
-      
-      // Handle marker click
-      marker.addListener('click', () => {
-        // Close all open infowindows
-        newMarkers.forEach(m => {
-          if (m.infowindow) {
-            m.infowindow.close();
+      console.log("Creating new markers for drivers:", driversWithLocation.length);
+      // Add new markers
+      const newMarkers = driversWithLocation.map(driver => {
+        // Determine marker color based on driver status
+        let markerColor;
+        
+        switch (driver.status) {
+          case 'active':
+            markerColor = '#4caf50'; // green
+            activeCount++;
+            break;
+          case 'inactive':
+            markerColor = '#f44336'; // red
+            inactiveCount++;
+            break;
+          case 'on_leave':
+            markerColor = '#ff9800'; // orange
+            onLeaveCount++;
+            break;
+          default:
+            markerColor = '#2196f3'; // blue
+        }
+        
+        // Create marker icon
+        const markerIcon = {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          fillColor: markerColor,
+          fillOpacity: 0.8,
+          strokeColor: '#ffffff',
+          strokeWeight: 2,
+          scale: 10
+        };
+        
+        console.log(`Creating marker for driver ${driver.name} at position:`, driver.currentLocation);
+        // Create marker
+        const marker = new window.google.maps.Marker({
+          position: {
+            lat: parseFloat(driver.currentLocation.latitude),
+            lng: parseFloat(driver.currentLocation.longitude)
+          },
+          map,
+          icon: markerIcon,
+          title: driver.name,
+          animation: window.google.maps.Animation.DROP
+        });
+        
+        // Add infowindow
+        const infowindow = new window.google.maps.InfoWindow({
+          content: `
+            <div style="padding: 8px;">
+              <div style="font-weight: bold; margin-bottom: 4px;">${driver.name}</div>
+              <div>Pojazd: ${driver.currentVehicle || 'Brak'}</div>
+              <div>Status: ${
+                driver.status === 'active' ? 'Aktywny' : 
+                driver.status === 'inactive' ? 'Nieaktywny' : 
+                driver.status === 'on_leave' ? 'Na urlopie' : driver.status
+              }</div>
+              <div>Ocena bezpieczeństwa: ${driver.safetyScore}%</div>
+              <div>Ostatnia aktualizacja: ${driver.lastUpdate}</div>
+            </div>
+          `
+        });
+        
+        // Handle marker click
+        marker.addListener('click', () => {
+          console.log(`Marker clicked for driver: ${driver.name}`);
+          // Close all open infowindows
+          newMarkers.forEach(m => {
+            if (m.infowindow) {
+              m.infowindow.close();
+            }
+          });
+          
+          // Open infowindow for clicked marker
+          infowindow.open(map, marker);
+          
+          // Call callback
+          if (onDriverSelect) {
+            onDriverSelect(driver);
           }
         });
         
-        // Open infowindow for clicked marker
-        infowindow.open(map, marker);
+        // Save infowindow in marker
+        marker.infowindow = infowindow;
         
-        // Call callback
-        if (onDriverSelect) {
-          onDriverSelect(driver);
+        return marker;
+      });
+      
+      console.log("Updating statistics", { activeCount, inactiveCount, onLeaveCount });
+      // Update statistics
+      setStats({
+        active: activeCount,
+        inactive: inactiveCount,
+        on_leave: onLeaveCount
+      });
+      
+      // Save markers
+      setMarkers(newMarkers);
+      
+      console.log("Fitting map bounds to markers");
+      // Fit map view to markers
+      if (newMarkers.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        
+        newMarkers.forEach(marker => {
+          bounds.extend(marker.getPosition());
+        });
+        
+        map.fitBounds(bounds);
+        
+        // If there's only one marker, set zoom
+        if (newMarkers.length === 1) {
+          map.setZoom(12);
         }
-      });
-      
-      // Save infowindow in marker
-      marker.infowindow = infowindow;
-      
-      return marker;
-    });
-    
-    // Update statistics
-    setStats({
-      active: activeCount,
-      inactive: inactiveCount,
-      on_leave: onLeaveCount
-    });
-    
-    // Save markers
-    setMarkers(newMarkers);
-    
-    // Fit map view to markers
-    if (newMarkers.length > 0) {
-      const bounds = new window.google.maps.LatLngBounds();
-      
-      newMarkers.forEach(marker => {
-        bounds.extend(marker.getPosition());
-      });
-      
-      map.fitBounds(bounds);
-      
-      // If there's only one marker, set zoom
-      if (newMarkers.length === 1) {
-        map.setZoom(12);
       }
+    } catch (error) {
+      console.error("Error adding markers to map:", error);
     }
     
     // Cleanup
     return () => {
-      if (newMarkers.length > 0) {
-        newMarkers.forEach(marker => marker.setMap(null));
+      if (markers.length > 0) {
+        console.log("Cleaning up markers");
+        markers.forEach(marker => marker.setMap(null));
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, driversWithLocation, onDriverSelect]);
   
   if (!drivers || drivers.length === 0) {
@@ -328,7 +398,7 @@ const DriverMap = ({ drivers, selectedDriver, onDriverSelect }) => {
             <div style={{ fontSize: '12px', marginTop: '8px' }}>Tylko kierowcy ze statusem "aktywny" i przypisanym pojazdem są widoczni na mapie</div>
           </MapPlaceholder>
         ) : (
-          <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
+          <MapContent ref={mapRef} />
         )}
         
         {driversWithLocation.length > 0 && (
