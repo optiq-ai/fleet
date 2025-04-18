@@ -25,9 +25,9 @@ const CostOptimizationChart = ({ data, isLoading }) => {
     
     // Prepare data for recommendations chart
     const recommendations = data.recommendations || [];
-    const labels = recommendations.map(item => item.title);
-    const savingsData = recommendations.map(item => item.estimatedSavings);
-    const costData = recommendations.map(item => item.implementationCost);
+    const labels = recommendations.map(item => item.category || item.title);
+    const savingsData = recommendations.map(item => item.savings || item.estimatedSavings);
+    const costData = recommendations.map(item => item.implementationCost || item.currentCost);
     
     // Create chart
     chartInstance.current = new Chart(ctx, {
@@ -73,7 +73,7 @@ const CostOptimizationChart = ({ data, isLoading }) => {
                 const index = tooltipItems[0].dataIndex;
                 const recommendation = recommendations[index];
                 const roi = recommendation.roi;
-                return `ROI: ${roi}%`;
+                return `ROI: ${roi} miesięcy`;
               }
             }
           },
