@@ -6,6 +6,8 @@ import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
 import roadTollsService from '../services/api/roadTollsService';
 import mockRoadTollsService from '../services/api/mockRoadTollsService';
+import RouteDetailsMap from '../components/route/RouteDetailsMap';
+import TollPointsMap from '../components/route/TollPointsMap';
 
 /**
  * Route Optimization component for optimizing routes to minimize toll costs, fuel consumption, travel time, and CO2 emissions
@@ -594,6 +596,7 @@ const RouteOptimization = () => {
                     </MapControlGroup>
                   </MapControls>
                   <MapPlaceholder>
+                    <RouteDetailsMap route={selectedRoute} />
                     <MapRoutesContainer>
                       <MapRouteLabel standard>Trasa standardowa</MapRouteLabel>
                       <MapRouteLabel alternative>Trasa alternatywna</MapRouteLabel>
@@ -607,7 +610,6 @@ const RouteOptimization = () => {
                         <MapPoint x={55} y={45} color="#FF5722" title="Punkt poboru opłat: 12.90 PLN" />
                       </>
                     )}
-                    Interaktywna mapa z wizualizacją tras standardowej i alternatywnej
                   </MapPlaceholder>
                 </MapContainer>
               )}
@@ -905,7 +907,7 @@ const RouteOptimization = () => {
               <MapPoint x={20} y={50} color="#FF5722" title="Punkt poboru opłat: A1 - Gdańsk" />
               <MapPoint x={30} y={55} color="#FF5722" title="Punkt poboru opłat: A1 - Toruń" />
               <MapPoint x={40} y={60} color="#FF5722" title="Punkt poboru opłat: A1 - Łódź" />
-              Mapa punktów poboru opłat w Polsce i krajach sąsiednich
+              <TollPointsMap tollPoints={tollPoints} />
             </MapPlaceholder>
           </MapContainer>
         </Card>
