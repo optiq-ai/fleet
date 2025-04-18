@@ -4,6 +4,11 @@ import Card from '../components/common/Card';
 import Table from '../components/common/Table';
 import driverSafetyService from '../services/api/driverSafetyService';
 import mockDriverSafetyService from '../services/api/mockDriverSafetyService';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 /**
  * @typedef {Object} SafetyAlert
@@ -304,14 +309,13 @@ const RadarChartCircle = styled.div`
 
 const RadarChartPoint = styled.div`
   position: absolute;
-  top: ${props => 50 + props.y * props.value / 100}%;
-  left: ${props => 50 + props.x * props.value / 100}%;
-  width: 8px;
-  height: 8px;
-  background-color: #3f51b5;
+  width: 10px;
+  height: 10px;
+  background-color: ${props => props.color || '#3f51b5'};
   border-radius: 50%;
   transform: translate(-50%, -50%);
   z-index: 4;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 `;
 
 const RadarChartPolygon = styled.div`
@@ -321,27 +325,18 @@ const RadarChartPolygon = styled.div`
   width: 100%;
   height: 100%;
   z-index: 3;
-  
-  & > svg {
-    width: 100%;
-    height: 100%;
-    
-    & > polygon {
-      fill: rgba(63, 81, 181, 0.2);
-      stroke: #3f51b5;
-      stroke-width: 2;
-    }
-  }
 `;
 
 const RadarChartLabel = styled.div`
   position: absolute;
-  top: ${props => props.y}%;
-  left: ${props => props.x}%;
   transform: translate(-50%, -50%);
   font-size: 12px;
-  color: #666;
+  font-weight: 500;
+  color: #333;
   z-index: 5;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
 `;
 
 const ProgressBar = styled.div`
@@ -717,72 +712,41 @@ const DriverSafety = () => {
             checked={useMockData} 
             onChange={() => setUseMockData(!useMockData)} 
           />
-          <span />
+          <span></span>
         </ToggleSwitch>
-        <ToggleLabel style={{ marginLeft: '12px' }}>
-          {useMockData ? 'Włączone' : 'Wyłączone'}
-        </ToggleLabel>
       </DataToggleContainer>
     );
   };
   
   // Renderowanie zakładek
   const renderTabs = () => {
+    const tabs = [
+      { id: 'overview', label: 'Przegląd' },
+      { id: 'style', label: 'Styl jazdy' },
+      { id: 'fatigue', label: 'Zmęczenie' },
+      { id: 'distraction', label: 'Rozproszenie uwagi' },
+      { id: 'collision', label: 'Zapobieganie kolizjom' },
+      { id: 'coaching', label: 'Coaching' },
+      { id: 'video', label: 'Telematyka wideo' },
+      { id: 'ranking', label: 'Ranking' }
+    ];
+    
     return (
       <TabsContainer>
-        <Tab 
-          active={activeTab === 'overview'} 
-          onClick={() => setActiveTab('overview')}
-        >
-          Przegląd
-        </Tab>
-        <Tab 
-          active={activeTab === 'fatigue'} 
-          onClick={() => setActiveTab('fatigue')}
-        >
-          Zmęczenie kierowcy
-        </Tab>
-        <Tab 
-          active={activeTab === 'distraction'} 
-          onClick={() => setActiveTab('distraction')}
-        >
-          Rozproszenie uwagi
-        </Tab>
-        <Tab 
-          active={activeTab === 'style'} 
-          onClick={() => setActiveTab('style')}
-        >
-          Styl jazdy
-        </Tab>
-        <Tab 
-          active={activeTab === 'collision'} 
-          onClick={() => setActiveTab('collision')}
-        >
-          Zapobieganie kolizjom
-        </Tab>
-        <Tab 
-          active={activeTab === 'coaching'} 
-          onClick={() => setActiveTab('coaching')}
-        >
-          Coaching
-        </Tab>
-        <Tab 
-          active={activeTab === 'video'} 
-          onClick={() => setActiveTab('video')}
-        >
-          Telematyka wideo
-        </Tab>
-        <Tab 
-          active={activeTab === 'ranking'} 
-          onClick={() => setActiveTab('ranking')}
-        >
-          Rankingi
-        </Tab>
+        {tabs.map(tab => (
+          <Tab 
+            key={tab.id} 
+            active={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </Tab>
+        ))}
       </TabsContainer>
     );
   };
   
-  // Renderowanie sekcji filtrów
+  // Renderowanie filtrów
   const renderFilters = () => {
     return (
       <FilterContainer>
@@ -1036,17 +1000,22 @@ const DriverSafety = () => {
   const renderDrivingStyleRadarChart = () => {
     if (!drivingStyle) return null;
     
-    const points = drivingStyle.drivingStyle.map(category => {
-      const radians = (category.angle * Math.PI) / 180;
-      const x = Math.cos(radians) * 40 * (category.value / 100);
-      const y = Math.sin(radians) * 40 * (category.value / 100);
-      
-      return { x, y, value: category.value };
-    });
+    // Calculate points position based on value and angle
+    const calculatePointPosition = (value, angle) => {
+      const radius = (value / 100) * 40; // 40% of container size
+      const radians = (angle * Math.PI) / 180;
+      const x = 50 + Math.cos(radians) * radius;
+      const y = 50 + Math.sin(radians) * radius;
+      return { x, y };
+    };
     
-    const polygonPoints = points.map(point => 
-      `${50 + point.x},${50 + point.y}`
-    ).join(' ');
+    // Generate SVG polygon points
+    const generatePolygonPoints = () => {
+      return drivingStyle.drivingStyle.map(category => {
+        const position = calculatePointPosition(category.value, category.angle);
+        return `${position.x}%,${position.y}%`;
+      }).join(' ');
+    };
     
     return (
       <RadarChartContainer>
@@ -1064,32 +1033,107 @@ const DriverSafety = () => {
         
         {/* Wielokąt */}
         <RadarChartPolygon>
-          <svg>
-            <polygon points={polygonPoints} />
+          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polygon 
+              points={generatePolygonPoints()} 
+              fill="rgba(63, 81, 181, 0.2)" 
+              stroke="#3f51b5" 
+              strokeWidth="2" 
+            />
           </svg>
         </RadarChartPolygon>
         
         {/* Punkty */}
-        {points.map((point, index) => (
-          <RadarChartPoint 
-            key={index} 
-            x={point.x} 
-            y={point.y} 
-            value={point.value} 
-          />
-        ))}
+        {drivingStyle.drivingStyle.map((category, index) => {
+          const position = calculatePointPosition(category.value, category.angle);
+          return (
+            <RadarChartPoint 
+              key={index} 
+              style={{
+                top: `${position.y}%`,
+                left: `${position.x}%`
+              }}
+              color={category.color}
+            />
+          );
+        })}
         
         {/* Etykiety */}
         {drivingStyle.drivingStyle.map((category, index) => (
           <RadarChartLabel 
             key={index} 
-            x={category.labelPosition.x} 
-            y={category.labelPosition.y}
+            style={{
+              top: `${category.labelPosition.y}%`,
+              left: `${category.labelPosition.x}%`
+            }}
           >
             {category.category}
           </RadarChartLabel>
         ))}
       </RadarChartContainer>
+    );
+  };
+  
+  // Renderowanie wykresu historii wyników
+  const renderHistoryChart = () => {
+    if (!drivingStyle || !drivingStyle.history) return null;
+    
+    const chartData = {
+      labels: drivingStyle.history.map(item => item.date),
+      datasets: [
+        {
+          label: 'Wynik bezpieczeństwa',
+          data: drivingStyle.history.map(item => item.score),
+          fill: true,
+          backgroundColor: 'rgba(63, 81, 181, 0.2)',
+          borderColor: '#3f51b5',
+          tension: 0.4,
+          pointBackgroundColor: '#3f51b5',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#3f51b5'
+        }
+      ]
+    };
+    
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: false,
+          min: Math.max(0, Math.min(...drivingStyle.history.map(item => item.score)) - 10),
+          max: 100,
+          title: {
+            display: true,
+            text: 'Wynik'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Data'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `Wynik: ${context.parsed.y}`;
+            }
+          }
+        }
+      }
+    };
+    
+    return (
+      <div style={{ height: '100%', width: '100%' }}>
+        <Line data={chartData} options={chartOptions} />
+      </div>
     );
   };
   
@@ -1619,7 +1663,7 @@ const DriverSafety = () => {
           
           <Card title="Historia wyników">
             <ChartContainer>
-              Wykres historii wyników
+              {renderHistoryChart()}
             </ChartContainer>
           </Card>
         </GridSection>

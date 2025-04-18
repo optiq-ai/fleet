@@ -442,7 +442,7 @@ class MockDriverSafetyService {
   async getDriverStyle(driverId) {
     await delay(900);
     
-    // Sample driving style data
+    // Enhanced driving style data with better positioning and colors
     const drivingStyle = {
       driver: driverId,
       overallScore: Math.floor(Math.random() * 20) + 80,
@@ -451,48 +451,61 @@ class MockDriverSafetyService {
           category: 'Przyspieszanie',
           value: Math.floor(Math.random() * 30) + 70,
           angle: 0,
-          labelPosition: { x: 85, y: 50 }
+          labelPosition: { x: 90, y: 50 },
+          color: '#4CAF50' // Green
         },
         {
           category: 'Hamowanie',
           value: Math.floor(Math.random() * 30) + 70,
           angle: 60,
-          labelPosition: { x: 75, y: 20 }
+          labelPosition: { x: 75, y: 15 },
+          color: '#2196F3' // Blue
         },
         {
           category: 'Skręcanie',
           value: Math.floor(Math.random() * 30) + 70,
           angle: 120,
-          labelPosition: { x: 25, y: 20 }
+          labelPosition: { x: 25, y: 15 },
+          color: '#9C27B0' // Purple
         },
         {
           category: 'Prędkość',
           value: Math.floor(Math.random() * 30) + 70,
           angle: 180,
-          labelPosition: { x: 15, y: 50 }
+          labelPosition: { x: 10, y: 50 },
+          color: '#F44336' // Red
         },
         {
           category: 'Płynność',
           value: Math.floor(Math.random() * 30) + 70,
           angle: 240,
-          labelPosition: { x: 25, y: 80 }
+          labelPosition: { x: 25, y: 85 },
+          color: '#FF9800' // Orange
         },
         {
           category: 'Koncentracja',
           value: Math.floor(Math.random() * 30) + 70,
           angle: 300,
-          labelPosition: { x: 75, y: 80 }
+          labelPosition: { x: 75, y: 85 },
+          color: '#00BCD4' // Cyan
         }
       ],
+      // Enhanced history data with more data points and consistent trend
       history: [
-        { date: '2025-04-07', score: Math.floor(Math.random() * 20) + 70 },
-        { date: '2025-04-08', score: Math.floor(Math.random() * 20) + 70 },
-        { date: '2025-04-09', score: Math.floor(Math.random() * 20) + 70 },
-        { date: '2025-04-10', score: Math.floor(Math.random() * 20) + 70 },
-        { date: '2025-04-11', score: Math.floor(Math.random() * 20) + 70 },
-        { date: '2025-04-12', score: Math.floor(Math.random() * 20) + 70 },
-        { date: '2025-04-13', score: Math.floor(Math.random() * 20) + 70 },
-        { date: '2025-04-14', score: Math.floor(Math.random() * 20) + 70 }
+        { date: '2025-04-01', score: 75 },
+        { date: '2025-04-02', score: 76 },
+        { date: '2025-04-03', score: 78 },
+        { date: '2025-04-04', score: 77 },
+        { date: '2025-04-05', score: 79 },
+        { date: '2025-04-06', score: 80 },
+        { date: '2025-04-07', score: 82 },
+        { date: '2025-04-08', score: 81 },
+        { date: '2025-04-09', score: 83 },
+        { date: '2025-04-10', score: 85 },
+        { date: '2025-04-11', score: 84 },
+        { date: '2025-04-12', score: 86 },
+        { date: '2025-04-13', score: 88 },
+        { date: '2025-04-14', score: 90 }
       ],
       recommendations: [
         {
@@ -518,39 +531,64 @@ class MockDriverSafetyService {
           night: Math.floor(Math.random() * 30)
         },
         symptoms: [
-          { name: 'Ziewanie', count: Math.floor(Math.random() * 10) + 5 },
-          { name: 'Zamykanie oczu', count: Math.floor(Math.random() * 5) + 1 },
-          { name: 'Opóźniona reakcja', count: Math.floor(Math.random() * 8) + 3 },
-          { name: 'Odchylenia od toru jazdy', count: Math.floor(Math.random() * 6) + 2 }
+          {
+            name: 'Ziewanie',
+            count: Math.floor(Math.random() * 10) + 1
+          },
+          {
+            name: 'Zamykanie oczu',
+            count: Math.floor(Math.random() * 10) + 1
+          },
+          {
+            name: 'Opóźniona reakcja',
+            count: Math.floor(Math.random() * 10) + 1
+          },
+          {
+            name: 'Odchylenia od toru jazdy',
+            count: Math.floor(Math.random() * 10) + 1
+          }
         ]
       },
       distractionData: {
-        incidents: Math.floor(Math.random() * 8),
+        incidents: Math.floor(Math.random() * 10) + 1,
+        duration: Math.floor(Math.random() * 10) + 1,
         types: {
-          phone: Math.floor(Math.random() * 5),
-          eating: Math.floor(Math.random() * 3),
-          radio: Math.floor(Math.random() * 4),
-          other: Math.floor(Math.random() * 2)
+          phone: Math.floor(Math.random() * 10) + 1,
+          eating: Math.floor(Math.random() * 10) + 1,
+          radio: Math.floor(Math.random() * 10) + 1,
+          other: Math.floor(Math.random() * 10) + 1
         },
-        duration: Math.floor(Math.random() * 20) + 10,
         impact: {
-          laneDeviation: Math.floor(Math.random() * 5) + 1,
-          speedVariation: Math.floor(Math.random() * 10) + 5,
-          reactionTime: Math.floor(Math.random() * 30) + 20
+          laneDeviation: Math.floor(Math.random() * 10) + 1,
+          speedVariation: Math.floor(Math.random() * 10) + 1,
+          reactionTime: Math.floor(Math.random() * 50) + 50
         }
       },
       collisionRiskData: {
-        incidents: Math.floor(Math.random() * 3),
-        types: {
-          frontCollision: Math.floor(Math.random() * 2),
-          laneChange: Math.floor(Math.random() * 2),
-          intersection: Math.floor(Math.random() * 2)
-        },
+        incidents: Math.floor(Math.random() * 5),
         averageDistance: Math.floor(Math.random() * 10) + 5,
+        types: {
+          frontCollision: Math.floor(Math.random() * 10) + 1,
+          laneChange: Math.floor(Math.random() * 10) + 1,
+          intersection: Math.floor(Math.random() * 10) + 1
+        },
         riskFactors: [
-          { factor: 'Prędkość', value: Math.floor(Math.random() * 30) + 70 },
-          { factor: 'Odległość', value: Math.floor(Math.random() * 30) + 70 },
-          { factor: 'Czas reakcji', value: Math.floor(Math.random() * 30) + 70 }
+          {
+            factor: 'Odległość od pojazdu',
+            value: Math.floor(Math.random() * 40) + 60
+          },
+          {
+            factor: 'Prędkość',
+            value: Math.floor(Math.random() * 40) + 60
+          },
+          {
+            factor: 'Sygnalizacja manewrów',
+            value: Math.floor(Math.random() * 40) + 60
+          },
+          {
+            factor: 'Obserwacja otoczenia',
+            value: Math.floor(Math.random() * 40) + 60
+          }
         ]
       }
     };
@@ -560,207 +598,117 @@ class MockDriverSafetyService {
   
   /**
    * Get coaching sessions
-   * @param {string} [driver] - Driver filter
-   * @param {string} [status] - Status filter
    * @returns {Promise<Object>} Coaching sessions response
    */
-  async getCoachingSessions(
-    driver,
-    status
-  ) {
-    await delay(600);
+  async getCoachingSessions() {
+    await delay(500);
     
     // Sample coaching sessions
-    const allSessions = [
+    const sessions = [
       {
         id: 'session-001',
         driver: 'Jan Kowalski',
         type: 'Indywidualny',
         topic: 'Zmęczenie podczas jazdy',
-        date: '2025-04-16 10:00',
-        status: 'scheduled',
-        coach: 'Marek Trener',
-        duration: 60,
-        materials: ['Prezentacja', 'Ćwiczenia praktyczne'],
-        goals: ['Rozpoznawanie oznak zmęczenia', 'Techniki przeciwdziałania zmęczeniu']
+        date: '2025-04-20 10:00',
+        status: 'scheduled'
       },
       {
         id: 'session-002',
         driver: 'Anna Nowak',
         type: 'Grupowy',
         topic: 'Rozproszenie uwagi',
-        date: '2025-04-17 14:00',
-        status: 'scheduled',
-        coach: 'Marek Trener',
-        duration: 90,
-        materials: ['Prezentacja', 'Symulator jazdy'],
-        goals: ['Identyfikacja czynników rozpraszających', 'Techniki koncentracji']
+        date: '2025-04-18 14:30',
+        status: 'completed'
       },
       {
         id: 'session-003',
         driver: 'Piotr Wiśniewski',
         type: 'Indywidualny',
-        topic: 'Styl jazdy - hamowanie',
-        date: '2025-04-15 09:30',
-        status: 'completed',
-        coach: 'Karolina Ekspert',
-        duration: 45,
-        materials: ['Analiza nagrań', 'Jazda z instruktorem'],
-        goals: ['Poprawa techniki hamowania', 'Zwiększenie płynności jazdy']
+        topic: 'Technika jazdy',
+        date: '2025-04-19 09:15',
+        status: 'scheduled'
       },
       {
         id: 'session-004',
         driver: 'Magdalena Kaczmarek',
-        type: 'Grupowy',
+        type: 'Indywidualny',
         topic: 'Zapobieganie kolizjom',
-        date: '2025-04-18 11:00',
-        status: 'scheduled',
-        coach: 'Karolina Ekspert',
-        duration: 120,
-        materials: ['Prezentacja', 'Symulator jazdy', 'Ćwiczenia praktyczne'],
-        goals: ['Przewidywanie zagrożeń', 'Techniki unikania kolizji']
+        date: '2025-04-17 11:45',
+        status: 'cancelled'
       },
       {
         id: 'session-005',
         driver: 'Tomasz Lewandowski',
-        type: 'Indywidualny',
-        topic: 'Styl jazdy - przyspieszanie',
-        date: '2025-04-14 15:30',
-        status: 'completed',
-        coach: 'Marek Trener',
-        duration: 60,
-        materials: ['Analiza nagrań', 'Jazda z instruktorem'],
-        goals: ['Poprawa techniki przyspieszania', 'Optymalizacja zużycia paliwa']
-      },
-      {
-        id: 'session-006',
-        driver: 'Katarzyna Zielińska',
         type: 'Grupowy',
-        topic: 'Jazda w trudnych warunkach',
-        date: '2025-04-19 13:00',
-        status: 'scheduled',
-        coach: 'Karolina Ekspert',
-        duration: 180,
-        materials: ['Prezentacja', 'Symulator jazdy', 'Jazda w terenie'],
-        goals: ['Techniki jazdy w deszczu/śniegu', 'Pokonywanie trudnych odcinków']
-      },
-      {
-        id: 'session-007',
-        driver: 'Michał Szymański',
-        type: 'Indywidualny',
-        topic: 'Analiza stylu jazdy',
-        date: '2025-04-13 10:00',
-        status: 'completed',
-        coach: 'Marek Trener',
-        duration: 90,
-        materials: ['Analiza nagrań', 'Raport telematyczny'],
-        goals: ['Identyfikacja obszarów do poprawy', 'Plan rozwoju kierowcy']
-      },
-      {
-        id: 'session-008',
-        driver: 'Aleksandra Woźniak',
-        type: 'Indywidualny',
-        topic: 'Zapobieganie rozproszeniu uwagi',
-        date: '2025-04-20 09:00',
-        status: 'scheduled',
-        coach: 'Karolina Ekspert',
-        duration: 60,
-        materials: ['Prezentacja', 'Ćwiczenia praktyczne'],
-        goals: ['Organizacja kabiny kierowcy', 'Techniki koncentracji']
+        topic: 'Zmęczenie podczas jazdy',
+        date: '2025-04-21 13:00',
+        status: 'scheduled'
       }
     ];
     
-    // Filter by driver if specified
-    let filteredSessions = allSessions;
-    if (driver) {
-      filteredSessions = filteredSessions.filter(session => 
-        session.driver.toLowerCase().includes(driver.toLowerCase())
-      );
-    }
-    
-    // Filter by status if specified
-    if (status) {
-      filteredSessions = filteredSessions.filter(session => 
-        session.status === status
-      );
-    }
-    
     return {
-      sessions: filteredSessions
+      sessions
     };
   }
   
   /**
    * Get video telematics data
    * @param {string} driverId - Driver ID or name
-   * @param {string} [date] - Date filter
-   * @returns {Promise<Object>} Video telematics data
+   * @returns {Promise<Object>} Video telematics response
    */
-  async getVideoTelematics(driverId, date) {
+  async getVideoTelematics(driverId) {
     await delay(800);
     
     // Sample video telematics data
     const videoTelematics = {
       driver: driverId,
-      date: date || '2025-04-14',
       videos: [
         {
           id: 'video-001',
-          type: 'fatigue',
-          timestamp: '08:23:45',
-          duration: 30,
+          description: 'Oznaki zmęczenia podczas jazdy',
+          timestamp: '2025-04-14 08:23',
+          duration: 15,
           location: 'Warszawa, ul. Marszałkowska',
-          thumbnail: 'https://example.com/thumbnails/video-001.jpg',
-          url: 'https://example.com/videos/video-001.mp4',
-          severity: 'high',
-          description: 'Wykryto oznaki zmęczenia - zamykanie oczu'
+          severity: 'high'
         },
         {
           id: 'video-002',
-          type: 'distraction',
-          timestamp: '10:15:22',
-          duration: 25,
-          location: 'Warszawa, ul. Puławska',
-          thumbnail: 'https://example.com/thumbnails/video-002.jpg',
-          url: 'https://example.com/videos/video-002.mp4',
-          severity: 'medium',
-          description: 'Wykryto rozproszenie uwagi - korzystanie z telefonu'
+          description: 'Korzystanie z telefonu podczas jazdy',
+          timestamp: '2025-04-14 09:45',
+          duration: 12,
+          location: 'Kraków, ul. Floriańska',
+          severity: 'medium'
         },
         {
           id: 'video-003',
-          type: 'style',
-          timestamp: '12:45:10',
-          duration: 20,
-          location: 'Warszawa, ul. Świętokrzyska',
-          thumbnail: 'https://example.com/thumbnails/video-003.jpg',
-          url: 'https://example.com/videos/video-003.mp4',
-          severity: 'low',
-          description: 'Wykryto gwałtowne hamowanie'
+          description: 'Gwałtowne hamowanie',
+          timestamp: '2025-04-14 10:12',
+          duration: 8,
+          location: 'Gdańsk, ul. Długa',
+          severity: 'low'
         },
         {
           id: 'video-004',
-          type: 'collision',
-          timestamp: '15:30:05',
-          duration: 35,
-          location: 'Warszawa, Al. Jerozolimskie',
-          thumbnail: 'https://example.com/thumbnails/video-004.jpg',
-          url: 'https://example.com/videos/video-004.mp4',
-          severity: 'high',
-          description: 'Wykryto ryzyko kolizji - zbyt mała odległość'
+          description: 'Zbyt mała odległość od pojazdu',
+          timestamp: '2025-04-14 11:30',
+          duration: 10,
+          location: 'Poznań, ul. Półwiejska',
+          severity: 'medium'
         }
       ],
       statistics: {
-        totalVideos: 4,
+        totalVideos: 15,
         byType: {
-          fatigue: 1,
-          distraction: 1,
-          style: 1,
-          collision: 1
+          fatigue: 4,
+          distraction: 6,
+          style: 3,
+          collision: 2
         },
         bySeverity: {
-          low: 1,
-          medium: 1,
-          high: 2
+          high: 3,
+          medium: 7,
+          low: 5
         }
       }
     };
@@ -769,6 +717,6 @@ class MockDriverSafetyService {
   }
 }
 
-// Export service instance
+// Export instance
 const mockDriverSafetyService = new MockDriverSafetyService();
 export default mockDriverSafetyService;
