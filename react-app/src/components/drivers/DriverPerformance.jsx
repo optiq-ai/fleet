@@ -197,21 +197,41 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
     
     const categories = performanceData.drivingStyle;
     
+    // Create a gradient for each category
+    const createGradients = (ctx) => {
+      const gradients = {};
+      categories.forEach((cat, index) => {
+        const color = cat.color || '#3f51b5';
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, `${color}CC`); // Semi-transparent
+        gradient.addColorStop(1, `${color}33`); // More transparent
+        gradients[`gradient-${index}`] = gradient;
+      });
+      return gradients;
+    };
+    
     const data = {
       labels: categories.map(cat => cat.category),
       datasets: [
         {
           label: 'Styl jazdy',
           data: categories.map(cat => cat.value),
-          backgroundColor: 'rgba(63, 81, 181, 0.2)',
+          backgroundColor: (context) => {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) {
+              return 'rgba(63, 81, 181, 0.2)';
+            }
+            return createGradients(ctx)[`gradient-${context.dataIndex}`] || 'rgba(63, 81, 181, 0.2)';
+          },
           borderColor: categories.map(cat => cat.color || '#3f51b5'),
           borderWidth: 2,
           pointBackgroundColor: categories.map(cat => cat.color || '#3f51b5'),
           pointBorderColor: '#fff',
           pointHoverBackgroundColor: '#fff',
           pointHoverBorderColor: categories.map(cat => cat.color || '#3f51b5'),
-          pointRadius: 4,
-          pointHoverRadius: 6
+          pointRadius: 5,
+          pointHoverRadius: 7
         }
       ]
     };
@@ -227,16 +247,23 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           suggestedMax: 100,
           ticks: {
             stepSize: 20,
-            backdropColor: 'transparent'
+            backdropColor: 'transparent',
+            font: {
+              size: 10
+            }
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
+            color: 'rgba(0, 0, 0, 0.1)',
+            circular: true
           },
           pointLabels: {
             font: {
-              size: 12
+              size: 13,
+              weight: 'bold'
             },
-            color: '#666'
+            color: '#333',
+            padding: 20, // Add padding to prevent labels from being cut off
+            centerPointLabels: true
           }
         }
       },
@@ -245,18 +272,31 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           display: false
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
           titleFont: {
-            size: 14
+            size: 14,
+            weight: 'bold'
           },
           bodyFont: {
             size: 13
           },
+          padding: 12,
+          cornerRadius: 6,
           callbacks: {
             label: function(context) {
-              return `Wynik: ${context.raw}/100`;
+              const category = categories[context.dataIndex];
+              return `${category.category}: ${context.raw}/100`;
+            },
+            labelTextColor: function(context) {
+              const category = categories[context.dataIndex];
+              return category.color || '#ffffff';
             }
           }
+        }
+      },
+      elements: {
+        line: {
+          tension: 0.2 // Add slight curve to lines
         }
       },
       maintainAspectRatio: false,
@@ -264,7 +304,7 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
     };
     
     return (
-      <ChartContainer>
+      <ChartContainer style={{ height: '350px' }}>
         <ChartTitle>Analiza stylu jazdy</ChartTitle>
         <ChartContent>
           <Radar data={data} options={options} />
@@ -279,6 +319,14 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
       return <div>Brak danych historycznych.</div>;
     }
     
+    // Create gradient for background
+    const createGradient = (ctx, color) => {
+      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, `${color}99`); // Semi-transparent
+      gradient.addColorStop(1, `${color}10`); // Very transparent
+      return gradient;
+    };
+    
     const chartData = {
       labels: data.history.map(item => item.month),
       datasets: [
@@ -286,14 +334,24 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           label: title,
           data: data.history.map(item => item.value),
           fill: true,
-          backgroundColor: data.chartColors?.background || 'rgba(63, 81, 181, 0.2)',
+          backgroundColor: function(context) {
+            const chart = context.chart;
+            const {ctx, chartArea} = chart;
+            if (!chartArea) {
+              return data.chartColors?.background || 'rgba(63, 81, 181, 0.2)';
+            }
+            return createGradient(ctx, data.chartColors?.primary || '#3f51b5');
+          },
           borderColor: data.chartColors?.border || '#3f51b5',
-          borderWidth: 2,
+          borderWidth: 3,
           tension: 0.4,
           pointBackgroundColor: data.chartColors?.primary || '#3f51b5',
           pointBorderColor: '#fff',
-          pointRadius: 4,
-          pointHoverRadius: 6
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          pointBorderWidth: 2,
+          pointShadowBlur: 5,
+          pointShadowColor: 'rgba(0, 0, 0, 0.3)'
         }
       ]
     };
@@ -303,17 +361,31 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
         y: {
           beginAtZero: false,
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
+            color: 'rgba(0, 0, 0, 0.05)',
+            drawBorder: false
           },
           ticks: {
+            font: {
+              size: 12
+            },
+            padding: 10,
             callback: function(value) {
               return value + (unit || '');
             }
+          },
+          border: {
+            dash: [4, 4]
           }
         },
         x: {
           grid: {
             display: false
+          },
+          ticks: {
+            font: {
+              size: 12
+            },
+            padding: 10
           }
         }
       },
@@ -322,13 +394,17 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           display: false
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
           titleFont: {
-            size: 14
+            size: 14,
+            weight: 'bold'
           },
           bodyFont: {
             size: 13
           },
+          padding: 12,
+          cornerRadius: 6,
+          displayColors: false,
           callbacks: {
             label: function(context) {
               return `${context.dataset.label}: ${context.raw}${unit || ''}`;
@@ -336,12 +412,21 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           }
         }
       },
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      elements: {
+        line: {
+          tension: 0.4
+        }
+      },
       maintainAspectRatio: false,
       responsive: true
     };
     
     return (
-      <ChartContainer>
+      <ChartContainer style={{ height: '350px' }}>
         <ChartTitle>{title}</ChartTitle>
         <ChartContent>
           <Line data={chartData} options={options} />
@@ -356,17 +441,36 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
       return <div>Brak danych historycznych.</div>;
     }
     
+    // Create gradient for bars
+    const createGradients = (ctx, color) => {
+      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, color || '#3f51b5');
+      gradient.addColorStop(1, color ? `${color}88` : 'rgba(63, 81, 181, 0.5)');
+      return gradient;
+    };
+    
     const chartData = {
       labels: data.history.map(item => item.month),
       datasets: [
         {
           label: title,
           data: data.history.map(item => item.value),
-          backgroundColor: data.chartColors?.background || 'rgba(63, 81, 181, 0.7)',
+          backgroundColor: function(context) {
+            const chart = context.chart;
+            const {ctx, chartArea} = chart;
+            if (!chartArea) {
+              return data.chartColors?.background || 'rgba(63, 81, 181, 0.7)';
+            }
+            return createGradients(ctx, data.chartColors?.primary || '#3f51b5');
+          },
           borderColor: data.chartColors?.border || '#3f51b5',
           borderWidth: 1,
-          borderRadius: 4,
-          hoverBackgroundColor: data.chartColors?.primary || '#3f51b5'
+          borderRadius: 6,
+          hoverBackgroundColor: data.chartColors?.primary || '#3f51b5',
+          hoverBorderWidth: 2,
+          hoverBorderColor: '#fff',
+          barPercentage: 0.7,
+          categoryPercentage: 0.8
         }
       ]
     };
@@ -376,17 +480,31 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
         y: {
           beginAtZero: false,
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
+            color: 'rgba(0, 0, 0, 0.05)',
+            drawBorder: false
           },
           ticks: {
+            font: {
+              size: 12
+            },
+            padding: 10,
             callback: function(value) {
               return value + (unit || '');
             }
+          },
+          border: {
+            dash: [4, 4]
           }
         },
         x: {
           grid: {
             display: false
+          },
+          ticks: {
+            font: {
+              size: 12
+            },
+            padding: 10
           }
         }
       },
@@ -395,13 +513,17 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           display: false
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
           titleFont: {
-            size: 14
+            size: 14,
+            weight: 'bold'
           },
           bodyFont: {
             size: 13
           },
+          padding: 12,
+          cornerRadius: 6,
+          displayColors: false,
           callbacks: {
             label: function(context) {
               return `${context.dataset.label}: ${context.raw}${unit || ''}`;
@@ -409,12 +531,20 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           }
         }
       },
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
       maintainAspectRatio: false,
       responsive: true
     };
     
     return (
-      <ChartContainer>
+      <ChartContainer style={{ height: '350px' }}>
         <ChartTitle>{title}</ChartTitle>
         <ChartContent>
           <Bar data={chartData} options={options} />
