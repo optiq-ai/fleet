@@ -97,7 +97,7 @@ class MockFuelAnalysisService {
     // Simulate API delay
     await delay(700);
     
-    const { compareBy = 'vehicle', period = 'month' } = filters;
+    const { compareBy = 'vehicle', period = 'month', page = 1, limit = 10 } = filters;
     
     let data;
     
@@ -114,10 +114,15 @@ class MockFuelAnalysisService {
         break;
     }
     
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedData = data.slice(startIndex, Math.min(endIndex, data.length));
+    
     return {
       compareBy,
       period,
-      data,
+      data: paginatedData,
       total: data.length
     };
   }
@@ -202,6 +207,9 @@ class MockFuelAnalysisService {
         break;
     }
     
+    // Generate vehicle-specific CO2 emission data for the table
+    const vehicles = this.generateVehicleCO2Data();
+    
     return {
       period,
       data,
@@ -211,6 +219,7 @@ class MockFuelAnalysisService {
         emissionPerKm: data.reduce((sum, item) => sum + item.emissionPerKm, 0) / data.length,
         emissionTrend: -3.2
       },
+      vehicles,
       standards: [
         {
           standard: 'Euro 6',
@@ -685,9 +694,42 @@ class MockFuelAnalysisService {
   }
   
   /**
-   * Generate daily CO2 emission data
-   * @returns {Array} Array of daily CO2 emission objects
+   * Generate vehicle CO2 emission data for the table
+   * @returns {Array} Array of vehicle CO2 emission objects
    */
+  generateVehicleCO2Data() {
+    const vehicles = [
+      { id: 'VEH001', name: 'Mercedes Actros' },
+      { id: 'VEH002', name: 'Volvo FH' },
+      { id: 'VEH003', name: 'Scania R' },
+      { id: 'VEH004', name: 'MAN TGX' },
+      { id: 'VEH005', name: 'DAF XF' },
+      { id: 'VEH006', name: 'Renault T' },
+      { id: 'VEH007', name: 'Iveco Stralis' },
+      { id: 'VEH008', name: 'Mercedes Atego' }
+    ];
+    
+    return vehicles.map(vehicle => {
+      const distance = Math.floor(Math.random() * 10000) + 5000;
+      const fuelConsumption = parseFloat((Math.random() * 500 + 1000).toFixed(1));
+      const emission = parseFloat((Math.random() * 5000 + 10000).toFixed(1));
+      const emissionPerKm = parseFloat((emission / distance).toFixed(2));
+      const emissionTarget = parseFloat((emission * 0.85).toFixed(1));
+      
+      return {
+        vehicleId: vehicle.id,
+        vehicleName: vehicle.name,
+        emission,
+        distance,
+        emissionPerKm,
+        fuelConsumption,
+        emissionTarget,
+        status: emission > emissionTarget ? 'Przekroczony limit' : 'W normie',
+        difference: parseFloat(((emission - emissionTarget) / emissionTarget * 100).toFixed(1)),
+        trend: parseFloat((Math.random() * 10 - 5).toFixed(1))
+      };
+    });
+  }
   generateDailyCO2Emission() {
     const data = [];
     
