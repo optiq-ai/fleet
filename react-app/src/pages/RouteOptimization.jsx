@@ -601,15 +601,6 @@ const RouteOptimization = () => {
                       <MapRouteLabel standard>Trasa standardowa</MapRouteLabel>
                       <MapRouteLabel alternative>Trasa alternatywna</MapRouteLabel>
                     </MapRoutesContainer>
-                    {showTollPoints && (
-                      <>
-                        {/* Simulate toll points on the map */}
-                        <MapPoint x={25} y={40} color="#FF5722" title="Punkt poboru opłat: 15.50 PLN" />
-                        <MapPoint x={35} y={35} color="#FF5722" title="Punkt poboru opłat: 22.75 PLN" />
-                        <MapPoint x={45} y={30} color="#FF5722" title="Punkt poboru opłat: 18.20 PLN" />
-                        <MapPoint x={55} y={45} color="#FF5722" title="Punkt poboru opłat: 12.90 PLN" />
-                      </>
-                    )}
                   </MapPlaceholder>
                 </MapContainer>
               )}
@@ -907,7 +898,7 @@ const RouteOptimization = () => {
               <MapPoint x={20} y={50} color="#FF5722" title="Punkt poboru opłat: A1 - Gdańsk" />
               <MapPoint x={30} y={55} color="#FF5722" title="Punkt poboru opłat: A1 - Toruń" />
               <MapPoint x={40} y={60} color="#FF5722" title="Punkt poboru opłat: A1 - Łódź" />
-              <TollPointsMap tollPoints={tollPoints} />
+              <TollPointsMap tollPoints={[]} />
             </MapPlaceholder>
           </MapContainer>
         </Card>

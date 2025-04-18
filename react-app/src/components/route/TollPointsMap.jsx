@@ -59,12 +59,16 @@ const TollPointsMap = ({ tollPoints = [] }) => {
 
     // Use mock toll points if none provided
     const points = tollPoints.length > 0 ? tollPoints : [
-      { id: 'TP001', name: 'A2 - Poznań Wschód', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 15.50, carRate: 5.20, paymentMethods: 'Gotówka, Karta, Transponder', lat: 52.4011, lng: 16.9537 },
-      { id: 'TP002', name: 'A2 - Świecko', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 22.75, carRate: 8.50, paymentMethods: 'Gotówka, Karta, Transponder', lat: 52.3438, lng: 14.5847 },
-      { id: 'TP003', name: 'A4 - Wrocław', road: 'A4', country: 'Polska', operator: 'ViaTOLL', truckRate: 18.20, carRate: 6.80, paymentMethods: 'Gotówka, Karta, Transponder', lat: 51.1079, lng: 17.0385 },
-      { id: 'TP004', name: 'A10 - Berlin', road: 'A10', country: 'Niemcy', operator: 'TollCollect', truckRate: 25.30, carRate: 0, paymentMethods: 'Transponder, OBU', lat: 52.5200, lng: 13.4050 },
-      { id: 'TP005', name: 'A13 - Dresden', road: 'A13', country: 'Niemcy', operator: 'TollCollect', truckRate: 19.80, carRate: 0, paymentMethods: 'Transponder, OBU', lat: 51.0504, lng: 13.7373 },
-      { id: 'TP006', name: 'A1 - Gdańsk', road: 'A1', country: 'Polska', operator: 'ViaTOLL', truckRate: 16.40, carRate: 6.10, paymentMethods: 'Gotówka, Karta, Transponder', lat: 54.3520, lng: 18.6466 }
+      { id: 'TP-1001', name: 'Punkt poboru A2 - Konin', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 15.50, carRate: 9.90, paymentMethods: 'Transponder, Gotówka, Karta', lat: 52.223, lng: 18.251 },
+      { id: 'TP-1002', name: 'Punkt poboru A2 - Poznań Wschód', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 22.75, carRate: 12.50, paymentMethods: 'Transponder, Gotówka, Karta', lat: 52.401, lng: 17.068 },
+      { id: 'TP-1003', name: 'Punkt poboru A2 - Poznań Zachód', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 18.20, carRate: 10.30, paymentMethods: 'Transponder, Gotówka, Karta', lat: 52.390, lng: 16.711 },
+      { id: 'TP-1004', name: 'Punkt poboru A2 - Świecko', road: 'A2', country: 'Polska', operator: 'ViaTOLL', truckRate: 12.90, carRate: 8.50, paymentMethods: 'Transponder, Gotówka, Karta', lat: 52.294, lng: 14.685 },
+      { id: 'TP-1005', name: 'Punkt poboru A4 - Kraków', road: 'A4', country: 'Polska', operator: 'ViaTOLL', truckRate: 20.00, carRate: 10.00, paymentMethods: 'Transponder, Gotówka, Karta', lat: 50.010, lng: 19.994 },
+      { id: 'TP-1006', name: 'Punkt poboru A4 - Katowice', road: 'A4', country: 'Polska', operator: 'ViaTOLL', truckRate: 18.50, carRate: 9.50, paymentMethods: 'Transponder, Gotówka, Karta', lat: 50.214, lng: 19.134 },
+      { id: 'TP-1007', name: 'Punkt poboru A4 - Wrocław', road: 'A4', country: 'Polska', operator: 'ViaTOLL', truckRate: 19.30, carRate: 9.80, paymentMethods: 'Transponder, Gotówka, Karta', lat: 51.036, lng: 17.124 },
+      { id: 'TP-1008', name: 'Punkt poboru A1 - Gdańsk', road: 'A1', country: 'Polska', operator: 'ViaTOLL', truckRate: 16.70, carRate: 9.20, paymentMethods: 'Transponder, Gotówka, Karta', lat: 54.349, lng: 18.659 },
+      { id: 'TP-1009', name: 'Punkt poboru A1 - Toruń', road: 'A1', country: 'Polska', operator: 'ViaTOLL', truckRate: 17.40, carRate: 9.40, paymentMethods: 'Transponder, Gotówka, Karta', lat: 53.035, lng: 18.604 },
+      { id: 'TP-1010', name: 'Punkt poboru A1 - Łódź', road: 'A1', country: 'Polska', operator: 'ViaTOLL', truckRate: 18.10, carRate: 9.60, paymentMethods: 'Transponder, Gotówka, Karta', lat: 51.759, lng: 19.461 }
     ];
 
     const newMarkers = [];
