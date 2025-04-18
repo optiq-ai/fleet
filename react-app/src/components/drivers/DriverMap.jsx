@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import Card from '../common/Card';
 
@@ -23,73 +23,50 @@ const MapPlaceholder = styled.div`
   flex-direction: column;
 `;
 
-const DriverMarker = styled.div`
+const MapOverlay = styled.div`
   position: absolute;
-  width: 20px;
-  height: 20px;
-  background-color: ${props => props.selected ? '#3f51b5' : '#666'};
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: #3f51b5;
-    width: 24px;
-    height: 24px;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30px;
-    height: 30px;
-    background-color: rgba(63, 81, 181, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-    opacity: ${props => props.selected ? 1 : 0};
-    transition: opacity 0.3s ease;
-  }
-`;
-
-const DriverTooltip = styled.div`
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: white;
-  padding: 8px 12px;
+  top: 16px;
+  right: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 12px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  font-size: 12px;
-  white-space: nowrap;
-  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  font-size: 14px;
+`;
+
+const MapLegend = styled.div`
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  font-size: 14px;
+`;
+
+const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
   
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: white transparent transparent transparent;
+  &:last-child {
+    margin-bottom: 0;
   }
 `;
 
-const MapImage = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Poland_topo.jpg/800px-Poland_topo.jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.8;
+const LegendColor = styled.div`
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: ${props => props.color};
+  margin-right: 8px;
+`;
+
+const LegendText = styled.div`
+  font-size: 12px;
 `;
 
 const SectionTitle = styled.h2`
@@ -138,7 +115,199 @@ const InfoValue = styled.div`
  * @returns {JSX.Element} DriverMap component
  */
 const DriverMap = ({ drivers, selectedDriver, onDriverSelect }) => {
-  const [hoveredDriver, setHoveredDriver] = React.useState(null);
+  const mapRef = useRef(null);
+  const [map, setMap] = useState(null);
+  const [markers, setMarkers] = useState([]);
+  const [stats, setStats] = useState({
+    active: 0,
+    inactive: 0,
+    on_leave: 0
+  });
+  
+  // Filter drivers with location data
+  const driversWithLocation = drivers && drivers.length > 0 ? drivers.filter(driver => 
+    driver.currentLocation && 
+    driver.currentLocation.latitude && 
+    driver.currentLocation.longitude
+  ) : [];
+  
+  // Initialize Google Maps
+  useEffect(() => {
+    // Check if Google Maps API is loaded
+    if (!window.google || !window.google.maps) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNLrJhOMz6idD05pzfn5lhA-TAw-mAZCU&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeMap;
+      document.head.appendChild(script);
+      
+      return () => {
+        document.head.removeChild(script);
+      };
+    } else {
+      initializeMap();
+    }
+  }, []);
+  
+  // Initialize map
+  const initializeMap = () => {
+    if (!mapRef.current) return;
+    
+    // Center of Poland
+    const center = { lat: 52.0692, lng: 19.4803 };
+    
+    const mapOptions = {
+      center,
+      zoom: 6,
+      mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      styles: [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }]
+        }
+      ]
+    };
+    
+    const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
+    setMap(newMap);
+  };
+  
+  // Add markers to the map
+  useEffect(() => {
+    if (!map || !driversWithLocation.length) return;
+    
+    // Remove existing markers
+    if (markers.length > 0) {
+      markers.forEach(marker => marker.setMap(null));
+    }
+    
+    // Counters for statistics
+    let activeCount = 0;
+    let inactiveCount = 0;
+    let onLeaveCount = 0;
+    
+    // Add new markers
+    const newMarkers = driversWithLocation.map(driver => {
+      // Determine marker color based on driver status
+      let markerColor;
+      
+      switch (driver.status) {
+        case 'active':
+          markerColor = '#4caf50'; // green
+          activeCount++;
+          break;
+        case 'inactive':
+          markerColor = '#f44336'; // red
+          inactiveCount++;
+          break;
+        case 'on_leave':
+          markerColor = '#ff9800'; // orange
+          onLeaveCount++;
+          break;
+        default:
+          markerColor = '#2196f3'; // blue
+      }
+      
+      // Create marker icon
+      const markerIcon = {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        fillColor: markerColor,
+        fillOpacity: 0.8,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+        scale: 10
+      };
+      
+      // Create marker
+      const marker = new window.google.maps.Marker({
+        position: {
+          lat: driver.currentLocation.latitude,
+          lng: driver.currentLocation.longitude
+        },
+        map,
+        icon: markerIcon,
+        title: driver.name
+      });
+      
+      // Add infowindow
+      const infowindow = new window.google.maps.InfoWindow({
+        content: `
+          <div style="padding: 8px;">
+            <div style="font-weight: bold; margin-bottom: 4px;">${driver.name}</div>
+            <div>Pojazd: ${driver.currentVehicle || 'Brak'}</div>
+            <div>Status: ${
+              driver.status === 'active' ? 'Aktywny' : 
+              driver.status === 'inactive' ? 'Nieaktywny' : 
+              driver.status === 'on_leave' ? 'Na urlopie' : driver.status
+            }</div>
+            <div>Ocena bezpieczeństwa: ${driver.safetyScore}%</div>
+            <div>Ostatnia aktualizacja: ${driver.lastUpdate}</div>
+          </div>
+        `
+      });
+      
+      // Handle marker click
+      marker.addListener('click', () => {
+        // Close all open infowindows
+        newMarkers.forEach(m => {
+          if (m.infowindow) {
+            m.infowindow.close();
+          }
+        });
+        
+        // Open infowindow for clicked marker
+        infowindow.open(map, marker);
+        
+        // Call callback
+        if (onDriverSelect) {
+          onDriverSelect(driver);
+        }
+      });
+      
+      // Save infowindow in marker
+      marker.infowindow = infowindow;
+      
+      return marker;
+    });
+    
+    // Update statistics
+    setStats({
+      active: activeCount,
+      inactive: inactiveCount,
+      on_leave: onLeaveCount
+    });
+    
+    // Save markers
+    setMarkers(newMarkers);
+    
+    // Fit map view to markers
+    if (newMarkers.length > 0) {
+      const bounds = new window.google.maps.LatLngBounds();
+      
+      newMarkers.forEach(marker => {
+        bounds.extend(marker.getPosition());
+      });
+      
+      map.fitBounds(bounds);
+      
+      // If there's only one marker, set zoom
+      if (newMarkers.length === 1) {
+        map.setZoom(12);
+      }
+    }
+    
+    // Cleanup
+    return () => {
+      if (newMarkers.length > 0) {
+        newMarkers.forEach(marker => marker.setMap(null));
+      }
+    };
+  }, [map, driversWithLocation, onDriverSelect]);
   
   if (!drivers || drivers.length === 0) {
     return (
@@ -148,74 +317,43 @@ const DriverMap = ({ drivers, selectedDriver, onDriverSelect }) => {
       </Card>
     );
   }
-  
-  // Filter drivers with location data
-  const driversWithLocation = drivers.filter(driver => 
-    driver.currentLocation && 
-    driver.currentLocation.latitude && 
-    driver.currentLocation.longitude
-  );
-  
-  // Map boundaries (Poland)
-  const mapBounds = {
-    minLat: 49.0,
-    maxLat: 55.0,
-    minLng: 14.0,
-    maxLng: 24.0
-  };
-  
-  // Convert geo coordinates to pixel positions
-  const getPixelPosition = (lat, lng) => {
-    const x = ((lng - mapBounds.minLng) / (mapBounds.maxLng - mapBounds.minLng)) * 100;
-    const y = 100 - ((lat - mapBounds.minLat) / (mapBounds.maxLat - mapBounds.minLat)) * 100;
-    return { x, y };
-  };
-  
+
   return (
     <Card>
       <SectionTitle>Mapa kierowców</SectionTitle>
       <MapContainer>
-        <MapImage />
-        
         {driversWithLocation.length === 0 ? (
           <MapPlaceholder>
             <div>Brak aktywnych kierowców z danymi lokalizacji</div>
             <div style={{ fontSize: '12px', marginTop: '8px' }}>Tylko kierowcy ze statusem "aktywny" i przypisanym pojazdem są widoczni na mapie</div>
           </MapPlaceholder>
         ) : (
-          driversWithLocation.map(driver => {
-            const position = getPixelPosition(
-              driver.currentLocation.latitude,
-              driver.currentLocation.longitude
-            );
+          <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
+        )}
+        
+        {driversWithLocation.length > 0 && (
+          <>
+            <MapOverlay>
+              <div>Aktywni kierowcy: {stats.active}</div>
+              <div>Nieaktywni kierowcy: {stats.inactive}</div>
+              <div>Kierowcy na urlopie: {stats.on_leave}</div>
+            </MapOverlay>
             
-            const isSelected = selectedDriver && selectedDriver.id === driver.id;
-            const isHovered = hoveredDriver === driver.id;
-            
-            return (
-              <React.Fragment key={driver.id}>
-                <DriverMarker
-                  style={{ left: `${position.x}%`, top: `${position.y}%` }}
-                  selected={isSelected}
-                  onClick={() => onDriverSelect(driver)}
-                  onMouseEnter={() => setHoveredDriver(driver.id)}
-                  onMouseLeave={() => setHoveredDriver(null)}
-                />
-                
-                {(isHovered || isSelected) && (
-                  <DriverTooltip style={{ left: `${position.x}%`, top: `${position.y - 5}%` }}>
-                    <div><strong>{driver.name}</strong></div>
-                    <div>Pojazd: {driver.currentVehicle || 'Brak'}</div>
-                    <div>Status: {
-                      driver.status === 'active' ? 'Aktywny' :
-                      driver.status === 'inactive' ? 'Nieaktywny' :
-                      driver.status === 'on_leave' ? 'Na urlopie' : driver.status
-                    }</div>
-                  </DriverTooltip>
-                )}
-              </React.Fragment>
-            );
-          })
+            <MapLegend>
+              <LegendItem>
+                <LegendColor color="#4caf50" />
+                <LegendText>Aktywni</LegendText>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor color="#f44336" />
+                <LegendText>Nieaktywni</LegendText>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor color="#ff9800" />
+                <LegendText>Na urlopie</LegendText>
+              </LegendItem>
+            </MapLegend>
+          </>
         )}
       </MapContainer>
       
@@ -231,10 +369,22 @@ const DriverMap = ({ drivers, selectedDriver, onDriverSelect }) => {
             <InfoValue>{selectedDriver.currentVehicle || 'Brak przypisanego pojazdu'}</InfoValue>
           </InfoRow>
           <InfoRow>
+            <InfoLabel>Status:</InfoLabel>
+            <InfoValue>
+              {selectedDriver.status === 'active' ? 'Aktywny' : 
+               selectedDriver.status === 'inactive' ? 'Nieaktywny' : 
+               selectedDriver.status === 'on_leave' ? 'Na urlopie' : selectedDriver.status}
+            </InfoValue>
+          </InfoRow>
+          <InfoRow>
             <InfoLabel>Współrzędne:</InfoLabel>
             <InfoValue>
               {selectedDriver.currentLocation.latitude.toFixed(4)}, {selectedDriver.currentLocation.longitude.toFixed(4)}
             </InfoValue>
+          </InfoRow>
+          <InfoRow>
+            <InfoLabel>Ocena bezpieczeństwa:</InfoLabel>
+            <InfoValue>{selectedDriver.safetyScore}%</InfoValue>
           </InfoRow>
           <InfoRow>
             <InfoLabel>Ostatnia aktualizacja:</InfoLabel>
