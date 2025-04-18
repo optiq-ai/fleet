@@ -1,6 +1,32 @@
 import React from 'react';
 import styled from 'styled-components';
 import Card from '../common/Card';
+import { Radar, Line, Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement
+} from 'chart.js';
+
+// Register ChartJS components
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement
+);
 
 const SectionTitle = styled.h2`
   font-size: 20px;
@@ -100,6 +126,8 @@ const ChartContainer = styled.div`
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ChartTitle = styled.div`
@@ -109,138 +137,11 @@ const ChartTitle = styled.div`
   margin-bottom: 16px;
 `;
 
-const ChartBars = styled.div`
-  display: flex;
-  height: 220px;
-  align-items: flex-end;
-  justify-content: space-around;
-  padding: 0 16px;
-`;
-
-const ChartBar = styled.div`
-  width: 40px;
-  height: ${props => props.height}%;
-  background-color: #3f51b5;
-  border-radius: 4px 4px 0 0;
+const ChartContent = styled.div`
+  flex: 1;
   position: relative;
-  transition: height 0.3s ease;
-  
-  &:hover {
-    background-color: #303f9f;
-  }
-`;
-
-const ChartBarLabel = styled.div`
-  position: absolute;
-  bottom: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  color: #666;
-  white-space: nowrap;
-`;
-
-const ChartBarValue = styled.div`
-  position: absolute;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  color: #333;
-  font-weight: 500;
-`;
-
-const ChartAxis = styled.div`
-  position: absolute;
-  left: 0;
-  bottom: 40px;
-  width: 100%;
-  height: 1px;
-  background-color: #e0e0e0;
-`;
-
-const RadarChartContainer = styled.div`
-  position: relative;
-  width: 300px;
-  height: 300px;
-  margin: 0 auto;
-`;
-
-const RadarChartBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background-color: #f5f5f5;
-  z-index: 1;
-`;
-
-const RadarChartAxis = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 1px;
-  background-color: #e0e0e0;
-  transform-origin: left center;
-  transform: rotate(${props => props.angle}deg);
-  z-index: 2;
-`;
-
-const RadarChartCircle = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: ${props => props.size}%;
-  height: ${props => props.size}%;
-  border-radius: 50%;
-  border: 1px dashed #e0e0e0;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-`;
-
-const RadarChartPoint = styled.div`
-  position: absolute;
-  top: ${props => 50 + props.y * props.value / 100}%;
-  left: ${props => 50 + props.x * props.value / 100}%;
-  width: 8px;
-  height: 8px;
-  background-color: #3f51b5;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 4;
-`;
-
-const RadarChartPolygon = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 3;
-  
-  & > svg {
-    width: 100%;
-    height: 100%;
-    
-    & > polygon {
-      fill: rgba(63, 81, 181, 0.2);
-      stroke: #3f51b5;
-      stroke-width: 2;
-    }
-  }
-`;
-
-const RadarChartLabel = styled.div`
-  position: absolute;
-  top: ${props => props.y}%;
-  left: ${props => props.x}%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
-  color: #666;
-  z-index: 5;
 `;
 
 const RecommendationContainer = styled.div`
@@ -295,106 +196,229 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
     }
     
     const categories = performanceData.drivingStyle;
-    const numCategories = categories.length;
-    const angleStep = 360 / numCategories;
     
-    // Calculate polygon points
-    const points = categories.map((category, index) => {
-      const angle = (index * angleStep - 90) * Math.PI / 180;
-      const value = category.value / 100;
-      const x = 50 + 40 * value * Math.cos(angle);
-      const y = 50 + 40 * value * Math.sin(angle);
-      return `${x},${y}`;
-    }).join(' ');
+    const data = {
+      labels: categories.map(cat => cat.category),
+      datasets: [
+        {
+          label: 'Styl jazdy',
+          data: categories.map(cat => cat.value),
+          backgroundColor: 'rgba(63, 81, 181, 0.2)',
+          borderColor: categories.map(cat => cat.color || '#3f51b5'),
+          borderWidth: 2,
+          pointBackgroundColor: categories.map(cat => cat.color || '#3f51b5'),
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: categories.map(cat => cat.color || '#3f51b5'),
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }
+      ]
+    };
+    
+    const options = {
+      scales: {
+        r: {
+          angleLines: {
+            display: true,
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          suggestedMin: 0,
+          suggestedMax: 100,
+          ticks: {
+            stepSize: 20,
+            backdropColor: 'transparent'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          pointLabels: {
+            font: {
+              size: 12
+            },
+            color: '#666'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 13
+          },
+          callbacks: {
+            label: function(context) {
+              return `Wynik: ${context.raw}/100`;
+            }
+          }
+        }
+      },
+      maintainAspectRatio: false,
+      responsive: true
+    };
     
     return (
       <ChartContainer>
         <ChartTitle>Analiza stylu jazdy</ChartTitle>
-        <RadarChartContainer>
-          <RadarChartBackground />
-          
-          {/* Circles */}
-          <RadarChartCircle size={20} />
-          <RadarChartCircle size={40} />
-          <RadarChartCircle size={60} />
-          <RadarChartCircle size={80} />
-          
-          {/* Axes */}
-          {categories.map((_, index) => (
-            <RadarChartAxis 
-              key={index} 
-              angle={index * angleStep} 
-            />
-          ))}
-          
-          {/* Labels */}
-          {categories.map((category, index) => {
-            const angle = (index * angleStep - 90) * Math.PI / 180;
-            const x = 50 + 48 * Math.cos(angle);
-            const y = 50 + 48 * Math.sin(angle);
-            
-            return (
-              <RadarChartLabel 
-                key={index} 
-                x={x} 
-                y={y}
-              >
-                {category.category}
-              </RadarChartLabel>
-            );
-          })}
-          
-          {/* Points */}
-          {categories.map((category, index) => {
-            const angle = (index * angleStep - 90) * Math.PI / 180;
-            const x = 40 * Math.cos(angle);
-            const y = 40 * Math.sin(angle);
-            
-            return (
-              <RadarChartPoint 
-                key={index} 
-                x={x} 
-                y={y} 
-                value={category.value} 
-              />
-            );
-          })}
-          
-          {/* Polygon */}
-          <RadarChartPolygon>
-            <svg>
-              <polygon points={points} />
-            </svg>
-          </RadarChartPolygon>
-        </RadarChartContainer>
+        <ChartContent>
+          <Radar data={data} options={options} />
+        </ChartContent>
+      </ChartContainer>
+    );
+  };
+  
+  // Render line chart for history data
+  const renderHistoryLineChart = (data, title, unit) => {
+    if (!data || !data.history || data.history.length === 0) {
+      return <div>Brak danych historycznych.</div>;
+    }
+    
+    const chartData = {
+      labels: data.history.map(item => item.month),
+      datasets: [
+        {
+          label: title,
+          data: data.history.map(item => item.value),
+          fill: true,
+          backgroundColor: data.chartColors?.background || 'rgba(63, 81, 181, 0.2)',
+          borderColor: data.chartColors?.border || '#3f51b5',
+          borderWidth: 2,
+          tension: 0.4,
+          pointBackgroundColor: data.chartColors?.primary || '#3f51b5',
+          pointBorderColor: '#fff',
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }
+      ]
+    };
+    
+    const options = {
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            callback: function(value) {
+              return value + (unit || '');
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 13
+          },
+          callbacks: {
+            label: function(context) {
+              return `${context.dataset.label}: ${context.raw}${unit || ''}`;
+            }
+          }
+        }
+      },
+      maintainAspectRatio: false,
+      responsive: true
+    };
+    
+    return (
+      <ChartContainer>
+        <ChartTitle>{title}</ChartTitle>
+        <ChartContent>
+          <Line data={chartData} options={options} />
+        </ChartContent>
       </ChartContainer>
     );
   };
   
   // Render bar chart for history data
-  const renderHistoryChart = (data, title, unit) => {
+  const renderHistoryBarChart = (data, title, unit) => {
     if (!data || !data.history || data.history.length === 0) {
       return <div>Brak danych historycznych.</div>;
     }
     
-    const maxValue = Math.max(...data.history.map(item => item.value)) * 1.2;
+    const chartData = {
+      labels: data.history.map(item => item.month),
+      datasets: [
+        {
+          label: title,
+          data: data.history.map(item => item.value),
+          backgroundColor: data.chartColors?.background || 'rgba(63, 81, 181, 0.7)',
+          borderColor: data.chartColors?.border || '#3f51b5',
+          borderWidth: 1,
+          borderRadius: 4,
+          hoverBackgroundColor: data.chartColors?.primary || '#3f51b5'
+        }
+      ]
+    };
+    
+    const options = {
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            callback: function(value) {
+              return value + (unit || '');
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 13
+          },
+          callbacks: {
+            label: function(context) {
+              return `${context.dataset.label}: ${context.raw}${unit || ''}`;
+            }
+          }
+        }
+      },
+      maintainAspectRatio: false,
+      responsive: true
+    };
     
     return (
       <ChartContainer>
         <ChartTitle>{title}</ChartTitle>
-        <ChartBars>
-          {data.history.map((item, index) => {
-            const height = (item.value / maxValue) * 100;
-            
-            return (
-              <ChartBar key={index} height={height}>
-                <ChartBarValue>{item.value}{unit}</ChartBarValue>
-                <ChartBarLabel>{item.month}</ChartBarLabel>
-              </ChartBar>
-            );
-          })}
-        </ChartBars>
-        <ChartAxis />
+        <ChartContent>
+          <Bar data={chartData} options={options} />
+        </ChartContent>
       </ChartContainer>
     );
   };
@@ -485,7 +509,7 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
             
             <GridSection>
               {renderDrivingStyleChart()}
-              {renderHistoryChart(
+              {renderHistoryLineChart(
                 performanceData.mileage, 
                 'Historia przejechanych kilometrów', 
                 ' km'
@@ -496,19 +520,19 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           </>
         );
       case 'mileage':
-        return renderHistoryChart(
+        return renderHistoryBarChart(
           performanceData.mileage, 
           'Historia przejechanych kilometrów', 
           ' km'
         );
       case 'fuel':
-        return renderHistoryChart(
+        return renderHistoryLineChart(
           performanceData.fuelConsumption, 
           'Historia zużycia paliwa', 
           ' l/100km'
         );
       case 'delivery':
-        return renderHistoryChart(
+        return renderHistoryBarChart(
           performanceData.deliveryTimes, 
           'Historia terminowości dostaw', 
           '%'
@@ -521,7 +545,7 @@ const DriverPerformance = ({ performanceData, isLoading }) => {
           </>
         );
       case 'ratings':
-        return renderHistoryChart(
+        return renderHistoryLineChart(
           performanceData.ratings, 
           'Historia ocen', 
           ''

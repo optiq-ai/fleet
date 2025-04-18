@@ -328,7 +328,7 @@ const mockDriversService = {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 600));
     
-    // Mock data
+    // Mock data with enhanced visualization properties
     const performanceData = {
       driver: id,
       overallScore: 85,
@@ -343,8 +343,15 @@ const mockDriversService = {
           { month: 'Styczeń 2025', value: 4800 },
           { month: 'Luty 2025', value: 4500 },
           { month: 'Marzec 2025', value: 4900 },
-          { month: 'Kwiecień 2025', value: 4250 }
-        ]
+          { month: 'Kwiecień 2025', value: 4250 },
+          { month: 'Maj 2025', value: 4600 },
+          { month: 'Czerwiec 2025', value: 4750 }
+        ],
+        chartColors: {
+          primary: '#4CAF50',
+          background: 'rgba(76, 175, 80, 0.2)',
+          border: '#4CAF50'
+        }
       },
       fuelConsumption: {
         current: {
@@ -357,8 +364,15 @@ const mockDriversService = {
           { month: 'Styczeń 2025', value: 31.2 },
           { month: 'Luty 2025', value: 30.5 },
           { month: 'Marzec 2025', value: 29.8 },
-          { month: 'Kwiecień 2025', value: 28.5 }
-        ]
+          { month: 'Kwiecień 2025', value: 28.5 },
+          { month: 'Maj 2025', value: 28.2 },
+          { month: 'Czerwiec 2025', value: 27.9 }
+        ],
+        chartColors: {
+          primary: '#2196F3',
+          background: 'rgba(33, 150, 243, 0.2)',
+          border: '#2196F3'
+        }
       },
       deliveryTimes: {
         current: {
@@ -371,15 +385,23 @@ const mockDriversService = {
           { month: 'Styczeń 2025', value: 88 },
           { month: 'Luty 2025', value: 90 },
           { month: 'Marzec 2025', value: 91 },
-          { month: 'Kwiecień 2025', value: 92 }
-        ]
+          { month: 'Kwiecień 2025', value: 92 },
+          { month: 'Maj 2025', value: 93 },
+          { month: 'Czerwiec 2025', value: 94 }
+        ],
+        chartColors: {
+          primary: '#FF9800',
+          background: 'rgba(255, 152, 0, 0.2)',
+          border: '#FF9800'
+        }
       },
       drivingStyle: [
-        { category: 'Hamowanie', value: 82 },
-        { category: 'Przyspieszanie', value: 78 },
-        { category: 'Prędkość', value: 90 },
-        { category: 'Obroty silnika', value: 85 },
-        { category: 'Czas pracy', value: 95 }
+        { category: 'Hamowanie', value: 82, color: '#E91E63' },
+        { category: 'Przyspieszanie', value: 78, color: '#9C27B0' },
+        { category: 'Prędkość', value: 90, color: '#2196F3' },
+        { category: 'Obroty silnika', value: 85, color: '#4CAF50' },
+        { category: 'Czas pracy', value: 95, color: '#FF9800' },
+        { category: 'Płynność jazdy', value: 88, color: '#795548' }
       ],
       ratings: {
         current: {
@@ -392,8 +414,15 @@ const mockDriversService = {
           { month: 'Styczeń 2025', value: 4.5 },
           { month: 'Luty 2025', value: 4.6 },
           { month: 'Marzec 2025', value: 4.6 },
-          { month: 'Kwiecień 2025', value: 4.7 }
-        ]
+          { month: 'Kwiecień 2025', value: 4.7 },
+          { month: 'Maj 2025', value: 4.8 },
+          { month: 'Czerwiec 2025', value: 4.8 }
+        ],
+        chartColors: {
+          primary: '#9C27B0',
+          background: 'rgba(156, 39, 176, 0.2)',
+          border: '#9C27B0'
+        }
       },
       recommendations: [
         { category: 'Hamowanie', recommendation: 'Unikaj gwałtownego hamowania, planuj zatrzymania z wyprzedzeniem.' },
