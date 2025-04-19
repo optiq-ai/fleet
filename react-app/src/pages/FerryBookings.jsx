@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
 import KPICard from '../components/common/KPICard';
+import FerryExpenseTrendsChart from '../components/ferry/FerryExpenseTrendsChart';
+import '../components/ferry/FerryExpenseTrendsChart.css';
 import * as ferryBookingsService from '../services/api/mockFerryBookingsService';
 
 /**
@@ -16,6 +18,7 @@ const FerryBookings = () => {
   
   // State for data
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [chartPeriod, setChartPeriod] = useState('monthly');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
@@ -406,21 +409,37 @@ const FerryBookings = () => {
           </Card>
           
           <Card title="Expense Trends" className="trends-card">
-            <div className="trends-container">
-              <div className="trends-header">
-                <h4>Monthly Expenses (€)</h4>
-              </div>
-              <div className="trends-chart">
-                <div className="chart-placeholder">
-                  {dashboardData.expenseTrends.monthly.map((item, index) => (
-                    <div key={index} className="chart-bar" style={{ height: `${item.amount / 250}px` }}>
-                      <div className="bar-value">{item.amount.toFixed(0)}</div>
-                      <div className="bar-label">{item.month}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="trends-tabs">
+              <button 
+                className={chartPeriod === 'monthly' ? 'active' : ''} 
+                onClick={() => setChartPeriod('monthly')}
+              >
+                Monthly
+              </button>
+              <button 
+                className={chartPeriod === 'quarterly' ? 'active' : ''} 
+                onClick={() => setChartPeriod('quarterly')}
+              >
+                Quarterly
+              </button>
+              <button 
+                className={chartPeriod === 'weekly' ? 'active' : ''} 
+                onClick={() => setChartPeriod('weekly')}
+              >
+                Weekly
+              </button>
+              <button 
+                className={chartPeriod === 'daily' ? 'active' : ''} 
+                onClick={() => setChartPeriod('daily')}
+              >
+                Daily
+              </button>
             </div>
+            <FerryExpenseTrendsChart 
+              data={dashboardData.expenseTrends[chartPeriod]} 
+              period={chartPeriod}
+              isLoading={isLoading}
+            />
           </Card>
         </div>
       </div>
