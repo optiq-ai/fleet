@@ -455,24 +455,44 @@ class MockFuelAnalysisService {
       const type = types[Math.floor(Math.random() * types.length)];
       const severity = severities[Math.floor(Math.random() * severities.length)];
       
-      let description;
+      // Generate value, expected value, and difference for anomalies
+      let value, expected, difference, description;
+      
       switch (type) {
         case 'Nagły wzrost zużycia':
-          description = `Wzrost zużycia paliwa o ${Math.floor(Math.random() * 30) + 10}% w porównaniu do średniej.`;
+          expected = parseFloat((Math.random() * 5 + 25).toFixed(1));
+          difference = Math.floor(Math.random() * 30) + 10;
+          value = parseFloat((expected * (1 + difference / 100)).toFixed(1));
+          description = `Wzrost zużycia paliwa o ${difference}% w porównaniu do średniej.`;
           break;
         case 'Nietypowy wzorzec tankowania':
-          description = `Tankowanie ${Math.floor(Math.random() * 50) + 20}L poza standardowym harmonogramem.`;
+          expected = Math.floor(Math.random() * 30) + 70;
+          value = Math.floor(Math.random() * 50) + 20 + expected;
+          difference = parseFloat(((value - expected) / expected * 100).toFixed(1));
+          description = `Tankowanie ${value - expected}L poza standardowym harmonogramem.`;
           break;
         case 'Podejrzenie kradzieży':
-          description = `Brak ${Math.floor(Math.random() * 40) + 20}L paliwa w porównaniu do przewidywanego poziomu.`;
+          expected = Math.floor(Math.random() * 100) + 200;
+          value = expected - (Math.floor(Math.random() * 40) + 20);
+          difference = parseFloat(((expected - value) / expected * 100).toFixed(1));
+          description = `Brak ${expected - value}L paliwa w porównaniu do przewidywanego poziomu.`;
           break;
         case 'Nieefektywna trasa':
-          description = `Trasa dłuższa o ${Math.floor(Math.random() * 30) + 10}% od optymalnej.`;
+          expected = Math.floor(Math.random() * 200) + 300;
+          difference = Math.floor(Math.random() * 30) + 10;
+          value = Math.floor(expected * (1 + difference / 100));
+          description = `Trasa dłuższa o ${difference}% od optymalnej.`;
           break;
         case 'Styl jazdy':
-          description = `Gwałtowne przyspieszenia i hamowania zwiększające zużycie paliwa o ${Math.floor(Math.random() * 20) + 5}%.`;
+          expected = parseFloat((Math.random() * 3 + 7).toFixed(1));
+          difference = Math.floor(Math.random() * 20) + 5;
+          value = parseFloat((expected * (1 + difference / 100)).toFixed(1));
+          description = `Gwałtowne przyspieszenia i hamowania zwiększające zużycie paliwa o ${difference}%.`;
           break;
         default:
+          expected = parseFloat((Math.random() * 10 + 20).toFixed(1));
+          difference = Math.floor(Math.random() * 25) + 5;
+          value = parseFloat((expected * (1 + difference / 100)).toFixed(1));
           description = 'Wykryto anomalię w zużyciu paliwa.';
       }
       
@@ -485,7 +505,10 @@ class MockFuelAnalysisService {
         driverId: drivers[Math.floor(Math.random() * drivers.length)],
         severity,
         potentialLoss: Math.floor(Math.random() * 1000) + 100,
-        status: statuses[Math.floor(Math.random() * statuses.length)]
+        status: statuses[Math.floor(Math.random() * statuses.length)],
+        value: value,
+        expected: expected,
+        difference: difference
       });
     }
     
