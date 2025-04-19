@@ -29,7 +29,7 @@ const RoadTolls = () => {
 
   // State for UI
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [activeSubTab, setActiveSubTab] = useState('overview');
+  const [activeSubTab, setActiveSubTab] = useState('daily');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [useMockData, setUseMockData] = useState(true);
