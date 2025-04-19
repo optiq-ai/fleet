@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import Card from '../common/Card';
+import useGoogleMapsApi from '../../hooks/useGoogleMapsApi';
 
 const MapContainer = styled.div`
   height: 500px;
@@ -132,6 +133,9 @@ const DriverMap = ({ drivers, selectedDriver, onDriverSelect }) => {
     on_leave: 0
   });
   
+  // Use the shared Google Maps API hook
+  const { loaded: googleMapsLoaded, error: googleMapsError } = useGoogleMapsApi();
+  
   // Filter drivers with location data
   const driversWithLocation = drivers && drivers.length > 0 ? drivers.filter(driver => 
     driver.currentLocation && 
@@ -139,47 +143,18 @@ const DriverMap = ({ drivers, selectedDriver, onDriverSelect }) => {
     driver.currentLocation.longitude
   ) : [];
   
-  // Initialize Google Maps
+  // Initialize map when Google Maps API is loaded
   useEffect(() => {
-    // Check if Google Maps API is loaded
-    if (!window.google || !window.google.maps) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNLrJhOMz6idD05pzfn5lhA-TAw-mAZCU&libraries=places&callback=Function.prototype`;
-      script.async = true;
-      script.defer = true;
-      
-      // Create a promise to track when the API is loaded
-      const loadGoogleMapsApi = new Promise((resolve) => {
-        window.initMap = () => {
-          resolve(window.google);
-        };
-        script.onload = () => {
-          if (window.google && window.google.maps) {
-            resolve(window.google);
-          }
-        };
-      });
-      
-      document.head.appendChild(script);
-      
-      // Initialize map after API is loaded
-      loadGoogleMapsApi.then(() => {
-        console.log("Google Maps API loaded successfully");
-        setTimeout(initializeMap, 100); // Small delay to ensure DOM is ready
-      }).catch(error => {
-        console.error("Error loading Google Maps API:", error);
-      });
-      
-      return () => {
-        if (script.parentNode) {
-          document.head.removeChild(script);
-        }
-      };
-    } else {
-      console.log("Google Maps API already loaded");
-      setTimeout(initializeMap, 100); // Small delay to ensure DOM is ready
+    if (!googleMapsLoaded || !mapRef.current) {
+      if (googleMapsError) {
+        console.error("Error loading Google Maps API:", googleMapsError);
+      }
+      return;
     }
-  }, []);
+    
+    console.log("Google Maps API loaded successfully, initializing map...");
+    initializeMap();
+  }, [googleMapsLoaded, googleMapsError]);
   
   // Initialize map
   const initializeMap = () => {

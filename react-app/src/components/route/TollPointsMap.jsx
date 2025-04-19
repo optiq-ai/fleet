@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import useGoogleMapsApi from '../../hooks/useGoogleMapsApi';
 
 /**
  * Toll Points Map component for displaying toll points on Google Maps
@@ -12,28 +13,11 @@ const TollPointsMap = ({ tollPoints = [] }) => {
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [infoWindow, setInfoWindow] = useState(null);
-
-  // Initialize Google Maps
-  useEffect(() => {
-    // Check if Google Maps API is loaded
-    if (!window.google || !window.google.maps) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNLrJhOMz6idD05pzwk_qCXOXsYW9Lrg4&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeMap;
-      document.head.appendChild(script);
-      return () => {
-        document.head.removeChild(script);
-      };
-    } else {
-      initializeMap();
-    }
-  }, []);
+  const { loaded: googleMapsLoaded, error: googleMapsError } = useGoogleMapsApi();
 
   // Initialize map when Google Maps API is loaded
-  const initializeMap = () => {
-    if (!mapRef.current) return;
+  useEffect(() => {
+    if (!googleMapsLoaded || !mapRef.current) return;
 
     const mapInstance = new window.google.maps.Map(mapRef.current, {
       center: { lat: 52.0697, lng: 19.4800 }, // Default center (Poland)
@@ -47,7 +31,7 @@ const TollPointsMap = ({ tollPoints = [] }) => {
 
     setMap(mapInstance);
     setInfoWindow(new window.google.maps.InfoWindow());
-  };
+  }, [googleMapsLoaded]);
 
   // Add markers when map and toll points data are available
   useEffect(() => {

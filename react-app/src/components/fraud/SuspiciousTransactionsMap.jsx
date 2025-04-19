@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
+import useGoogleMapsApi from '../../hooks/useGoogleMapsApi';
 
 /**
  * @typedef {Object} SuspiciousTransactionsMapProps
@@ -78,29 +79,11 @@ const SuspiciousTransactionsMap = ({
     verified: 0,
     flagged: 0
   });
+  const { loaded: googleMapsLoaded, error: googleMapsError } = useGoogleMapsApi();
   
   // Inicjalizacja mapy Google Maps
   useEffect(() => {
-    // Sprawdzenie, czy Google Maps API jest załadowane
-    if (!window.google || !window.google.maps) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNLrJhOMz6idD05pzfn5lhA-TAw-mAZCU&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeMap;
-      document.head.appendChild(script);
-      
-      return () => {
-        document.head.removeChild(script);
-      };
-    } else {
-      initializeMap();
-    }
-  }, []);
-  
-  // Inicjalizacja mapy
-  const initializeMap = () => {
-    if (!mapRef.current) return;
+    if (!googleMapsLoaded || !mapRef.current) return;
     
     // Centrum Polski
     const center = { lat: 52.0692, lng: 19.4803 };
@@ -123,7 +106,7 @@ const SuspiciousTransactionsMap = ({
     
     const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
     setMap(newMap);
-  };
+  }, [googleMapsLoaded]);
   
   // Dodawanie markerów na mapie
   useEffect(() => {
