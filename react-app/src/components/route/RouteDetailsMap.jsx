@@ -207,11 +207,13 @@ const RouteDetailsMap = ({ route }) => {
   }, [map, route, infoWindow]);
 
   return (
-    <MapContent ref={mapRef} />
+    <MapContainer>
+      <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
+    </MapContainer>
   );
 };
 
-const MapContent = styled.div`
+const MapContainer = styled.div`
   width: 100%;
   height: 100%;
 `;
