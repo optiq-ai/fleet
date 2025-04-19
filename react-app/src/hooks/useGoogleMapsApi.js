@@ -17,7 +17,7 @@ const useGoogleMapsApi = (options = {}) => {
   const [loaded, setLoaded] = useState(isLoaded);
   const [error, setError] = useState(loadError);
   
-  const apiKey = options.apiKey || 'AIzaSyBNLrJhOMz6idD05pzwk_qCXOXsYW9Lrg4';
+  const apiKey = options.apiKey || 'AIzaSyBNLrJhOMz6idD05pzfn5lhA-TAw-mAZCU';
   // Include all necessary libraries by default: places, drawing, geometry, visualization
   const libraries = options.libraries || ['places', 'drawing', 'geometry', 'visualization'];
   
