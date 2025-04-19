@@ -6,6 +6,8 @@ import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
 import roadTollsService from '../services/api/roadTollsService';
 import mockRoadTollsService from '../services/api/mockRoadTollsService';
+import RoadTollsActivityMap from '../components/roadtolls/RoadTollsActivityMap';
+import RoadTollSpendingTrendsChart from '../components/roadtolls/RoadTollSpendingTrendsChart';
 
 /**
  * Road Tolls component for managing toll expenses, transponders, violations and route optimization
@@ -472,18 +474,10 @@ const RoadTolls = () => {
         <GridSection columns={2}>
           <Card title="Mapa aktywności opłat drogowych">
             <MapContainer>
-              {dashboardData.mapData.map((point) => (
-                <MapPoint 
-                  key={point.id} 
-                  x={((point.lng + 180) / 360) * 100} 
-                  y={((90 - point.lat) / 180) * 100}
-                  color="#007bff"
-                  title={`${point.name}: ${formatCurrency(point.amount)}`}
-                />
-              ))}
-              <MapPlaceholder>
-                Mapa punktów poboru opłat
-              </MapPlaceholder>
+              <RoadTollsActivityMap 
+                tollPoints={dashboardData.mapData} 
+                onMarkerClick={(point) => console.log('Clicked toll point:', point)}
+              />
             </MapContainer>
           </Card>
           
@@ -516,9 +510,11 @@ const RoadTolls = () => {
                 </TabItem>
               </TabsList>
               <TabContent>
-                <ChartPlaceholder>
-                  Wykres trendów wydatków na opłaty drogowe
-                </ChartPlaceholder>
+                <RoadTollSpendingTrendsChart
+                  data={dashboardData.expenseTrends[activeSubTab]}
+                  period={activeSubTab}
+                  isLoading={isLoading}
+                />
               </TabContent>
             </TabsContainer>
           </Card>
