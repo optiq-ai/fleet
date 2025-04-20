@@ -68,14 +68,6 @@ body {
   /* Dark theme overrides are handled by CSS variables */
 }
 
-.theme-blue {
-  /* Blue theme overrides are handled by CSS variables */
-}
-
-.theme-green {
-  /* Green theme overrides are handled by CSS variables */
-}
-
 /* Theme preview styles for the settings page */
 .theme-preview {
   border: 1px solid var(--border);
@@ -104,25 +96,9 @@ body {
 .theme-sample.dark {
   --preview-primary: #7986cb;
   --preview-background: #121212;
-  --preview-surface: #1e1e1e;
+  --preview-surface: #1a1a1a;
   --preview-text: #ffffff;
   --preview-border: #333333;
-}
-
-.theme-sample.blue {
-  --preview-primary: #1976d2;
-  --preview-background: #f5f8fa;
-  --preview-surface: #ffffff;
-  --preview-text: #333333;
-  --preview-border: #e1e8ed;
-}
-
-.theme-sample.green {
-  --preview-primary: #2e7d32;
-  --preview-background: #f1f8e9;
-  --preview-surface: #ffffff;
-  --preview-text: #33691e;
-  --preview-border: #dcedc8;
 }
 
 .theme-header {

@@ -29,10 +29,8 @@ const ViewCustomization = () => {
     ];
     
     const mockThemes = [
-      { id: 'light', name: 'Light', description: 'Default light theme' },
-      { id: 'dark', name: 'Dark', description: 'Dark theme for low-light environments' },
-      { id: 'blue', name: 'Blue', description: 'Blue-focused theme' },
-      { id: 'green', name: 'Green', description: 'Green-focused theme' }
+      { id: 'light', name: 'Light', description: 'Default light theme with bright colors' },
+      { id: 'dark', name: 'Dark', description: 'Dark theme for low-light environments and reduced eye strain' }
     ];
     
     const mockDashboardElements = [

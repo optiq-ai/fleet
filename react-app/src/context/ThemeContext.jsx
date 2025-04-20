@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 /**
  * @typedef {Object} ThemeContextType
- * @property {string} currentTheme - Current theme ID ('light', 'dark', 'blue', 'green')
+ * @property {string} currentTheme - Current theme ID ('light', 'dark')
  * @property {function} setTheme - Function to set current theme
  * @property {Object} themeColors - Current theme color values
  * @property {boolean} isLoading - Whether theme is loading
@@ -42,53 +42,13 @@ const themeDefinitions = {
     warning: '#ffb74d',
     error: '#e57373',
     info: '#64b5f6',
-    sidebar: '#1e1e1e',
-    sidebarText: '#ffffff',
-    header: '#1e1e1e',
-    headerText: '#ffffff',
-    card: '#2d2d2d',
+    sidebar: '#1a1a1a',
+    sidebarText: '#e0e0e0',
+    header: '#1a1a1a',
+    headerText: '#e0e0e0',
+    card: '#252525',
     cardBorder: '#333333',
-    hover: '#333333'
-  },
-  blue: {
-    primary: '#1976d2',
-    secondary: '#dc004e',
-    background: '#f5f8fa',
-    surface: '#ffffff',
-    text: '#333333',
-    textSecondary: '#666666',
-    border: '#e1e8ed',
-    success: '#4caf50',
-    warning: '#ff9800',
-    error: '#f44336',
-    info: '#03a9f4',
-    sidebar: '#1976d2',
-    sidebarText: '#ffffff',
-    header: '#1976d2',
-    headerText: '#ffffff',
-    card: '#ffffff',
-    cardBorder: '#e1e8ed',
-    hover: '#e3f2fd'
-  },
-  green: {
-    primary: '#2e7d32',
-    secondary: '#c2185b',
-    background: '#f1f8e9',
-    surface: '#ffffff',
-    text: '#33691e',
-    textSecondary: '#558b2f',
-    border: '#dcedc8',
-    success: '#388e3c',
-    warning: '#f57f17',
-    error: '#d32f2f',
-    info: '#0288d1',
-    sidebar: '#2e7d32',
-    sidebarText: '#ffffff',
-    header: '#2e7d32',
-    headerText: '#ffffff',
-    card: '#ffffff',
-    cardBorder: '#dcedc8',
-    hover: '#e8f5e9'
+    hover: '#2c2c2c'
   }
 };
 
@@ -105,7 +65,7 @@ export const ThemeProvider = ({ children }) => {
   // Initialize theme from localStorage or default to 'light'
   const [currentTheme, setCurrentTheme] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
-    return savedTheme || 'light';
+    return (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'light';
   });
   
   const [isLoading, setIsLoading] = useState(true);
