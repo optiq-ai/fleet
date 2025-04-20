@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../common/Card';
 import Table from '../common/Table';
+import GeofencingMap from './GeofencingMap';
 import * as geofencingService from '../../services/api/mockGeofencingService';
 
 const DashboardContainer = styled.div`
@@ -239,11 +240,10 @@ const GeofencingDashboard = () => {
       {/* Map and Alerts */}
       <DashboardRow>
         <Card title="Geofencing Map">
-          <MapPlaceholder>
-            <p>Interactive map showing geofences and vehicles would be displayed here.</p>
-            <p>Total Geofences: {dashboardData.mapData.geofences.length}</p>
-            <p>Vehicles Tracked: {dashboardData.mapData.vehicles.length}</p>
-          </MapPlaceholder>
+          <GeofencingMap 
+            geofences={dashboardData.mapData.geofences} 
+            vehicles={dashboardData.mapData.vehicles}
+          />
         </Card>
         
         <Card title="Recent Alerts">
