@@ -1,44 +1,18 @@
-.settings-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+.settings-link {
+  color: #3f51b5;
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-.settings-container h1 {
-  color: #333;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.settings-intro {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.settings-intro p {
-  margin-bottom: 15px;
-  line-height: 1.5;
-}
-
-.settings-menu-list {
-  list-style-type: none;
-  padding: 0;
+.settings-link:hover {
+  color: #303f9f;
+  text-decoration: underline;
 }
 
 .settings-menu-list li {
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.settings-menu-list li:last-child {
-  border-bottom: none;
+  margin-bottom: 12px;
 }
 
 .settings-menu-list strong {
-  color: #3f51b5;
-  margin-right: 8px;
+  font-weight: 500;
 }

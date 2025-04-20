@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Settings.css';
 
 /**
@@ -14,16 +15,24 @@ const Settings = () => {
         <p>Welcome to the Settings section. Please select a specific settings category from the sidebar menu:</p>
         <ul className="settings-menu-list">
           <li>
-            <strong>Users</strong> - Manage user accounts, permissions, and access control
+            <Link to="/settings/users" className="settings-link">
+              <strong>Users</strong>
+            </Link> - Manage user accounts, permissions, and access control
           </li>
           <li>
-            <strong>Roles</strong> - Configure user roles and associated permissions
+            <Link to="/settings/roles" className="settings-link">
+              <strong>Roles</strong>
+            </Link> - Configure user roles and associated permissions
           </li>
           <li>
-            <strong>View Customization</strong> - Customize the appearance and layout of the application
+            <Link to="/settings/view-customization" className="settings-link">
+              <strong>View Customization</strong>
+            </Link> - Customize the appearance and layout of the application
           </li>
           <li>
-            <strong>Security</strong> - Configure security settings, password policies, and authentication options
+            <Link to="/settings/security" className="settings-link">
+              <strong>Security</strong>
+            </Link> - Configure security settings, password policies, and authentication options
           </li>
         </ul>
       </div>
