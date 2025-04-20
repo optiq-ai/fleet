@@ -1,3 +1,27 @@
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.settings-intro {
+  text-align: center;
+  width: 100%;
+}
+
+.settings-menu-list {
+  display: inline-block;
+  text-align: left;
+  margin-top: 20px;
+  padding-left: 0;
+  list-style-position: inside;
+}
+
 .settings-link {
   color: #3f51b5;
   text-decoration: none;
@@ -15,4 +39,10 @@
 
 .settings-menu-list strong {
   font-weight: 500;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
 }
