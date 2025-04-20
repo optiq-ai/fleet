@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useTheme } from '../../context/ThemeContext';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
+// Using CSS variables from theme.css for theming
 const LayoutContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -17,8 +19,10 @@ const MainContent = styled.main`
 const ContentArea = styled.div`
   flex: 1;
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--surface);
+  color: var(--text);
   overflow-y: auto;
+  transition: background-color 0.3s ease, color 0.3s ease;
 `;
 
 /**
@@ -28,8 +32,11 @@ const ContentArea = styled.div`
  * @returns {JSX.Element} Layout component
  */
 const Layout = ({ children }) => {
+  // Use theme context to access current theme
+  const { currentTheme } = useTheme();
+
   return (
-    <LayoutContainer>
+    <LayoutContainer className={`theme-${currentTheme}`}>
       <Header />
       <MainContent>
         <Sidebar />

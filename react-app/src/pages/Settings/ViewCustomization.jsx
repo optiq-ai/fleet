@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import './ViewCustomization.css';
 
 /**
@@ -9,10 +10,13 @@ const ViewCustomization = () => {
   const [layouts, setLayouts] = useState([]);
   const [themes, setThemes] = useState([]);
   const [selectedLayout, setSelectedLayout] = useState('default');
-  const [selectedTheme, setSelectedTheme] = useState('light');
   const [dashboardElements, setDashboardElements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(null);
+  
+  // Use the theme context
+  const { currentTheme, setTheme } = useTheme();
+  const [selectedTheme, setSelectedTheme] = useState(currentTheme);
 
   // Simulate fetching view customization data
   useEffect(() => {
@@ -57,7 +61,10 @@ const ViewCustomization = () => {
   };
 
   const handleThemeChange = (e) => {
-    setSelectedTheme(e.target.value);
+    const newTheme = e.target.value;
+    setSelectedTheme(newTheme);
+    // Apply the theme immediately to the entire application
+    setTheme(newTheme);
   };
 
   const handleElementVisibilityChange = (elementId) => {
@@ -90,6 +97,7 @@ const ViewCustomization = () => {
   const handleResetDefaults = () => {
     setSelectedLayout('default');
     setSelectedTheme('light');
+    setTheme('light'); // Reset the global theme to light
     setDashboardElements(prevElements => 
       prevElements.map(element => ({
         ...element,

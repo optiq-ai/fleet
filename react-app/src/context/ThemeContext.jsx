@@ -1,24 +1,99 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 /**
- * @typedef {'light' | 'dark' | 'blue' | 'green' | 'purple'} ThemeType
- */
-
-/**
  * @typedef {Object} ThemeContextType
- * @property {ThemeType} theme - Current theme
- * @property {boolean} isDarkMode - Whether dark mode is enabled
- * @property {function} setTheme - Function to set theme
- * @property {function} toggleDarkMode - Function to toggle dark mode
- * @property {number} fontSize - Font size in pixels
- * @property {function} setFontSize - Function to set font size
- * @property {boolean} highContrast - Whether high contrast mode is enabled
- * @property {function} setHighContrast - Function to set high contrast mode
- * @property {boolean} reducedMotion - Whether reduced motion is enabled
- * @property {function} setReducedMotion - Function to set reduced motion
+ * @property {string} currentTheme - Current theme ID ('light', 'dark', 'blue', 'green')
+ * @property {function} setTheme - Function to set current theme
+ * @property {Object} themeColors - Current theme color values
+ * @property {boolean} isLoading - Whether theme is loading
  */
 
-const ThemeContext = createContext(undefined);
+// Define theme colors for each theme
+const themeDefinitions = {
+  light: {
+    primary: '#3f51b5',
+    secondary: '#f50057',
+    background: '#ffffff',
+    surface: '#f5f5f5',
+    text: '#333333',
+    textSecondary: '#666666',
+    border: '#e0e0e0',
+    success: '#4caf50',
+    warning: '#ff9800',
+    error: '#f44336',
+    info: '#2196f3',
+    sidebar: '#ffffff',
+    sidebarText: '#333333',
+    header: '#ffffff',
+    headerText: '#333333',
+    card: '#ffffff',
+    cardBorder: '#e0e0e0',
+    hover: '#f0f0f0'
+  },
+  dark: {
+    primary: '#7986cb',
+    secondary: '#ff4081',
+    background: '#121212',
+    surface: '#1e1e1e',
+    text: '#ffffff',
+    textSecondary: '#b0b0b0',
+    border: '#333333',
+    success: '#81c784',
+    warning: '#ffb74d',
+    error: '#e57373',
+    info: '#64b5f6',
+    sidebar: '#1e1e1e',
+    sidebarText: '#ffffff',
+    header: '#1e1e1e',
+    headerText: '#ffffff',
+    card: '#2d2d2d',
+    cardBorder: '#333333',
+    hover: '#333333'
+  },
+  blue: {
+    primary: '#1976d2',
+    secondary: '#dc004e',
+    background: '#f5f8fa',
+    surface: '#ffffff',
+    text: '#333333',
+    textSecondary: '#666666',
+    border: '#e1e8ed',
+    success: '#4caf50',
+    warning: '#ff9800',
+    error: '#f44336',
+    info: '#03a9f4',
+    sidebar: '#1976d2',
+    sidebarText: '#ffffff',
+    header: '#1976d2',
+    headerText: '#ffffff',
+    card: '#ffffff',
+    cardBorder: '#e1e8ed',
+    hover: '#e3f2fd'
+  },
+  green: {
+    primary: '#2e7d32',
+    secondary: '#c2185b',
+    background: '#f1f8e9',
+    surface: '#ffffff',
+    text: '#33691e',
+    textSecondary: '#558b2f',
+    border: '#dcedc8',
+    success: '#388e3c',
+    warning: '#f57f17',
+    error: '#d32f2f',
+    info: '#0288d1',
+    sidebar: '#2e7d32',
+    sidebarText: '#ffffff',
+    header: '#2e7d32',
+    headerText: '#ffffff',
+    card: '#ffffff',
+    cardBorder: '#dcedc8',
+    hover: '#e8f5e9'
+  }
+};
+
+// Create context with default value
+export const ThemeContext = createContext(undefined);
 
 /**
  * Theme provider component
@@ -27,73 +102,63 @@ const ThemeContext = createContext(undefined);
  * @returns {JSX.Element} ThemeProvider component
  */
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
+  // Initialize theme from localStorage or default to 'light'
+  const [currentTheme, setCurrentTheme] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme || 'light';
   });
   
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedDarkMode = localStorage.getItem('isDarkMode');
-    return savedDarkMode ? JSON.parse(savedDarkMode) : false;
-  });
+  const [isLoading, setIsLoading] = useState(true);
   
-  const [fontSize, setFontSize] = useState(() => {
-    const savedFontSize = localStorage.getItem('fontSize');
-    return savedFontSize ? parseInt(savedFontSize) : 16;
-  });
+  // Save theme to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('theme', currentTheme);
+    
+    // Apply theme to root element
+    applyThemeToDocument(currentTheme);
+    
+    setIsLoading(false);
+  }, [currentTheme]);
   
-  const [highContrast, setHighContrast] = useState(() => {
-    const savedHighContrast = localStorage.getItem('highContrast');
-    return savedHighContrast ? JSON.parse(savedHighContrast) : false;
-  });
-  
-  const [reducedMotion, setReducedMotion] = useState(() => {
-    const savedReducedMotion = localStorage.getItem('reducedMotion');
-    return savedReducedMotion ? JSON.parse(savedReducedMotion) : false;
-  });
-  
-  const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
+  /**
+   * Apply theme colors to document root as CSS variables
+   * @param {string} themeId - Theme ID to apply
+   */
+  const applyThemeToDocument = (themeId) => {
+    const theme = themeDefinitions[themeId] || themeDefinitions.light;
+    const root = document.documentElement;
+    
+    // Set CSS variables for each theme color
+    Object.entries(theme).forEach(([key, value]) => {
+      root.style.setProperty(`--${key}`, value);
+    });
+    
+    // Add theme class to body
+    document.body.className = `theme-${themeId}`;
   };
   
-  // Save preferences to localStorage
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-    localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
-    localStorage.setItem('fontSize', fontSize.toString());
-    localStorage.setItem('highContrast', JSON.stringify(highContrast));
-    localStorage.setItem('reducedMotion', JSON.stringify(reducedMotion));
-    
-    // Apply theme to document
-    document.documentElement.setAttribute('data-theme', theme);
-    document.documentElement.setAttribute('data-dark-mode', isDarkMode.toString());
-    document.documentElement.style.fontSize = `${fontSize}px`;
-    
-    if (highContrast) {
-      document.documentElement.classList.add('high-contrast');
+  /**
+   * Set current theme
+   * @param {string} themeId - Theme ID to set
+   */
+  const setTheme = (themeId) => {
+    if (themeDefinitions[themeId]) {
+      setCurrentTheme(themeId);
     } else {
-      document.documentElement.classList.remove('high-contrast');
+      console.error(`Theme "${themeId}" not found, using default`);
+      setCurrentTheme('light');
     }
-    
-    if (reducedMotion) {
-      document.documentElement.classList.add('reduced-motion');
-    } else {
-      document.documentElement.classList.remove('reduced-motion');
-    }
-  }, [theme, isDarkMode, fontSize, highContrast, reducedMotion]);
+  };
+  
+  // Get current theme colors
+  const themeColors = themeDefinitions[currentTheme] || themeDefinitions.light;
   
   return (
     <ThemeContext.Provider value={{
-      theme,
-      isDarkMode,
+      currentTheme,
       setTheme,
-      toggleDarkMode,
-      fontSize,
-      setFontSize,
-      highContrast,
-      setHighContrast,
-      reducedMotion,
-      setReducedMotion
+      themeColors,
+      isLoading
     }}>
       {children}
     </ThemeContext.Provider>
@@ -112,4 +177,5 @@ export const useTheme = () => {
   return context;
 };
 
+// Also export as default for backward compatibility
 export default ThemeContext;

@@ -1,13 +1,15 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useTheme } from '../../context/ThemeContext';
 
 const SidebarContainer = styled.aside`
   width: 250px;
-  background-color: #f0f2f5;
-  border-right: 1px solid #e0e0e0;
+  background-color: var(--sidebar);
+  border-right: 1px solid var(--border);
   height: calc(100vh - 60px);
   overflow-y: auto;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 `;
 
 const MenuList = styled.ul`
@@ -20,11 +22,13 @@ const MenuItem = styled.li`
   padding: 12px 20px;
   cursor: pointer;
   font-weight: ${props => props.active ? 'bold' : 'normal'};
-  background-color: ${props => props.active ? '#e3e7f1' : 'transparent'};
-  border-left: 4px solid ${props => props.active ? '#3f51b5' : 'transparent'};
+  background-color: ${props => props.active ? 'var(--hover)' : 'transparent'};
+  border-left: 4px solid ${props => props.active ? 'var(--primary)' : 'transparent'};
+  color: var(--sidebarText);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   
   &:hover {
-    background-color: #e3e7f1;
+    background-color: var(--hover);
   }
 `;
 
@@ -46,10 +50,11 @@ const SubMenuItem = styled.li`
   cursor: pointer;
   font-size: 14px;
   font-weight: ${props => props.active ? 'bold' : 'normal'};
-  color: ${props => props.active ? '#3f51b5' : '#555'};
+  color: ${props => props.active ? 'var(--primary)' : 'var(--textSecondary)'};
+  transition: color 0.3s ease;
   
   &:hover {
-    color: #3f51b5;
+    color: var(--primary);
   }
 `;
 
@@ -60,9 +65,11 @@ const SubMenuItem = styled.li`
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentTheme } = useTheme();
+  
   const [expandedMenus, setExpandedMenus] = React.useState({
     vehicles: false,
-    settings: false
+    settings: location.pathname.startsWith('/settings')
   });
   
   const isActive = (path) => {
