@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useGoogleMapsApi } from '../../hooks/useGoogleMapsApi';
+import useGoogleMapsApi from '../../hooks/useGoogleMapsApi';
 
 /**
  * GeofencingMap Component
