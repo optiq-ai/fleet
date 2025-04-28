@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTheme } from '../../context/ThemeContext';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { 
   FiHome, FiMonitor, FiShield, FiTruck, FiUsers, 
   FiMap, FiFileText, FiBarChart2, FiSettings,
@@ -13,7 +12,6 @@ import {
 } from 'react-icons/fi';
 
 // Enhanced styling with animations and better visual hierarchy
-// Removed fixed positioning to allow sidebar to scroll with the page
 const SidebarContainer = styled.aside`
   width: 250px;
   background-color: var(--sidebar);
@@ -228,14 +226,13 @@ const CategoryLabel = styled.div`
 `;
 
 /**
- * Enhanced Sidebar navigation component with improved visuals and i18n support
+ * Enhanced Sidebar navigation component with improved visuals
  * @returns {JSX.Element} Enhanced Sidebar component
  */
 const SidebarEnhanced = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentTheme } = useTheme();
-  const { t } = useTranslation(); // Initialize useTranslation
   
   // State for expanded menus, including nested ones
   const [expandedMenus, setExpandedMenus] = React.useState({
@@ -286,11 +283,11 @@ const SidebarEnhanced = () => {
           <MenuIcon active={isSubMenuActive('/')}>
             <FiHome />
           </MenuIcon>
-          <MenuText>{t('sidebar.dashboard')}</MenuText>
+          <MenuText>Dashboard</MenuText>
         </MenuItem>
 
         <SectionDivider />
-        <CategoryLabel>{t('sidebar.categories.monitoring')}</CategoryLabel>
+        <CategoryLabel>Monitoring</CategoryLabel>
 
         {/* 2. Monitoring & Bezpieczeństwo */}
         <SubMenuContainer expanded={expandedMenus.monitoringSecurity}>
@@ -301,7 +298,7 @@ const SidebarEnhanced = () => {
             <MenuIcon active={isActive('/monitoring') || isActive('/fraud-detection') || isActive('/driver-safety') || isActive('/geofencing')}>
               <FiMonitor />
             </MenuIcon>
-            <MenuText>{t('sidebar.menu.monitoringSecurity')}</MenuText>
+            <MenuText>Monitoring & Security</MenuText>
           </MenuItem>
           <SubMenuList>
             <SubMenuItem 
@@ -309,34 +306,34 @@ const SidebarEnhanced = () => {
               onClick={() => handleNavigate('/monitoring')}
             >
               <FiMonitor style={{ marginRight: '8px', fontSize: '14px' }} />
-              {t('sidebar.menu.monitoring')}
+              Monitoring
             </SubMenuItem>
             <SubMenuItem 
               active={isSubMenuActive('/fraud-detection')} 
               onClick={() => handleNavigate('/fraud-detection')}
             >
               <FiAlertTriangle style={{ marginRight: '8px', fontSize: '14px' }} />
-              {t('sidebar.menu.fraudDetection')}
+              Fraud Detection
             </SubMenuItem>
             <SubMenuItem 
               active={isSubMenuActive('/driver-safety')} 
               onClick={() => handleNavigate('/driver-safety')}
             >
               <FiShield style={{ marginRight: '8px', fontSize: '14px' }} />
-              {t('sidebar.menu.driverSafety')}
+              Driver Safety
             </SubMenuItem>
             <SubMenuItem 
               active={isSubMenuActive('/geofencing')} 
               onClick={() => handleNavigate('/geofencing')}
             >
               <FiMapPin style={{ marginRight: '8px', fontSize: '14px' }} />
-              {t('sidebar.menu.geofencing')}
+              Geofencing
             </SubMenuItem>
           </SubMenuList>
         </SubMenuContainer>
 
         <SectionDivider />
-        <CategoryLabel>{t('sidebar.categories.fleet')}</CategoryLabel>
+        <CategoryLabel>Fleet</CategoryLabel>
 
         {/* 3. Zarządzanie Flotą */}
         <SubMenuContainer expanded={expandedMenus.fleetManagement}>
@@ -347,7 +344,7 @@ const SidebarEnhanced = () => {
             <MenuIcon active={isActive('/fleet-management') || isActive('/vehicles') || isActive('/truck-fleet') || isActive('/asset-management')}>
               <FiTruck />
             </MenuIcon>
-            <MenuText>{t('sidebar.menu.fleetManagement')}</MenuText>
+            <MenuText>Fleet Management</MenuText>
           </MenuItem>
           <SubMenuList>
             <SubMenuItem 
@@ -355,7 +352,7 @@ const SidebarEnhanced = () => {
               onClick={() => handleNavigate('/fleet-management')}
             >
               <FiDatabase style={{ marginRight: '8px', fontSize: '14px' }} />
-              {t('sidebar.menu.fleetOverview')}
+              Fleet Overview
             </SubMenuItem>
             {/* Nested Vehicles Menu */}
             <NestedSubMenuContainer expanded={expandedMenus.vehiclesSubMenu}>
@@ -364,32 +361,32 @@ const SidebarEnhanced = () => {
                 onClick={() => toggleNestedSubMenu('vehiclesSubMenu')}
               >
                 <FiTruck style={{ marginRight: '8px', fontSize: '14px' }} />
-                {t('sidebar.menu.vehicles')}
+                Vehicles
               </SubMenuItem>
               <NestedSubMenuList>
                 <NestedSubMenuItem 
                   active={isSubMenuActive('/vehicles/overview')} 
                   onClick={() => handleNavigate('/vehicles/overview')}
                 >
-                  {t('sidebar.menu.overview')}
+                  Overview
                 </NestedSubMenuItem>
                 <NestedSubMenuItem 
                   active={isSubMenuActive('/predictive-maintenance')} 
                   onClick={() => handleNavigate('/predictive-maintenance')}
                 >
-                  {t('sidebar.menu.maintenance')}
+                  Maintenance
                 </NestedSubMenuItem>
                 <NestedSubMenuItem 
                   active={isSubMenuActive('/vehicles/parts')} 
                   onClick={() => handleNavigate('/vehicles/parts')}
                 >
-                  {t('sidebar.menu.parts')}
+                  Parts
                 </NestedSubMenuItem>
                 <NestedSubMenuItem 
                   active={isSubMenuActive('/vehicles/tires')} 
                   onClick={() => handleNavigate('/vehicles/tires')}
                 >
-                  {t('sidebar.menu.tires')}
+                  Tires
                 </NestedSubMenuItem>
               </NestedSubMenuList>
             </NestedSubMenuContainer>
@@ -398,23 +395,203 @@ const SidebarEnhanced = () => {
               onClick={() => handleNavigate('/truck-fleet')}
             >
               <FiPackage style={{ marginRight: '8px', fontSize: '14px' }} />
-              {t('sidebar.menu.truckFleet')}
+              Truck Fleet
             </SubMenuItem>
             <SubMenuItem 
               active={isSubMenuActive('/asset-management')} 
               onClick={() => handleNavigate('/asset-management')}
             >
               <FiLayers style={{ marginRight: '8px', fontSize: '14px' }} />
-              {t('sidebar.menu.assetManagement')}
+              Asset Management
             </SubMenuItem>
           </SubMenuList>
         </SubMenuContainer>
 
-        {/* Rest of the component remains unchanged */}
-        {/* ... */}
+        {/* 4. Kierowcy */}
+        <SubMenuContainer expanded={expandedMenus.drivers}>
+           <MenuItem 
+            active={isActive('/drivers')} 
+            onClick={() => toggleSubMenu('drivers')}
+          >
+            <MenuIcon active={isActive('/drivers')}>
+              <FiUsers />
+            </MenuIcon>
+            <MenuText>Drivers</MenuText>
+          </MenuItem>
+          <SubMenuList>
+             <SubMenuItem 
+              active={isSubMenuActive('/drivers')} 
+              onClick={() => handleNavigate('/drivers')}
+            >
+              <FiUserCheck style={{ marginRight: '8px', fontSize: '14px' }} />
+              Driver List
+            </SubMenuItem>
+          </SubMenuList>
+        </SubMenuContainer>
+
+        <SectionDivider />
+        <CategoryLabel>Operations</CategoryLabel>
+
+        {/* 5. Operacje Transportowe */}
+        <SubMenuContainer expanded={expandedMenus.transportOperations}>
+          <MenuItem 
+            active={isActive('/route-optimization') || isActive('/fuel-analysis') || isActive('/road-tolls') || isActive('/ferry-bookings')} 
+            onClick={() => toggleSubMenu('transportOperations')}
+          >
+            <MenuIcon active={isActive('/route-optimization') || isActive('/fuel-analysis') || isActive('/road-tolls') || isActive('/ferry-bookings')}>
+              <FiMap />
+            </MenuIcon>
+            <MenuText>Transport Operations</MenuText>
+          </MenuItem>
+          <SubMenuList>
+            <SubMenuItem 
+              active={isSubMenuActive('/route-optimization')} 
+              onClick={() => handleNavigate('/route-optimization')}
+            >
+              <FiNavigation style={{ marginRight: '8px', fontSize: '14px' }} />
+              Route Optimization
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/fuel-analysis')} 
+              onClick={() => handleNavigate('/fuel-analysis')}
+            >
+              <FiDroplet style={{ marginRight: '8px', fontSize: '14px' }} />
+              Fuel Analysis
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/road-tolls')} 
+              onClick={() => handleNavigate('/road-tolls')}
+            >
+              <FiDollarSign style={{ marginRight: '8px', fontSize: '14px' }} />
+              Road Tolls
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/ferry-bookings')} 
+              onClick={() => handleNavigate('/ferry-bookings')}
+            >
+              <FiAnchor style={{ marginRight: '8px', fontSize: '14px' }} />
+              Ferry Bookings
+            </SubMenuItem>
+          </SubMenuList>
+        </SubMenuContainer>
+
+        {/* 6. Dokumenty & Komunikacja */}
+        <SubMenuContainer expanded={expandedMenus.docsCommunication}>
+          <MenuItem 
+            active={isActive('/document-management') || isActive('/communication')} 
+            onClick={() => toggleSubMenu('docsCommunication')}
+          >
+            <MenuIcon active={isActive('/document-management') || isActive('/communication')}>
+              <FiFileText />
+            </MenuIcon>
+            <MenuText>Docs & Communication</MenuText>
+          </MenuItem>
+          <SubMenuList>
+            <SubMenuItem 
+              active={isSubMenuActive('/document-management')} 
+              onClick={() => handleNavigate('/document-management')}
+            >
+              <FiClipboard style={{ marginRight: '8px', fontSize: '14px' }} />
+              Document Management
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/communication')} 
+              onClick={() => handleNavigate('/communication')}
+            >
+              <FiMessageSquare style={{ marginRight: '8px', fontSize: '14px' }} />
+              Communication
+            </SubMenuItem>
+          </SubMenuList>
+        </SubMenuContainer>
+
+        <SectionDivider />
+        <CategoryLabel>Analytics</CategoryLabel>
+
+        {/* 7. Analityka & Automatyzacja */}
+        <SubMenuContainer expanded={expandedMenus.analyticsAutomation}>
+          <MenuItem 
+            active={isActive('/statistics') || isActive('/ai-automation') || isActive('/integrations')} 
+            onClick={() => toggleSubMenu('analyticsAutomation')}
+          >
+            <MenuIcon active={isActive('/statistics') || isActive('/ai-automation') || isActive('/integrations')}>
+              <FiBarChart2 />
+            </MenuIcon>
+            <MenuText>Analytics & Automation</MenuText>
+          </MenuItem>
+          <SubMenuList>
+            <SubMenuItem 
+              active={isSubMenuActive('/statistics')} 
+              onClick={() => handleNavigate('/statistics')}
+            >
+              <FiPieChart style={{ marginRight: '8px', fontSize: '14px' }} />
+              Statistics
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/ai-automation')} 
+              onClick={() => handleNavigate('/ai-automation')}
+            >
+              <FiCpu style={{ marginRight: '8px', fontSize: '14px' }} />
+              AI & Automation
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/integrations')} 
+              onClick={() => handleNavigate('/integrations')}
+            >
+              <FiLink style={{ marginRight: '8px', fontSize: '14px' }} />
+              Integrations
+            </SubMenuItem>
+          </SubMenuList>
+        </SubMenuContainer>
+
+        <SectionDivider />
+
+        {/* 8. Ustawienia */}
+        <SubMenuContainer expanded={expandedMenus.settings}>
+          <MenuItem 
+            active={isActive('/settings')} 
+            onClick={() => toggleSubMenu('settings')}
+          >
+            <MenuIcon active={isActive('/settings')}>
+              <FiSettings />
+            </MenuIcon>
+            <MenuText>Settings</MenuText>
+          </MenuItem>
+          <SubMenuList>
+            <SubMenuItem 
+              active={isSubMenuActive('/settings/users')} 
+              onClick={() => handleNavigate('/settings/users')}
+            >
+              <FiUsers style={{ marginRight: '8px', fontSize: '14px' }} />
+              Users
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/settings/roles')} 
+              onClick={() => handleNavigate('/settings/roles')}
+            >
+              <FiUserCheck style={{ marginRight: '8px', fontSize: '14px' }} />
+              Roles
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/settings/view-customization')} 
+              onClick={() => handleNavigate('/settings/view-customization')}
+            >
+              <FiTool style={{ marginRight: '8px', fontSize: '14px' }} />
+              View Customization
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isSubMenuActive('/settings/security')} 
+              onClick={() => handleNavigate('/settings/security')}
+            >
+              <FiShield style={{ marginRight: '8px', fontSize: '14px' }} />
+              Security
+            </SubMenuItem>
+          </SubMenuList>
+        </SubMenuContainer>
+
       </MenuList>
     </SidebarContainer>
   );
 };
 
 export default SidebarEnhanced;
+
