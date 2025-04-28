@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './TruckManagement.css'; // Reuse the existing CSS
+import {
+  TruckStatusDistributionChart,
+  TruckMileageDistributionChart,
+  TruckAgeDistributionChart,
+  TruckMaintenanceCostChart,
+  TruckUtilizationRateChart
+} from '../../components/charts/TruckCharts'; // Import truck charts
 
 // Mock data for trucks (can be moved to a shared location later)
 const mockTrucks = [
@@ -64,7 +71,7 @@ const mockTrucks = [
  * TruckManagementSection component
  * 
  * Section within the comprehensive dashboard for managing trucks.
- * Displays a list of trucks and allows basic operations.
+ * Displays a list of trucks, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} TruckManagementSection component
  */
@@ -138,7 +145,7 @@ const TruckManagementSection = () => {
 
   return (
     <div className="truck-management-section">
-      {/* Toolbar can be part of the section or global for the dashboard */}
+      {/* Toolbar */}
       <div className="toolbar">
         <input 
           type="text"
@@ -150,6 +157,7 @@ const TruckManagementSection = () => {
         <button className="add-button" onClick={handleAddTruck}>Add New Truck</button>
       </div>
 
+      {/* Truck List */}
       <div className="truck-list-container">
         <table className="truck-table">
           <thead>
@@ -195,6 +203,15 @@ const TruckManagementSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><TruckStatusDistributionChart /></div>
+        <div className="chart-container"><TruckMileageDistributionChart /></div>
+        <div className="chart-container"><TruckAgeDistributionChart /></div>
+        <div className="chart-container"><TruckMaintenanceCostChart /></div>
+        <div className="chart-container full-width"><TruckUtilizationRateChart /></div>
       </div>
 
       {/* Placeholder for Truck Details Modal/View */}

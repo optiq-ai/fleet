@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './RouteManagement.css'; // We'll create this CSS file later if needed
+import {
+  RouteStatusDistributionChart,
+  OnTimePerformanceChart,
+  AverageRouteDurationChart,
+  FuelEfficiencyByRouteChart
+} from '../../components/charts/RouteCharts'; // Import route charts
 
 // Mock data for routes
 const mockRoutes = [
@@ -61,7 +67,7 @@ const mockRoutes = [
  * RouteManagementSection component
  * 
  * Section within the comprehensive dashboard for managing routes.
- * Displays a list of routes and allows basic operations.
+ * Displays a list of routes, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} RouteManagementSection component
  */
@@ -214,6 +220,14 @@ const RouteManagementSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><RouteStatusDistributionChart /></div>
+        <div className="chart-container"><OnTimePerformanceChart /></div>
+        <div className="chart-container"><AverageRouteDurationChart /></div>
+        <div className="chart-container"><FuelEfficiencyByRouteChart /></div>
       </div>
 
       {/* Placeholder for Route Details Modal/View */}

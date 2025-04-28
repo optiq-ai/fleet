@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './WorkTimeTracking.css'; // We'll create this CSS file later if needed
+import {
+  WorkHoursDistributionChart,
+  DrivingVsRestTimeChart,
+  OvertimeHoursChart,
+  ComplianceStatusChart
+} from '../../components/charts/WorkTimeCharts'; // Import work time charts
 
 // Mock data for driver work time
 const mockWorkTimeRecords = [
@@ -87,7 +93,7 @@ const mockWorkTimeRecords = [
  * WorkTimeSection component
  * 
  * Section within the comprehensive dashboard for tracking driver work time.
- * Displays work time records and allows basic operations.
+ * Displays work time records, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} WorkTimeSection component
  */
@@ -231,6 +237,14 @@ const WorkTimeSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><WorkHoursDistributionChart /></div>
+        <div className="chart-container"><DrivingVsRestTimeChart /></div>
+        <div className="chart-container"><OvertimeHoursChart /></div>
+        <div className="chart-container"><ComplianceStatusChart /></div>
       </div>
 
       {/* Placeholder for Record Details Modal/View */}

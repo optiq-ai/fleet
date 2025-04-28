@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './DriverManagement.css'; // We will create this CSS file next
+import {
+  DriverStatusDistributionChart,
+  DriverPerformanceScoreChart,
+  DriverViolationsChart,
+  DriverTrainingStatusChart,
+  DriverAvailabilityChart
+} from '../../components/charts/DriverCharts'; // Import driver charts
 
 // Mock data for drivers
 const mockDrivers = [
@@ -59,7 +66,7 @@ const mockDrivers = [
  * DriverManagementSection component
  * 
  * Section within the comprehensive dashboard for managing drivers.
- * Displays a list of drivers and allows basic operations.
+ * Displays a list of drivers, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} DriverManagementSection component
  */
@@ -181,6 +188,15 @@ const DriverManagementSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><DriverStatusDistributionChart /></div>
+        <div className="chart-container"><DriverPerformanceScoreChart /></div>
+        <div className="chart-container"><DriverViolationsChart /></div>
+        <div className="chart-container"><DriverTrainingStatusChart /></div>
+        <div className="chart-container full-width"><DriverAvailabilityChart /></div>
       </div>
 
       {/* Placeholder for Driver Details Modal/View */}

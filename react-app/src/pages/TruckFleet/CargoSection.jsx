@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './CargoPlanning.css'; // We'll create this CSS file later if needed
+import {
+  CargoTypeDistributionChart,
+  CargoVolumeWeightChart,
+  CargoStatusDistributionChart,
+  CargoTimelineChart
+} from '../../components/charts/CargoCharts'; // Import cargo charts
 
 // Mock data for cargo/loads
 const mockCargoLoads = [
@@ -65,7 +71,7 @@ const mockCargoLoads = [
  * CargoSection component
  * 
  * Section within the comprehensive dashboard for cargo planning and tracking.
- * Displays a list of cargo loads and allows basic operations.
+ * Displays a list of cargo loads, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} CargoSection component
  */
@@ -229,6 +235,14 @@ const CargoSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><CargoTypeDistributionChart /></div>
+        <div className="chart-container"><CargoVolumeWeightChart /></div>
+        <div className="chart-container"><CargoStatusDistributionChart /></div>
+        <div className="chart-container"><CargoTimelineChart /></div>
       </div>
 
       {/* Placeholder for Load Details Modal/View */}

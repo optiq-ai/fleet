@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './ServiceManagement.css'; // We'll create this CSS file later if needed
+import {
+  ServiceCostTrendChart,
+  ServiceTypeDistributionChart,
+  ServiceStatusDistributionChart,
+  UpcomingServicesChart
+} from '../../components/charts/ServiceCharts'; // Import service charts
 
 // Mock data for service records
 const mockServiceRecords = [
@@ -61,7 +67,7 @@ const mockServiceRecords = [
  * ServiceSection component
  * 
  * Section within the comprehensive dashboard for managing truck service and maintenance.
- * Displays a list of service records and allows basic operations.
+ * Displays a list of service records, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} ServiceSection component
  */
@@ -231,6 +237,14 @@ const ServiceSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><ServiceCostTrendChart /></div>
+        <div className="chart-container"><ServiceTypeDistributionChart /></div>
+        <div className="chart-container"><ServiceStatusDistributionChart /></div>
+        <div className="chart-container"><UpcomingServicesChart /></div>
       </div>
 
       {/* Placeholder for Service Record Details Modal/View */}

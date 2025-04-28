@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './TollManagement.css'; // We'll create this CSS file later if needed
+import {
+  TollExpensesByCountryChart,
+  TollExpensesTrendChart,
+  TollPaymentStatusChart,
+  TollExpensesByProviderChart
+} from '../../components/charts/TollCharts'; // Import toll charts
 
 // Mock data for toll expenses
 const mockTollExpenses = [
@@ -64,7 +70,7 @@ const mockTollExpenses = [
  * TollSection component
  * 
  * Section within the comprehensive dashboard for managing toll expenses.
- * Displays a list of toll records and allows basic operations.
+ * Displays a list of toll records, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} TollSection component
  */
@@ -225,6 +231,14 @@ const TollSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><TollExpensesByCountryChart /></div>
+        <div className="chart-container"><TollExpensesTrendChart /></div>
+        <div className="chart-container"><TollPaymentStatusChart /></div>
+        <div className="chart-container"><TollExpensesByProviderChart /></div>
       </div>
 
       {/* Placeholder for Expense Details Modal/View */}

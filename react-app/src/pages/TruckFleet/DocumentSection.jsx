@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './DocumentManagement.css'; // We'll create this CSS file later if needed
+import {
+  DocumentStatusDistributionChart,
+  DocumentExpiryTimelineChart,
+  DocumentTypeDistributionChart,
+  DocumentCompletenessChart
+} from '../../components/charts/DocumentCharts'; // Import document charts
 
 // Mock data for documents
 const mockDocuments = [
@@ -81,7 +87,7 @@ const mockDocuments = [
  * DocumentSection component
  * 
  * Section within the comprehensive dashboard for managing truck-related documents.
- * Displays a list of documents and allows basic operations.
+ * Displays a list of documents, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} DocumentSection component
  */
@@ -246,6 +252,14 @@ const DocumentSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><DocumentStatusDistributionChart /></div>
+        <div className="chart-container"><DocumentExpiryTimelineChart /></div>
+        <div className="chart-container"><DocumentTypeDistributionChart /></div>
+        <div className="chart-container"><DocumentCompletenessChart /></div>
       </div>
 
       {/* Placeholder for Document Viewer Modal */}

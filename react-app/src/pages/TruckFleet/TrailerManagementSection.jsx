@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './TrailerManagement.css'; // Reuse the existing CSS
+import {
+  TrailerTypeDistributionChart,
+  TrailerStatusDistributionChart,
+  TrailerAvailabilityChart,
+  TrailerUtilizationChart,
+  TrailerRotationRateChart,
+  TrailerDowntimeChart
+} from '../../components/charts/TrailerCharts'; // Import trailer charts
 
 // Mock data for trailers (can be moved to a shared location later)
 const mockTrailers = [
@@ -59,7 +67,7 @@ const mockTrailers = [
  * TrailerManagementSection component
  * 
  * Section within the comprehensive dashboard for managing trailers.
- * Displays a list of trailers and allows basic operations.
+ * Displays a list of trailers, charts, and allows basic operations.
  * 
  * @returns {JSX.Element} TrailerManagementSection component
  */
@@ -182,6 +190,16 @@ const TrailerManagementSection = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        <div className="chart-container"><TrailerTypeDistributionChart /></div>
+        <div className="chart-container"><TrailerStatusDistributionChart /></div>
+        <div className="chart-container"><TrailerAvailabilityChart /></div>
+        <div className="chart-container"><TrailerUtilizationChart /></div>
+        <div className="chart-container"><TrailerRotationRateChart /></div>
+        <div className="chart-container"><TrailerDowntimeChart /></div>
       </div>
 
       {/* Placeholder for Trailer Details Modal/View */}
