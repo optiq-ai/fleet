@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTheme } from '../../context/ThemeContext';
 import Header from './Header';
-import Sidebar from './Sidebar';
+import Sidebar from './SidebarEnhanced';
 
 // Using CSS variables from theme.css for theming
 const LayoutContainer = styled.div`

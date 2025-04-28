@@ -32,8 +32,7 @@ import SettingsViewCustomization from './pages/Settings/ViewCustomization';
 
 // Import Truck Fleet pages
 import TruckFleetDashboard from './pages/TruckFleet/TruckFleetDashboard';
-// Import Sidebar Test Page
-import SidebarTestPage from './pages/SidebarTestPage';
+// Removed imports for individual truck fleet pages as they will be integrated into the dashboard
 
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -49,9 +48,6 @@ function App() {
       <ViewCustomizationProvider>
         <Router>
           <Routes>
-            {/* Sidebar Test Page Route */}
-            <Route path="/sidebar-test" element={<SidebarTestPage />} />
-            
             <Route path="/" element={
               <Layout>
                 <Dashboard />
@@ -193,8 +189,7 @@ function App() {
             <Route path="/settings/security" element={
               <Layout>
                 <SettingsSecurity />
-              </Layout>            
-            } key="settings-security-route" />
+              </Layout>            } key="settings-security-route" />
             
             {/* Truck Fleet Module Route - Single comprehensive dashboard */}
             <Route path="/truck-fleet" element={
@@ -203,7 +198,7 @@ function App() {
               </Layout>
             } key="truck-fleet-dashboard-route" />
             
-            {/* Fallback route for any unmatched paths */}
+            {/* Fallback route for any unmatched paths */}}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
