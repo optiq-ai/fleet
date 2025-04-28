@@ -32,15 +32,7 @@ import SettingsViewCustomization from './pages/Settings/ViewCustomization';
 
 // Import Truck Fleet pages
 import TruckFleetDashboard from './pages/TruckFleet/TruckFleetDashboard';
-import TruckManagement from './pages/TruckFleet/TruckManagement';
-import TrailerManagement from './pages/TruckFleet/TrailerManagement';
-import TruckDrivers from './pages/TruckFleet/TruckDrivers';
-import WorkTimeTracking from './pages/TruckFleet/WorkTimeTracking';
-import TruckRouteOptimization from './pages/TruckFleet/RouteOptimization'; // Renamed to avoid conflict
-import CargoPlanning from './pages/TruckFleet/CargoPlanning';
-import TruckTollManagement from './pages/TruckFleet/TollManagement'; // Renamed to avoid conflict
-import TruckService from './pages/TruckFleet/TruckService';
-import TruckDocuments from './pages/TruckFleet/TruckDocuments';
+// Removed imports for individual truck fleet pages as they will be integrated into the dashboard
 
 import { ViewCustomizationProvider } from './context/ViewCustomizationContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -199,57 +191,12 @@ function App() {
                 <SettingsSecurity />
               </Layout>            } key="settings-security-route" />
             
-            {/* Truck Fleet Module Routes */}
+            {/* Truck Fleet Module Route - Single comprehensive dashboard */}
             <Route path="/truck-fleet" element={
               <Layout>
                 <TruckFleetDashboard />
               </Layout>
             } key="truck-fleet-dashboard-route" />
-            <Route path="/truck-fleet/trucks" element={
-              <Layout>
-                <TruckManagement />
-              </Layout>
-            } key="truck-fleet-trucks-route" />
-            <Route path="/truck-fleet/trailers" element={
-              <Layout>
-                <TrailerManagement />
-              </Layout>
-            } key="truck-fleet-trailers-route" />
-            <Route path="/truck-fleet/drivers" element={
-              <Layout>
-                <TruckDrivers />
-              </Layout>
-            } key="truck-fleet-drivers-route" />
-            <Route path="/truck-fleet/work-time" element={
-              <Layout>
-                <WorkTimeTracking />
-              </Layout>
-            } key="truck-fleet-work-time-route" />
-            <Route path="/truck-fleet/routes" element={
-              <Layout>
-                <TruckRouteOptimization />
-              </Layout>
-            } key="truck-fleet-routes-route" />
-            <Route path="/truck-fleet/cargo" element={
-              <Layout>
-                <CargoPlanning />
-              </Layout>
-            } key="truck-fleet-cargo-route" />
-            <Route path="/truck-fleet/tolls" element={
-              <Layout>
-                <TruckTollManagement />
-              </Layout>
-            } key="truck-fleet-tolls-route" />
-            <Route path="/truck-fleet/service" element={
-              <Layout>
-                <TruckService />
-              </Layout>
-            } key="truck-fleet-service-route" />
-            <Route path="/truck-fleet/documents" element={
-              <Layout>
-                <TruckDocuments />
-              </Layout>
-            } key="truck-fleet-documents-route" />
             
             {/* Fallback route for any unmatched paths */}}
             <Route path="*" element={<Navigate to="/" replace />} />

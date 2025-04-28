@@ -1,36 +1,36 @@
-/* TrailerManagement.css */
+/* WorkTimeTracking.css */
 
-.trailer-management-section {
-  /* Add styles specific to the trailer management section if needed */
+.work-time-section {
+  /* Add styles specific to the work time tracking section if needed */
 }
 
-.trailer-list-container {
+.work-time-list-container {
   margin-top: 20px;
 }
 
-.trailer-table {
+.work-time-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.trailer-table th,
-.trailer-table td {
+.work-time-table th,
+.work-time-table td {
   border: 1px solid var(--border);
   padding: 10px;
   text-align: left;
   font-size: 14px;
 }
 
-.trailer-table th {
+.work-time-table th {
   background-color: var(--surface);
   font-weight: bold;
 }
 
-.trailer-table tbody tr:nth-child(even) {
+.work-time-table tbody tr:nth-child(even) {
   background-color: var(--surface);
 }
 
-.trailer-table tbody tr:hover {
+.work-time-table tbody tr:hover {
   background-color: var(--hover);
 }
 
@@ -42,13 +42,19 @@
   margin-bottom: 20px;
 }
 
-.search-input {
+.search-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input,
+.filter-select,
+.date-filter {
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--input);
   color: var(--text);
-  width: 300px;
 }
 
 .add-button {
@@ -109,15 +115,15 @@
   color: white;
 }
 
-.status-active {
+.status-completed {
   background-color: #28a745;
 }
 
-.status-inactive {
-  background-color: #6c757d;
+.status-in-progress {
+  background-color: #0275d8;
 }
 
-.status-maintenance {
+.status-pending {
   background-color: #f0ad4e;
   color: #333;
 }
@@ -130,8 +136,9 @@
   background-color: var(--surface);
 }
 
-.no-results {
+.no-results td {
   text-align: center;
   padding: 20px;
   color: var(--textSecondary);
 }
+

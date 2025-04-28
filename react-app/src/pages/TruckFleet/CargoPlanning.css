@@ -1,36 +1,36 @@
-/* TrailerManagement.css */
+/* CargoPlanning.css */
 
-.trailer-management-section {
-  /* Add styles specific to the trailer management section if needed */
+.cargo-section {
+  /* Add styles specific to the cargo planning section if needed */
 }
 
-.trailer-list-container {
+.cargo-list-container {
   margin-top: 20px;
 }
 
-.trailer-table {
+.cargo-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.trailer-table th,
-.trailer-table td {
+.cargo-table th,
+.cargo-table td {
   border: 1px solid var(--border);
   padding: 10px;
   text-align: left;
   font-size: 14px;
 }
 
-.trailer-table th {
+.cargo-table th {
   background-color: var(--surface);
   font-weight: bold;
 }
 
-.trailer-table tbody tr:nth-child(even) {
+.cargo-table tbody tr:nth-child(even) {
   background-color: var(--surface);
 }
 
-.trailer-table tbody tr:hover {
+.cargo-table tbody tr:hover {
   background-color: var(--hover);
 }
 
@@ -42,13 +42,19 @@
   margin-bottom: 20px;
 }
 
-.search-input {
+.search-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input,
+.filter-select,
+.status-filter {
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--input);
   color: var(--text);
-  width: 300px;
 }
 
 .add-button {
@@ -109,17 +115,29 @@
   color: white;
 }
 
-.status-active {
+.status-planned {
+  background-color: #f0ad4e;
+  color: #333;
+}
+
+.status-loading {
+  background-color: #17a2b8;
+}
+
+.status-in-transit {
+  background-color: #0275d8;
+}
+
+.status-unloading {
+  background-color: #6f42c1;
+}
+
+.status-delivered {
   background-color: #28a745;
 }
 
-.status-inactive {
+.status-cancelled {
   background-color: #6c757d;
-}
-
-.status-maintenance {
-  background-color: #f0ad4e;
-  color: #333;
 }
 
 .details-placeholder {
@@ -130,7 +148,7 @@
   background-color: var(--surface);
 }
 
-.no-results {
+.no-results td {
   text-align: center;
   padding: 20px;
   color: var(--textSecondary);

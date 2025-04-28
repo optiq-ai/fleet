@@ -1,40 +1,46 @@
-/* TrailerManagement.css */
+/* DriverManagement.css */
 
-.trailer-management-section {
-  /* Add styles specific to the trailer management section if needed */
+.driver-management-section {
+  /* Add styles specific to the driver management section if needed */
 }
 
-.trailer-list-container {
+.driver-list-container {
   margin-top: 20px;
 }
 
-.trailer-table {
+.driver-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.trailer-table th,
-.trailer-table td {
+.driver-table th,
+.driver-table td {
   border: 1px solid var(--border);
   padding: 10px;
   text-align: left;
   font-size: 14px;
 }
 
-.trailer-table th {
+.driver-table th {
   background-color: var(--surface);
   font-weight: bold;
 }
 
-.trailer-table tbody tr:nth-child(even) {
+.driver-table tbody tr:nth-child(even) {
   background-color: var(--surface);
 }
 
-.trailer-table tbody tr:hover {
+.driver-table tbody tr:hover {
   background-color: var(--hover);
 }
 
-/* Reusing general styles */
+.no-results td {
+  text-align: center;
+  padding: 20px;
+  color: var(--textSecondary);
+}
+
+/* Reusing general styles from other sections */
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -42,13 +48,19 @@
   margin-bottom: 20px;
 }
 
-.search-input {
+.search-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input,
+.filter-select,
+.date-filter {
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--input);
   color: var(--text);
-  width: 300px;
 }
 
 .add-button {
@@ -117,8 +129,8 @@
   background-color: #6c757d;
 }
 
-.status-maintenance {
-  background-color: #f0ad4e;
+.status-on-leave {
+  background-color: #ffc107;
   color: #333;
 }
 
@@ -130,8 +142,3 @@
   background-color: var(--surface);
 }
 
-.no-results {
-  text-align: center;
-  padding: 20px;
-  color: var(--textSecondary);
-}
