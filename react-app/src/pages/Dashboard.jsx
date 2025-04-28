@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import Card from '../components/common/Card';
 import KPICard from '../components/common/KPICard';
 import Table from '../components/common/Table';
@@ -264,6 +265,8 @@ const ToggleSwitch = styled.div`
  * @returns {JSX.Element} Dashboard component
  */
 const Dashboard = () => {
+  const { t } = useTranslation(); // Initialize useTranslation
+  
   // Stan dla danych KPI
   const [kpiData, setKpiData] = useState(null);
   
@@ -388,14 +391,14 @@ const Dashboard = () => {
         });
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
-        setError('Nie udało się pobrać danych dashboardu. Spróbuj odświeżyć stronę.');
+        setError(t('dashboard.error'));
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchDashboardData();
-  }, [dataService, useMockData]);
+  }, [dataService, useMockData, t]);
   
   // Obsługa zmiany typu danych mapy
   const handleMapTypeChange = async (type) => {
@@ -406,7 +409,7 @@ const Dashboard = () => {
       setMapData(mapResponse);
     } catch (err) {
       console.error('Error fetching map data:', err);
-      setError('Nie udało się pobrać danych mapy.');
+      setError(t('dashboard.error'));
     } finally {
       setIsLoading(false);
     }
@@ -448,24 +451,24 @@ const Dashboard = () => {
     
     return (
       <>
-        <SectionTitle>KLUCZOWE WSKAŹNIKI</SectionTitle>
+        <SectionTitle>{t('dashboard.sections.keyIndicators')}</SectionTitle>
         <GridSection>
           <KPICard 
-            title="Aktywne pojazdy" 
+            title={t('dashboard.kpi.activeVehicles')} 
             value={kpiData.activeVehicles.toString()} 
             icon="🚚"
             trend="up"
             trendValue="5%"
           />
           <KPICard 
-            title="Aktywni kierowcy" 
+            title={t('dashboard.kpi.activeDrivers')} 
             value={kpiData.activeDrivers.toString()} 
             icon="👤"
             trend="up"
             trendValue="3%"
           />
           <KPICard 
-            title="Dzienne koszty" 
+            title={t('dashboard.kpi.dailyCosts')} 
             value={`${kpiData.dailyCosts.toLocaleString()} zł`} 
             icon="💰"
             trend="down"
@@ -473,7 +476,7 @@ const Dashboard = () => {
             trendPositive
           />
           <KPICard 
-            title="Potencjalne oszczędności" 
+            title={t('dashboard.kpi.potentialSavings')} 
             value={`${kpiData.potentialSavings.toLocaleString()} zł`} 
             icon="💹"
             trend="up"
@@ -481,7 +484,7 @@ const Dashboard = () => {
             trendPositive
           />
           <KPICard 
-            title="Indeks bezpieczeństwa" 
+            title={t('dashboard.kpi.safetyIndex')} 
             value={`${kpiData.safetyIndex}/100`} 
             icon="🛡️"
             trend="up"
@@ -489,7 +492,7 @@ const Dashboard = () => {
             trendPositive
           />
           <KPICard 
-            title="Alerty o oszustwach" 
+            title={t('dashboard.kpi.fraudAlerts')} 
             value={alerts ? alerts.fraudAlerts.length.toString() : "0"} 
             icon="⚠️"
             trend="down"
@@ -522,31 +525,37 @@ const Dashboard = () => {
     
     return (
       <>
-        <SectionTitle>WYKRYWANIE OSZUSTW</SectionTitle>
+        <SectionTitle>{t('dashboard.sections.fraudDetection')}</SectionTitle>
         <Card fullWidth>
           <TabsContainer>
             <Tab 
               active={activeAlertTab === 'fraud'} 
               onClick={() => setActiveAlertTab('fraud')}
             >
-              Oszustwa ({alerts.fraudAlerts.length})
+              {t('dashboard.alerts.tabs.fraud')} ({alerts.fraudAlerts.length})
             </Tab>
             <Tab 
               active={activeAlertTab === 'safety'} 
               onClick={() => setActiveAlertTab('safety')}
             >
-              Bezpieczeństwo ({alerts.safetyAlerts.length})
+              {t('dashboard.alerts.tabs.safety')} ({alerts.safetyAlerts.length})
             </Tab>
             <Tab 
               active={activeAlertTab === 'maintenance'} 
               onClick={() => setActiveAlertTab('maintenance')}
             >
-              Konserwacja ({alerts.maintenanceAlerts.length})
+              {t('dashboard.alerts.tabs.maintenance')} ({alerts.maintenanceAlerts.length})
             </Tab>
           </TabsContainer>
           
           <Table 
-            headers={['Priorytet', 'Opis', 'Pojazd', 'Data', 'Status']}
+            headers={[
+              t('dashboard.alerts.table.priority'), 
+              t('dashboard.alerts.table.description'), 
+              t('dashboard.alerts.table.vehicle'), 
+              t('dashboard.alerts.table.date'), 
+              t('dashboard.alerts.table.status')
+            ]}
             data={currentAlerts.slice(0, 5).map(alert => [
               alert.priority,
               alert.description,
@@ -558,15 +567,15 @@ const Dashboard = () => {
           />
           
           <ViewAllButton onClick={() => console.log('View all alerts')}>
-            Zobacz wszystkie alerty
+            {t('dashboard.alerts.viewAll')}
           </ViewAllButton>
         </Card>
         
         <GridSection>
-          <Card title="Mapa fraudów">
+          <Card title={t('dashboard.maps.fraudMap')}>
             <MapContainer style={{ height: '300px' }}>
               {isLoadingFraudMap ? (
-                <MapPlaceholder>Ładowanie mapy fraudów...</MapPlaceholder>
+                <MapPlaceholder>{t('dashboard.maps.loading')}</MapPlaceholder>
               ) : (
                 <SuspiciousTransactionsMap 
                   transactions={fraudMapTransactions}
@@ -576,9 +585,9 @@ const Dashboard = () => {
             </MapContainer>
           </Card>
           
-          <Card title="Wskaźnik ryzyka oszustw">
+          <Card title={t('dashboard.charts.fraudRisk.title')}>
             <div>
-              <strong>Aktualny poziom ryzyka: </strong> 
+              <strong>{t('dashboard.charts.fraudRisk.currentLevel')} </strong> 
               {fraudRiskData?.current}
               <span style={{ 
                 color: fraudRiskData?.change < 0 ? '#4caf50' : '#f44336',
@@ -594,7 +603,7 @@ const Dashboard = () => {
                     labels: fraudRiskData.trend.map(item => item.date),
                     datasets: [
                       {
-                        label: 'Poziom ryzyka',
+                        label: t('dashboard.charts.fraudRisk.riskLevel'),
                         data: fraudRiskData.trend.map(item => item.value),
                         borderColor: '#f44336',
                         backgroundColor: 'rgba(244, 67, 54, 0.1)',
@@ -622,10 +631,10 @@ const Dashboard = () => {
                         callbacks: {
                           label: (context) => {
                             const value = context.raw;
-                            let riskLevel = 'Niski';
-                            if (value >= 70) riskLevel = 'Wysoki';
-                            else if (value >= 30) riskLevel = 'Średni';
-                            return `Poziom ryzyka: ${value} (${riskLevel})`;
+                            let riskLevel = t('dashboard.charts.fraudRisk.riskLevels.low');
+                            if (value >= 70) riskLevel = t('dashboard.charts.fraudRisk.riskLevels.high');
+                            else if (value >= 30) riskLevel = t('dashboard.charts.fraudRisk.riskLevels.medium');
+                            return `${t('dashboard.charts.fraudRisk.riskLevel')}: ${value} (${riskLevel})`;
                           }
                         }
                       }
@@ -653,9 +662,9 @@ const Dashboard = () => {
             </ChartContainer>
           </Card>
           
-          <Card title="Zużycie paliwa">
+          <Card title={t('dashboard.charts.fuelConsumption.title')}>
             <div>
-              <strong>Aktualne zużycie: </strong> 
+              <strong>{t('dashboard.charts.fuelConsumption.currentConsumption')} </strong> 
               {fuelConsumptionData?.current} l/100km
               <span style={{ 
                 color: fuelConsumptionData?.change < 0 ? '#4caf50' : '#f44336',
@@ -671,7 +680,7 @@ const Dashboard = () => {
                     labels: fuelConsumptionData.trend.map(item => item.date),
                     datasets: [
                       {
-                        label: 'Zużycie paliwa',
+                        label: t('dashboard.charts.fuelConsumption.title'),
                         data: fuelConsumptionData.trend.map(item => item.value),
                         borderColor: '#3f51b5',
                         backgroundColor: 'rgba(63, 81, 181, 0.1)',
@@ -680,7 +689,7 @@ const Dashboard = () => {
                         fill: true
                       },
                       {
-                        label: 'Cel',
+                        label: t('dashboard.charts.fuelConsumption.target'),
                         data: fuelConsumptionData.trend.map(() => fuelConsumptionData.target),
                         borderColor: '#4caf50',
                         borderWidth: 2,
@@ -702,10 +711,10 @@ const Dashboard = () => {
                           label: (context) => {
                             const datasetLabel = context.dataset.label;
                             const value = context.raw;
-                            if (datasetLabel === 'Cel') {
-                              return `Cel: ${value} l/100km`;
+                            if (datasetLabel === t('dashboard.charts.fuelConsumption.target')) {
+                              return `${t('dashboard.charts.fuelConsumption.target')}: ${value} l/100km`;
                             }
-                            return `Zużycie: ${value} l/100km`;
+                            return `${t('dashboard.charts.fuelConsumption.title')}: ${value} l/100km`;
                           }
                         }
                       }
@@ -729,9 +738,9 @@ const Dashboard = () => {
             </ChartContainer>
           </Card>
           
-          <Card title="Koszty operacyjne">
+          <Card title={t('dashboard.charts.operationalCosts.title')}>
             <div>
-              <strong>Całkowite koszty: </strong> 
+              <strong>{t('dashboard.charts.operationalCosts.totalCosts')} </strong> 
               {operationalCostsData?.total.toLocaleString()} zł
               <span style={{ 
                 color: operationalCostsData?.change < 0 ? '#4caf50' : '#f44336',
@@ -793,9 +802,9 @@ const Dashboard = () => {
     
     return (
       <>
-        <SectionTitle>STATYSTYKI FLOTY</SectionTitle>
+        <SectionTitle>{t('dashboard.sections.fleetStatistics')}</SectionTitle>
         <GridSection>
-          <Card title="Efektywność kierowców">
+          <Card title={t('dashboard.fleetStats.driverEfficiency.title')}>
             <RankingContainer>
               {fleetStats.driverEfficiency.drivers.map(driver => (
                 <RankingItem key={driver.id}>
@@ -809,39 +818,39 @@ const Dashboard = () => {
             </RankingContainer>
           </Card>
           
-          <Card title="Realizacja tras">
+          <Card title={t('dashboard.fleetStats.routeCompletion.title')}>
             <div style={{ marginTop: '12px' }}>
               <div style={{ marginBottom: '8px' }}>
-                <strong>Ukończone: </strong> 
+                <strong>{t('dashboard.fleetStats.routeCompletion.completed')} </strong> 
                 <span style={{ color: '#4caf50' }}>{fleetStats.routeCompletion.completed}%</span>
               </div>
               <div style={{ marginBottom: '8px' }}>
-                <strong>Na czas: </strong> 
+                <strong>{t('dashboard.fleetStats.routeCompletion.onTime')} </strong> 
                 <span style={{ color: '#4caf50' }}>{fleetStats.routeCompletion.onTime}%</span>
               </div>
               <div style={{ marginBottom: '8px' }}>
-                <strong>Opóźnione: </strong> 
+                <strong>{t('dashboard.fleetStats.routeCompletion.delayed')} </strong> 
                 <span style={{ color: '#ff9800' }}>{fleetStats.routeCompletion.delayed}%</span>
               </div>
               <div>
-                <strong>Anulowane: </strong> 
+                <strong>{t('dashboard.fleetStats.routeCompletion.cancelled')} </strong> 
                 <span style={{ color: '#f44336' }}>{fleetStats.routeCompletion.cancelled}%</span>
               </div>
             </div>
           </Card>
           
-          <Card title="Prognoza konserwacji">
+          <Card title={t('dashboard.fleetStats.maintenanceForecast.title')}>
             <div style={{ marginTop: '12px' }}>
               <div style={{ marginBottom: '8px' }}>
-                <strong>Pojazdy wymagające przeglądu: </strong> 
+                <strong>{t('dashboard.fleetStats.maintenanceForecast.vehiclesRequiringInspection')} </strong> 
                 <span>12</span>
               </div>
               <div style={{ marginBottom: '8px' }}>
-                <strong>Pojazdy wymagające naprawy: </strong> 
+                <strong>{t('dashboard.fleetStats.maintenanceForecast.vehiclesRequiringRepair')} </strong> 
                 <span style={{ color: '#f44336' }}>3</span>
               </div>
               <div>
-                <strong>Szacowany koszt: </strong> 
+                <strong>{t('dashboard.fleetStats.maintenanceForecast.estimatedCost')} </strong> 
                 <span>15 000 zł</span>
               </div>
             </div>
@@ -856,12 +865,12 @@ const Dashboard = () => {
     <PageContainer>
       <DataSourceToggle>
         <ToggleLabel>
-          API
+          {t('dashboard.dataSource.api')}
           <ToggleSwitch 
             checked={useMockData} 
             onClick={handleToggleDataSource}
           />
-          Mock
+          {t('dashboard.dataSource.mock')}
         </ToggleLabel>
       </DataSourceToggle>
       
@@ -870,7 +879,7 @@ const Dashboard = () => {
       )}
       
       {isLoading ? (
-        <LoadingIndicator>Ładowanie danych dashboardu...</LoadingIndicator>
+        <LoadingIndicator>{t('dashboard.loading')}</LoadingIndicator>
       ) : (
         <>
           {renderKPISection()}
