@@ -1,0 +1,229 @@
+.truck-fleet-dashboard {
+  padding: 20px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 18px;
+  color: #666;
+}
+
+.dashboard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stats-section {
+  flex: 1;
+  min-width: 300px;
+  background-color: var(--card);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: var(--textPrimary);
+}
+
+.stats-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.stats-card {
+  flex: 1;
+  min-width: 120px;
+  background-color: var(--surface);
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.stats-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: var(--textSecondary);
+}
+
+.stats-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--textPrimary);
+  margin-bottom: 5px;
+}
+
+.stats-label {
+  font-size: 12px;
+  color: var(--textSecondary);
+  margin-bottom: 10px;
+}
+
+.stats-secondary {
+  font-size: 12px;
+  color: var(--textSecondary);
+}
+
+.dashboard-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.dashboard-section {
+  flex: 1;
+  min-width: 300px;
+  background-color: var(--card);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: var(--textPrimary);
+}
+
+.map-placeholder {
+  height: 300px;
+  background-color: var(--surface);
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--textSecondary);
+  border: 1px dashed var(--border);
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-item {
+  display: flex;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: var(--surface);
+}
+
+.alert-warning {
+  border-left: 4px solid #f0ad4e;
+}
+
+.alert-critical {
+  border-left: 4px solid #d9534f;
+}
+
+.alert-info {
+  border-left: 4px solid #5bc0de;
+}
+
+.alert-time {
+  width: 60px;
+  font-size: 12px;
+  color: var(--textSecondary);
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--textPrimary);
+}
+
+.alert-description {
+  font-size: 13px;
+  color: var(--textSecondary);
+}
+
+.metrics-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.metric-item {
+  flex: 1;
+  min-width: 120px;
+  background-color: var(--surface);
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.metric-title {
+  font-size: 14px;
+  color: var(--textSecondary);
+  margin-bottom: 10px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--textPrimary);
+  margin-bottom: 5px;
+}
+
+.metric-trend {
+  font-size: 12px;
+}
+
+.metric-trend.positive {
+  color: #28a745;
+}
+
+.metric-trend.negative {
+  color: #dc3545;
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.action-button {
+  padding: 10px 15px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: var(--primaryDark);
+}
+
+@media (max-width: 768px) {
+  .dashboard-stats,
+  .dashboard-sections {
+    flex-direction: column;
+  }
+  
+  .stats-section,
+  .dashboard-section {
+    min-width: auto;
+  }
+}

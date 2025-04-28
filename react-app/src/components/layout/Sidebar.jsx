@@ -69,7 +69,8 @@ const Sidebar = () => {
   
   const [expandedMenus, setExpandedMenus] = React.useState({
     vehicles: false,
-    settings: location.pathname.startsWith('/settings')
+    settings: location.pathname.startsWith("/settings"),
+    truckFleet: location.pathname.startsWith("/truck-fleet") // Add state for truck fleet menu
   });
   
   const isActive = (path) => {
@@ -243,6 +244,78 @@ const Sidebar = () => {
         >
           Statistics
         </MenuItem>
+        
+        {/* Truck Fleet Management Module */}
+        <SubMenuContainer expanded={expandedMenus.truckFleet}>
+          <MenuItem 
+            active={location.pathname.startsWith('/truck-fleet')} 
+            onClick={() => toggleSubMenu('truckFleet')}
+          >
+            Truck Fleet
+          </MenuItem>
+          <SubMenuList>
+            <SubMenuItem 
+              active={isActive('/truck-fleet')} 
+              onClick={() => handleNavigate('/truck-fleet')}
+            >
+              Dashboard
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/trucks')} 
+              onClick={() => handleNavigate('/truck-fleet/trucks')}
+            >
+              Trucks
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/trailers')} 
+              onClick={() => handleNavigate('/truck-fleet/trailers')}
+            >
+              Trailers
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/drivers')} 
+              onClick={() => handleNavigate('/truck-fleet/drivers')}
+            >
+              Drivers
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/work-time')} 
+              onClick={() => handleNavigate('/truck-fleet/work-time')}
+            >
+              Work Time
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/routes')} 
+              onClick={() => handleNavigate('/truck-fleet/routes')}
+            >
+              Routes
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/cargo')} 
+              onClick={() => handleNavigate('/truck-fleet/cargo')}
+            >
+              Cargo
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/tolls')} 
+              onClick={() => handleNavigate('/truck-fleet/tolls')}
+            >
+              Tolls
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/service')} 
+              onClick={() => handleNavigate('/truck-fleet/service')}
+            >
+              Service
+            </SubMenuItem>
+            <SubMenuItem 
+              active={isActive('/truck-fleet/documents')} 
+              onClick={() => handleNavigate('/truck-fleet/documents')}
+            >
+              Documents
+            </SubMenuItem>
+          </SubMenuList>
+        </SubMenuContainer>
         
         <SubMenuContainer expanded={expandedMenus.settings}>
           <MenuItem 
