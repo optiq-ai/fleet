@@ -1,6 +1,70 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import styled from 'styled-components';
 import useGoogleMapsApi from '../../hooks/useGoogleMapsApi';
+
+// Define mock truck data outside the component to prevent recreation on re-renders
+const mockTrucks = [
+  {
+    id: 'T001',
+    name: 'Truck WA12345',
+    status: 'active',
+    currentLocation: { latitude: 52.2297, longitude: 21.0122 }, // Warsaw
+    currentDriver: 'John Smith',
+    lastUpdate: '2 hours ago',
+    nextService: '3 days',
+    cargo: 'Electronics'
+  },
+  {
+    id: 'T002',
+    name: 'Truck GD54321',
+    status: 'active',
+    currentLocation: { latitude: 54.3520, longitude: 18.6466 }, // Gdansk
+    currentDriver: 'Anna Kowalska',
+    lastUpdate: '1 hour ago',
+    nextService: '15 days',
+    cargo: 'Furniture'
+  },
+  {
+    id: 'T003',
+    name: 'Truck KR98765',
+    status: 'maintenance',
+    currentLocation: { latitude: 50.0647, longitude: 19.9450 }, // Krakow
+    currentDriver: 'None',
+    lastUpdate: '5 hours ago',
+    nextService: 'In progress',
+    cargo: 'None'
+  },
+  {
+    id: 'T004',
+    name: 'Truck WR45678',
+    status: 'loading',
+    currentLocation: { latitude: 51.1079, longitude: 17.0385 }, // Wroclaw
+    currentDriver: 'Piotr Nowak',
+    lastUpdate: '30 minutes ago',
+    nextService: '7 days',
+    cargo: 'Food products'
+  },
+  {
+    id: 'T005',
+    name: 'Truck PO13579',
+    status: 'unloading',
+    currentLocation: { latitude: 52.4064, longitude: 16.9252 }, // Poznan
+    currentDriver: 'Marek Wiśniewski',
+    lastUpdate: '45 minutes ago',
+    nextService: '10 days',
+    cargo: 'Construction materials'
+  },
+  {
+    id: 'T006',
+    name: 'Truck LO24680',
+    status: 'active',
+    currentLocation: { latitude: 51.7592, longitude: 19.4560 }, // Lodz
+    currentDriver: 'Katarzyna Zielińska',
+    lastUpdate: '1.5 hours ago',
+    nextService: '5 days',
+    cargo: 'Automotive parts'
+  }
+];
 
 const MapContainer = styled.div`
   height: 400px;
@@ -95,80 +159,16 @@ const FleetMap = () => {
   // Use the shared Google Maps API hook
   const { loaded: googleMapsLoaded, error: googleMapsError } = useGoogleMapsApi();
   
-  // Mock truck data with locations
-  const trucks = [
-    {
-      id: 'T001',
-      name: 'Truck WA12345',
-      status: 'active',
-      currentLocation: { latitude: 52.2297, longitude: 21.0122 }, // Warsaw
-      currentDriver: 'John Smith',
-      lastUpdate: '2 hours ago',
-      nextService: '3 days',
-      cargo: 'Electronics'
-    },
-    {
-      id: 'T002',
-      name: 'Truck GD54321',
-      status: 'active',
-      currentLocation: { latitude: 54.3520, longitude: 18.6466 }, // Gdansk
-      currentDriver: 'Anna Kowalska',
-      lastUpdate: '1 hour ago',
-      nextService: '15 days',
-      cargo: 'Furniture'
-    },
-    {
-      id: 'T003',
-      name: 'Truck KR98765',
-      status: 'maintenance',
-      currentLocation: { latitude: 50.0647, longitude: 19.9450 }, // Krakow
-      currentDriver: 'None',
-      lastUpdate: '5 hours ago',
-      nextService: 'In progress',
-      cargo: 'None'
-    },
-    {
-      id: 'T004',
-      name: 'Truck WR45678',
-      status: 'loading',
-      currentLocation: { latitude: 51.1079, longitude: 17.0385 }, // Wroclaw
-      currentDriver: 'Piotr Nowak',
-      lastUpdate: '30 minutes ago',
-      nextService: '7 days',
-      cargo: 'Food products'
-    },
-    {
-      id: 'T005',
-      name: 'Truck PO13579',
-      status: 'unloading',
-      currentLocation: { latitude: 52.4064, longitude: 16.9252 }, // Poznan
-      currentDriver: 'Marek Wiśniewski',
-      lastUpdate: '45 minutes ago',
-      nextService: '10 days',
-      cargo: 'Construction materials'
-    },
-    {
-      id: 'T006',
-      name: 'Truck LO24680',
-      status: 'active',
-      currentLocation: { latitude: 51.7592, longitude: 19.4560 }, // Lodz
-      currentDriver: 'Katarzyna Zielińska',
-      lastUpdate: '1.5 hours ago',
-      nextService: '5 days',
-      cargo: 'Automotive parts'
-    }
-  ];
-  
-  // Filter trucks with location data
-  const trucksWithLocation = trucks.filter(truck => 
+  // Memoize the filtered truck data to prevent unnecessary re-renders of the marker effect
+  const trucksWithLocation = useMemo(() => mockTrucks.filter(truck => 
     truck.currentLocation && 
     truck.currentLocation.latitude && 
     truck.currentLocation.longitude
-  );
+  ), []); // Empty dependency array as mockTrucks is constant
   
-  // Initialize map when Google Maps API is loaded
+  // Initialize map when Google Maps API is loaded and mapRef is available
   useEffect(() => {
-    if (!googleMapsLoaded || !mapRef.current) {
+    if (!googleMapsLoaded || !mapRef.current || map) { // Prevent re-initialization if map already exists
       if (googleMapsError) {
         console.error("Error loading Google Maps API:", googleMapsError);
       }
@@ -176,16 +176,6 @@ const FleetMap = () => {
     }
     
     console.log("Google Maps API loaded successfully, initializing map...");
-    initializeMap();
-  }, [googleMapsLoaded, googleMapsError]);
-  
-  // Initialize map
-  const initializeMap = () => {
-    console.log("Initializing map...");
-    if (!mapRef.current) {
-      console.error("Map reference is not available");
-      return;
-    }
     
     try {
       // Center of Poland
@@ -222,7 +212,8 @@ const FleetMap = () => {
     } catch (error) {
       console.error("Error initializing map:", error);
     }
-  };
+    
+  }, [googleMapsLoaded, googleMapsError, map]); // Add map to dependency array to prevent re-initialization
   
   // Add markers to the map
   useEffect(() => {
@@ -232,12 +223,13 @@ const FleetMap = () => {
       return;
     }
     
+    // Store current markers in a local variable to use in cleanup
+    let currentMarkers = [];
+    
     try {
       console.log("Removing existing markers");
-      // Remove existing markers
-      if (markers.length > 0) {
-        markers.forEach(marker => marker.setMap(null));
-      }
+      // Remove existing markers before adding new ones
+      markers.forEach(marker => marker.setMap(null));
       
       // Counters for statistics
       let activeCount = 0;
@@ -247,7 +239,7 @@ const FleetMap = () => {
       
       console.log("Creating new markers for trucks:", trucksWithLocation.length);
       // Add new markers
-      const newMarkers = trucksWithLocation.map(truck => {
+      currentMarkers = trucksWithLocation.map(truck => {
         // Determine marker color based on truck status
         let markerColor;
         
@@ -317,8 +309,8 @@ const FleetMap = () => {
         // Handle marker click
         marker.addListener('click', () => {
           console.log(`Marker clicked for truck: ${truck.name}`);
-          // Close all open infowindows
-          newMarkers.forEach(m => {
+          // Close all open infowindows (using currentMarkers)
+          currentMarkers.forEach(m => {
             if (m.infowindow) {
               m.infowindow.close();
             }
@@ -343,41 +335,53 @@ const FleetMap = () => {
         unloading: unloadingCount
       });
       
-      // Save markers
-      setMarkers(newMarkers);
+      // Save markers to state
+      setMarkers(currentMarkers);
       
       console.log("Fitting map bounds to markers");
       // Fit map view to markers
-      if (newMarkers.length > 0) {
+      if (currentMarkers.length > 0) {
         const bounds = new window.google.maps.LatLngBounds();
         
-        newMarkers.forEach(marker => {
+        currentMarkers.forEach(marker => {
           bounds.extend(marker.getPosition());
         });
         
         map.fitBounds(bounds);
         
-        // If there's only one marker, set zoom
-        if (newMarkers.length === 1) {
-          map.setZoom(12);
-        }
+        // Adjust zoom if necessary after fitting bounds
+        const listener = window.google.maps.event.addListenerOnce(map, 'idle', () => {
+          if (map.getZoom() > 12) map.setZoom(12); // Prevent excessive zoom on single marker
+          if (currentMarkers.length === 1 && map.getZoom() < 10) map.setZoom(10); // Ensure reasonable zoom for single marker
+        });
+        // Clean up listener
+        // setTimeout(() => window.google.maps.event.removeListener(listener), 2000); 
       }
     } catch (error) {
       console.error("Error adding markers to map:", error);
     }
     
-    // Cleanup
+    // Cleanup function for the effect
     return () => {
-      if (markers.length > 0) {
-        console.log("Cleaning up markers");
-        markers.forEach(marker => marker.setMap(null));
-      }
+      console.log("Cleaning up markers from effect");
+      // Use the markers stored in the local variable for cleanup
+      currentMarkers.forEach(marker => marker.setMap(null));
     };
-  }, [map, trucksWithLocation]);
+  // Dependency array: run only when map instance or truck data changes
+  }, [map, trucksWithLocation]); 
 
   return (
     <MapContainer>
-      {trucksWithLocation.length === 0 ? (
+      {!googleMapsLoaded ? (
+        <MapPlaceholder>
+          <div>Loading Map...</div>
+        </MapPlaceholder>
+      ) : googleMapsError ? (
+        <MapPlaceholder>
+          <div>Error loading map. Please check the API key and network connection.</div>
+          <div style={{ fontSize: '12px', marginTop: '8px' }}>{googleMapsError.message}</div>
+        </MapPlaceholder>
+      ) : trucksWithLocation.length === 0 ? (
         <MapPlaceholder>
           <div>Brak aktywnych ciężarówek z danymi lokalizacji</div>
           <div style={{ fontSize: '12px', marginTop: '8px' }}>Sprawdź połączenie z systemem monitoringu floty</div>
@@ -386,7 +390,7 @@ const FleetMap = () => {
         <MapContent ref={mapRef} />
       )}
       
-      {trucksWithLocation.length > 0 && (
+      {googleMapsLoaded && !googleMapsError && trucksWithLocation.length > 0 && (
         <>
           <MapOverlay>
             <div>Aktywne ciężarówki: {stats.active}</div>
@@ -420,3 +424,4 @@ const FleetMap = () => {
 };
 
 export default FleetMap;
+
