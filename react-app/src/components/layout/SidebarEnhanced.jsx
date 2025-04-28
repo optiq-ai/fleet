@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fi';
 
 // Enhanced styling with animations and better visual hierarchy
-// Added position: fixed to make sidebar stay in place during scrolling
+// Removed fixed positioning to allow sidebar to scroll with the page
 const SidebarContainer = styled.aside`
   width: 250px;
   background-color: var(--sidebar);
@@ -22,10 +22,6 @@ const SidebarContainer = styled.aside`
   overflow-y: auto;
   transition: all 0.3s ease;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  position: fixed; /* Make sidebar fixed */
-  top: 60px; /* Position below header */
-  left: 0;
-  z-index: 100; /* Ensure sidebar appears above content */
   
   &:hover {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
