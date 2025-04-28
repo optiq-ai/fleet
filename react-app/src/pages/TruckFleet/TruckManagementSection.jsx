@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './TruckManagement.css'; // Reuse the existing CSS
 import {
-  TruckStatusDistributionChart,
-  TruckMileageDistributionChart,
+  TruckAvailabilityTrendChart, // Replaced TruckStatusDistributionChart
+  TruckMileageComparisonChart, // Replaced TruckMileageDistributionChart
   TruckAgeDistributionChart,
-  TruckMaintenanceCostChart,
-  TruckUtilizationRateChart
+  TCOPerTruckChart,            // Replaced TruckMaintenanceCostChart
+  FuelEfficiencyByTruckChart   // Replaced TruckUtilizationRateChart
 } from '../../components/charts/TruckCharts'; // Import truck charts
 
 // Mock data for trucks (can be moved to a shared location later)
@@ -207,11 +207,11 @@ const TruckManagementSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><TruckStatusDistributionChart /></div>
-        <div className="chart-container"><TruckMileageDistributionChart /></div>
+        <div className="chart-container"><TruckAvailabilityTrendChart /></div>
+        <div className="chart-container"><TruckMileageComparisonChart /></div>
         <div className="chart-container"><TruckAgeDistributionChart /></div>
-        <div className="chart-container"><TruckMaintenanceCostChart /></div>
-        <div className="chart-container full-width"><TruckUtilizationRateChart /></div>
+        <div className="chart-container"><TCOPerTruckChart /></div>
+        <div className="chart-container full-width"><FuelEfficiencyByTruckChart /></div>
       </div>
 
       {/* Placeholder for Truck Details Modal/View */}

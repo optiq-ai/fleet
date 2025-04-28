@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './RouteManagement.css'; // We'll create this CSS file later if needed
 import {
-  RouteStatusDistributionChart,
-  OnTimePerformanceChart,
-  AverageRouteDurationChart,
-  FuelEfficiencyByRouteChart
+  RouteDelayAnalysisChart,
+  RouteEfficiencyTrendChart,
+  RouteTravelTimeChart,
+  RouteCostAnalysisChart
 } from '../../components/charts/RouteCharts'; // Import route charts
 
 // Mock data for routes
@@ -224,10 +224,10 @@ const RouteManagementSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><RouteStatusDistributionChart /></div>
-        <div className="chart-container"><OnTimePerformanceChart /></div>
-        <div className="chart-container"><AverageRouteDurationChart /></div>
-        <div className="chart-container"><FuelEfficiencyByRouteChart /></div>
+        <div className="chart-container"><RouteDelayAnalysisChart /></div>
+        <div className="chart-container"><RouteEfficiencyTrendChart /></div>
+        <div className="chart-container"><RouteTravelTimeChart /></div>
+        <div className="chart-container"><RouteCostAnalysisChart /></div>
       </div>
 
       {/* Placeholder for Route Details Modal/View */}

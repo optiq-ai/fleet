@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './DocumentManagement.css'; // We'll create this CSS file later if needed
 import {
-  DocumentStatusDistributionChart,
-  DocumentExpiryTimelineChart,
-  DocumentTypeDistributionChart,
-  DocumentCompletenessChart
+  DocumentStatusChart,
+  UpcomingExpirationsChart,
+  DocumentTypeChart,
+  DocumentComplianceChart
 } from '../../components/charts/DocumentCharts'; // Import document charts
 
 // Mock data for documents
@@ -256,10 +256,10 @@ const DocumentSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><DocumentStatusDistributionChart /></div>
-        <div className="chart-container"><DocumentExpiryTimelineChart /></div>
-        <div className="chart-container"><DocumentTypeDistributionChart /></div>
-        <div className="chart-container"><DocumentCompletenessChart /></div>
+        <div className="chart-container"><DocumentStatusChart /></div>
+        <div className="chart-container"><UpcomingExpirationsChart /></div>
+        <div className="chart-container"><DocumentTypeChart /></div>
+        <div className="chart-container"><DocumentComplianceChart /></div>
       </div>
 
       {/* Placeholder for Document Viewer Modal */}

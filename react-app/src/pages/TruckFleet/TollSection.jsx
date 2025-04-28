@@ -3,8 +3,8 @@ import './TollManagement.css'; // We'll create this CSS file later if needed
 import {
   TollExpensesByCountryChart,
   TollExpensesTrendChart,
-  TollPaymentStatusChart,
-  TollExpensesByProviderChart
+  TollExpensesByVehicleTypeChart,
+  TollExpensesByEmissionClassChart
 } from '../../components/charts/TollCharts'; // Import toll charts
 
 // Mock data for toll expenses
@@ -237,8 +237,8 @@ const TollSection = () => {
       <div className="charts-grid">
         <div className="chart-container"><TollExpensesByCountryChart /></div>
         <div className="chart-container"><TollExpensesTrendChart /></div>
-        <div className="chart-container"><TollPaymentStatusChart /></div>
-        <div className="chart-container"><TollExpensesByProviderChart /></div>
+        <div className="chart-container"><TollExpensesByVehicleTypeChart /></div>
+        <div className="chart-container"><TollExpensesByEmissionClassChart /></div>
       </div>
 
       {/* Placeholder for Expense Details Modal/View */}

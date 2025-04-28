@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './WorkTimeTracking.css'; // We'll create this CSS file later if needed
 import {
-  WorkHoursDistributionChart,
-  DrivingVsRestTimeChart,
-  OvertimeHoursChart,
-  ComplianceStatusChart
+  FleetWorkTimeChart, // Replaced WorkHoursDistributionChart
+  TimeUtilizationBreakdownChart, // Replaced DrivingVsRestTimeChart
+  OvertimeAnalysisChart, // Replaced OvertimeHoursChart
+  WorkTimeComplianceChart // Replaced ComplianceStatusChart
 } from '../../components/charts/WorkTimeCharts'; // Import work time charts
 
 // Mock data for driver work time
@@ -241,10 +241,10 @@ const WorkTimeSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><WorkHoursDistributionChart /></div>
-        <div className="chart-container"><DrivingVsRestTimeChart /></div>
-        <div className="chart-container"><OvertimeHoursChart /></div>
-        <div className="chart-container"><ComplianceStatusChart /></div>
+        <div className="chart-container"><FleetWorkTimeChart /></div>
+        <div className="chart-container"><TimeUtilizationBreakdownChart /></div>
+        <div className="chart-container"><OvertimeAnalysisChart /></div>
+        <div className="chart-container"><WorkTimeComplianceChart /></div>
       </div>
 
       {/* Placeholder for Record Details Modal/View */}

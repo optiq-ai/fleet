@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './TrailerManagement.css'; // Reuse the existing CSS
 import {
-  TrailerTypeDistributionChart,
-  TrailerStatusDistributionChart,
-  TrailerAvailabilityChart,
-  TrailerUtilizationChart,
+  TrailerTypesChart, // Replaced TrailerTypeDistributionChart
+  TrailerUtilizationChart, // Replaced TrailerStatusDistributionChart (using Utilization)
+  TrailerAvailabilityTrendChart, // Replaced TrailerAvailabilityChart
   TrailerRotationRateChart,
-  TrailerDowntimeChart
+  TrailerDowntimeChart,
+  LoadCapacityUtilizationChart // Added this as it was missing but available
 } from '../../components/charts/TrailerCharts'; // Import trailer charts
 
 // Mock data for trailers (can be moved to a shared location later)
@@ -194,10 +194,10 @@ const TrailerManagementSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><TrailerTypeDistributionChart /></div>
-        <div className="chart-container"><TrailerStatusDistributionChart /></div>
-        <div className="chart-container"><TrailerAvailabilityChart /></div>
+        <div className="chart-container"><TrailerTypesChart /></div>
         <div className="chart-container"><TrailerUtilizationChart /></div>
+        <div className="chart-container"><TrailerAvailabilityTrendChart /></div>
+        <div className="chart-container"><LoadCapacityUtilizationChart /></div>
         <div className="chart-container"><TrailerRotationRateChart /></div>
         <div className="chart-container"><TrailerDowntimeChart /></div>
       </div>

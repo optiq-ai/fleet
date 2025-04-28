@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './CargoPlanning.css'; // We'll create this CSS file later if needed
 import {
-  CargoTypeDistributionChart,
-  CargoVolumeWeightChart,
-  CargoStatusDistributionChart,
-  CargoTimelineChart
+  CargoTypesChart,
+  CargoLoadUtilizationChart,
+  CargoDamageChart,
+  LoadingTimeChart
 } from '../../components/charts/CargoCharts'; // Import cargo charts
 
 // Mock data for cargo/loads
@@ -239,10 +239,10 @@ const CargoSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><CargoTypeDistributionChart /></div>
-        <div className="chart-container"><CargoVolumeWeightChart /></div>
-        <div className="chart-container"><CargoStatusDistributionChart /></div>
-        <div className="chart-container"><CargoTimelineChart /></div>
+        <div className="chart-container"><CargoTypesChart /></div>
+        <div className="chart-container"><CargoLoadUtilizationChart /></div>
+        <div className="chart-container"><CargoDamageChart /></div>
+        <div className="chart-container"><LoadingTimeChart /></div>
       </div>
 
       {/* Placeholder for Load Details Modal/View */}

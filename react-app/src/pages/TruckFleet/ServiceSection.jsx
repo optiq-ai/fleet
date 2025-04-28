@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './ServiceManagement.css'; // We'll create this CSS file later if needed
 import {
-  ServiceCostTrendChart,
-  ServiceTypeDistributionChart,
-  ServiceStatusDistributionChart,
-  UpcomingServicesChart
+  ServiceCostsTrendChart, // Corrected typo
+  ServiceCostsByTypeChart, // Corrected name
+  ServiceFrequencyByVehicleChart, // Replaced ServiceStatusDistributionChart
+  ServiceProviderPerformanceChart // Replaced UpcomingServicesChart
 } from '../../components/charts/ServiceCharts'; // Import service charts
 
 // Mock data for service records
@@ -241,10 +241,10 @@ const ServiceSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><ServiceCostTrendChart /></div>
-        <div className="chart-container"><ServiceTypeDistributionChart /></div>
-        <div className="chart-container"><ServiceStatusDistributionChart /></div>
-        <div className="chart-container"><UpcomingServicesChart /></div>
+        <div className="chart-container"><ServiceCostsTrendChart /></div>
+        <div className="chart-container"><ServiceCostsByTypeChart /></div>
+        <div className="chart-container"><ServiceFrequencyByVehicleChart /></div>
+        <div className="chart-container"><ServiceProviderPerformanceChart /></div>
       </div>
 
       {/* Placeholder for Service Record Details Modal/View */}

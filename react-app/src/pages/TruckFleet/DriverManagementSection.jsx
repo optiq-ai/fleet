@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './DriverManagement.css'; // We will create this CSS file next
 import {
-  DriverStatusDistributionChart,
-  DriverPerformanceScoreChart,
-  DriverViolationsChart,
-  DriverTrainingStatusChart,
-  DriverAvailabilityChart
+  DriverAvailabilityChart,
+  DriverRankingChart,
+  DriverSafetyKPIChart,
+  DriverWorkTimeChart,
+  DrivingStyleChart // Added to replace duplicate/missing
 } from '../../components/charts/DriverCharts'; // Import driver charts
 
 // Mock data for drivers
@@ -192,11 +192,11 @@ const DriverManagementSection = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
-        <div className="chart-container"><DriverStatusDistributionChart /></div>
-        <div className="chart-container"><DriverPerformanceScoreChart /></div>
-        <div className="chart-container"><DriverViolationsChart /></div>
-        <div className="chart-container"><DriverTrainingStatusChart /></div>
-        <div className="chart-container full-width"><DriverAvailabilityChart /></div>
+        <div className="chart-container"><DriverAvailabilityChart /></div>
+        <div className="chart-container"><DriverRankingChart /></div>
+        <div className="chart-container"><DriverSafetyKPIChart /></div>
+        <div className="chart-container"><DriverWorkTimeChart /></div>
+        <div className="chart-container full-width"><DrivingStyleChart /></div>
       </div>
 
       {/* Placeholder for Driver Details Modal/View */}
