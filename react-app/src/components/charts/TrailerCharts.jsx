@@ -35,7 +35,35 @@ const commonOptions = {
   plugins: {
     legend: {
       position: 'top',
+      labels: {
+        font: {
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+          size: 12,
+          weight: 'normal'
+        },
+        padding: 10
+      }
     },
+    tooltip: {
+      enabled: true,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      titleFont: {
+        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        size: 14,
+        weight: 'bold'
+      },
+      bodyFont: {
+        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        size: 13,
+        weight: 'normal'
+      },
+      padding: 10,
+      cornerRadius: 4,
+      displayColors: true,
+      caretSize: 6,
+      caretPadding: 8,
+      titleMarginBottom: 8
+    }
   },
 };
 
