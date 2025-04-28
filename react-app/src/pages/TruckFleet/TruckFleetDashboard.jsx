@@ -11,6 +11,7 @@ import CargoSection from './CargoSection';
 import TollSection from './TollSection';
 import ServiceSection from './ServiceSection';
 import DocumentSection from './DocumentSection';
+import FleetMap from './FleetMap'; // Import the new FleetMap component
 
 /**
  * TruckFleetDashboard component
@@ -171,10 +172,7 @@ const TruckFleetDashboard = () => {
             <div className="dashboard-sections">
               <div className="dashboard-section map-section">
                 <h2>Fleet Location</h2>
-                <div className="map-placeholder">
-                  <div className="placeholder-text">Map view of truck fleet locations</div>
-                  <div className="placeholder-subtext">Interactive map placeholder</div>
-                </div>
+                <FleetMap />
               </div>
               <div className="dashboard-section alerts-section">
                 <h2>Recent Alerts</h2>
