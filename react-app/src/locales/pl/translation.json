@@ -49,5 +49,84 @@
   "languageSwitcher": {
     "english": "Angielski",
     "polish": "Polski"
+  },
+  "dashboard": {
+    "sections": {
+      "keyIndicators": "KLUCZOWE WSKAŹNIKI",
+      "fraudDetection": "WYKRYWANIE OSZUSTW",
+      "fleetStatistics": "STATYSTYKI FLOTY"
+    },
+    "kpi": {
+      "activeVehicles": "Aktywne pojazdy",
+      "activeDrivers": "Aktywni kierowcy",
+      "dailyCosts": "Dzienne koszty",
+      "potentialSavings": "Potencjalne oszczędności",
+      "safetyIndex": "Indeks bezpieczeństwa",
+      "fraudAlerts": "Alerty o oszustwach"
+    },
+    "alerts": {
+      "tabs": {
+        "fraud": "Oszustwa",
+        "safety": "Bezpieczeństwo",
+        "maintenance": "Konserwacja"
+      },
+      "table": {
+        "priority": "Priorytet",
+        "description": "Opis",
+        "vehicle": "Pojazd",
+        "date": "Data",
+        "status": "Status"
+      },
+      "viewAll": "Zobacz wszystkie alerty"
+    },
+    "maps": {
+      "fraudMap": "Mapa fraudów",
+      "loading": "Ładowanie mapy fraudów..."
+    },
+    "charts": {
+      "fraudRisk": {
+        "title": "Wskaźnik ryzyka oszustw",
+        "currentLevel": "Aktualny poziom ryzyka:",
+        "riskLevels": {
+          "low": "Niski",
+          "medium": "Średni",
+          "high": "Wysoki"
+        },
+        "riskLevel": "Poziom ryzyka"
+      },
+      "fuelConsumption": {
+        "title": "Zużycie paliwa",
+        "currentConsumption": "Aktualne zużycie:",
+        "target": "Cel"
+      },
+      "operationalCosts": {
+        "title": "Koszty operacyjne",
+        "totalCosts": "Całkowite koszty:"
+      }
+    },
+    "fleetStats": {
+      "driverEfficiency": {
+        "title": "Efektywność kierowców"
+      },
+      "routeCompletion": {
+        "title": "Realizacja tras",
+        "completed": "Ukończone:",
+        "onTime": "Na czas:",
+        "delayed": "Opóźnione:",
+        "cancelled": "Anulowane:"
+      },
+      "maintenanceForecast": {
+        "title": "Prognoza konserwacji",
+        "vehiclesRequiringInspection": "Pojazdy wymagające przeglądu:",
+        "vehiclesRequiringRepair": "Pojazdy wymagające naprawy:",
+        "estimatedCost": "Szacowany koszt:"
+      }
+    },
+    "dataSource": {
+      "api": "API",
+      "mock": "Mock"
+    },
+    "loading": "Ładowanie danych dashboardu...",
+    "error": "Nie udało się pobrać danych dashboardu. Spróbuj odświeżyć stronę."
   }
 }

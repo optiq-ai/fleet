@@ -49,5 +49,84 @@
   "languageSwitcher": {
     "english": "English",
     "polish": "Polish"
+  },
+  "dashboard": {
+    "sections": {
+      "keyIndicators": "KEY INDICATORS",
+      "fraudDetection": "FRAUD DETECTION",
+      "fleetStatistics": "FLEET STATISTICS"
+    },
+    "kpi": {
+      "activeVehicles": "Active vehicles",
+      "activeDrivers": "Active drivers",
+      "dailyCosts": "Daily costs",
+      "potentialSavings": "Potential savings",
+      "safetyIndex": "Safety index",
+      "fraudAlerts": "Fraud alerts"
+    },
+    "alerts": {
+      "tabs": {
+        "fraud": "Fraud",
+        "safety": "Safety",
+        "maintenance": "Maintenance"
+      },
+      "table": {
+        "priority": "Priority",
+        "description": "Description",
+        "vehicle": "Vehicle",
+        "date": "Date",
+        "status": "Status"
+      },
+      "viewAll": "View all alerts"
+    },
+    "maps": {
+      "fraudMap": "Fraud map",
+      "loading": "Loading fraud map..."
+    },
+    "charts": {
+      "fraudRisk": {
+        "title": "Fraud risk indicator",
+        "currentLevel": "Current risk level:",
+        "riskLevels": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
+        "riskLevel": "Risk level"
+      },
+      "fuelConsumption": {
+        "title": "Fuel consumption",
+        "currentConsumption": "Current consumption:",
+        "target": "Target"
+      },
+      "operationalCosts": {
+        "title": "Operational costs",
+        "totalCosts": "Total costs:"
+      }
+    },
+    "fleetStats": {
+      "driverEfficiency": {
+        "title": "Driver efficiency"
+      },
+      "routeCompletion": {
+        "title": "Route completion",
+        "completed": "Completed:",
+        "onTime": "On time:",
+        "delayed": "Delayed:",
+        "cancelled": "Cancelled:"
+      },
+      "maintenanceForecast": {
+        "title": "Maintenance forecast",
+        "vehiclesRequiringInspection": "Vehicles requiring inspection:",
+        "vehiclesRequiringRepair": "Vehicles requiring repair:",
+        "estimatedCost": "Estimated cost:"
+      }
+    },
+    "dataSource": {
+      "api": "API",
+      "mock": "Mock"
+    },
+    "loading": "Loading dashboard data...",
+    "error": "Failed to load dashboard data. Try refreshing the page."
   }
 }
