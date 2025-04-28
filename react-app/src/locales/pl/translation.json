@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "dashboard": "Pulpit",
+    "categories": {
+      "monitoring": "Monitoring",
+      "fleet": "Flota",
+      "operations": "Operacje",
+      "analytics": "Analityka"
+    },
+    "menu": {
+      "monitoringSecurity": "Monitoring i Bezpieczeństwo",
+      "monitoring": "Monitoring",
+      "fraudDetection": "Wykrywanie Oszustw",
+      "driverSafety": "Bezpieczeństwo Kierowcy",
+      "geofencing": "Geofencing",
+      "fleetManagement": "Zarządzanie Flotą",
+      "fleetOverview": "Przegląd Floty",
+      "vehicles": "Pojazdy",
+      "overview": "Przegląd",
+      "maintenance": "Konserwacja",
+      "parts": "Części",
+      "tires": "Opony",
+      "truckFleet": "Flota Ciężarowa",
+      "assetManagement": "Zarządzanie Aktywami",
+      "drivers": "Kierowcy",
+      "driverList": "Lista Kierowców",
+      "transportOperations": "Operacje Transportowe",
+      "routeOptimization": "Optymalizacja Tras",
+      "fuelAnalysis": "Analiza Paliwa",
+      "roadTolls": "Opłaty Drogowe",
+      "ferryBookings": "Rezerwacje Promów",
+      "docsCommunication": "Dokumenty i Komunikacja",
+      "documentManagement": "Zarządzanie Dokumentami",
+      "communication": "Komunikacja",
+      "analyticsAutomation": "Analityka i Automatyzacja",
+      "statistics": "Statystyki",
+      "aiAutomation": "AI i Automatyzacja",
+      "integrations": "Integracje",
+      "settings": "Ustawienia"
+    }
+  },
+  "header": {
+    "search": "Szukaj...",
+    "notifications": "Powiadomienia",
+    "profile": "Profil",
+    "logout": "Wyloguj",
+    "language": "Język"
+  },
+  "languageSwitcher": {
+    "english": "Angielski",
+    "polish": "Polski"
+  }
+}

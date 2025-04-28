@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "categories": {
+      "monitoring": "Monitoring",
+      "fleet": "Fleet",
+      "operations": "Operations",
+      "analytics": "Analytics"
+    },
+    "menu": {
+      "monitoringSecurity": "Monitoring & Security",
+      "monitoring": "Monitoring",
+      "fraudDetection": "Fraud Detection",
+      "driverSafety": "Driver Safety",
+      "geofencing": "Geofencing",
+      "fleetManagement": "Fleet Management",
+      "fleetOverview": "Fleet Overview",
+      "vehicles": "Vehicles",
+      "overview": "Overview",
+      "maintenance": "Maintenance",
+      "parts": "Parts",
+      "tires": "Tires",
+      "truckFleet": "Truck Fleet",
+      "assetManagement": "Asset Management",
+      "drivers": "Drivers",
+      "driverList": "Driver List",
+      "transportOperations": "Transport Operations",
+      "routeOptimization": "Route Optimization",
+      "fuelAnalysis": "Fuel Analysis",
+      "roadTolls": "Road Tolls",
+      "ferryBookings": "Ferry Bookings",
+      "docsCommunication": "Docs & Communication",
+      "documentManagement": "Document Management",
+      "communication": "Communication",
+      "analyticsAutomation": "Analytics & Automation",
+      "statistics": "Statistics",
+      "aiAutomation": "AI & Automation",
+      "integrations": "Integrations",
+      "settings": "Settings"
+    }
+  },
+  "header": {
+    "search": "Search...",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "languageSwitcher": {
+    "english": "English",
+    "polish": "Polish"
+  }
+}
