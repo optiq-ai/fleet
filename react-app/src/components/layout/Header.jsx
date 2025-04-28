@@ -25,7 +25,9 @@ const Logo = styled.div`
 `;
 
 const LogoImage = styled.img`
-  height: 32px;
+  height: 40px; /* Increased height for better visibility */
+  width: auto;
+  border-radius: 4px; /* Optional: adds slight rounding to the logo */
 `;
 
 const LogoText = styled.div`
@@ -126,7 +128,7 @@ const Header = () => {
   return (
     <HeaderContainer>
       <Logo onClick={() => navigate('/')}>
-        <LogoImage src="/logo.svg" alt="Fleet App Logo" />
+        <LogoImage src="/images/fleet_logo.jpg" alt="Fleet App Logo" />
         <LogoText>Fleet App</LogoText> {/* Keeping logo text static for now */}
       </Logo>
       
@@ -161,4 +163,3 @@ const Header = () => {
 };
 
 export default Header;
-
